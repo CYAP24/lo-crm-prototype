@@ -1,0 +1,11 @@
+# Local Claude Code permissions — machine-specific, not part of the project
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.pyc
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store

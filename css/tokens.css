@@ -1,0 +1,183 @@
+/* ==========================================================================
+   LoanOptions CRM — Design tokens
+   Mirrors the Figma library in CRM-2026 (page: "↪️ Design System").
+   Variable names match the `code syntax` set on the Figma variables.
+   ========================================================================== */
+
+/* ---------- Typeface ---------------------------------------------------- */
+
+@font-face {
+  font-family: 'Articulat CF';
+  src: local('Articulat CF Regular'), local('ArticulatCF-Regular'),
+       url('../assets/fonts/ArticulatCF-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Articulat CF';
+  src: local('Articulat CF Medium'), local('ArticulatCF-Medium'),
+       url('../assets/fonts/ArticulatCF-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Articulat CF';
+  src: local('Articulat CF DemiBold'), local('ArticulatCF-DemiBold'),
+       url('../assets/fonts/ArticulatCF-DemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Articulat CF';
+  src: local('Articulat CF Bold'), local('ArticulatCF-Bold'),
+       url('../assets/fonts/ArticulatCF-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- Primitives ------------------------------------------------ */
+
+  --brand-50:  #F9F4FF;
+  --brand-100: #EFE2FF;
+  --brand-200: #D1B4FC;
+  --brand-300: #C8A9F9;
+  --brand-400: #9B6BF0;
+  --brand-500: #7B3FE4;
+  --brand-600: #5614BB;
+  --brand-700: #47109B;
+  --brand-800: #380C7B;
+  --brand-900: #2F0273;
+
+  --neutral-100: #F8F9FA;
+  --neutral-200: #E9ECEF;
+  --neutral-300: #DEE2E6;
+  --neutral-400: #CED4DA;
+  --neutral-500: #ADB5BD;
+  --neutral-600: #6C757D;
+  --neutral-700: #495057;
+  --neutral-800: #343A40;
+  --neutral-900: #212529;
+
+  --white: #FFFFFF;
+  --black: #000000;
+
+  --accent-orange: #F2994A;
+  --accent-red:    #EB5757;
+  --accent-green:  #00B194;
+  --accent-blue:   #3749A6;
+  --accent-amber:  #F79009;
+  /* Added for the pipeline-stage markers, which need five distinguishable
+     hues beyond the status palette. */
+  --accent-teal:   #0E9FBF;
+  --accent-yellow: #F2C94C;
+
+  /* ---------- Semantic status ------------------------------------------ */
+
+  --success-base: #12B76A;  --success-text: #027A48;
+  --success-border: #32D583; --success-bg: #D1FADF;
+
+  --warning-base: #F79009;  --warning-text: #B54708;
+  --warning-border: #FEC84B; --warning-bg: #FEF0C7;
+
+  --error-base: #D92D20;    --error-text: #B42318;
+  --error-border: #F04438;  --error-bg: #FEE2E2;
+
+  --info-base: #3749A6;     --info-text: #2A3880;
+  --info-border: #8C9BD8;   --info-bg: #EEF1FB;
+
+  /* ---------- Background tokens ---------------------------------------- */
+
+  --bg-base:          var(--white);
+  --bg-canvas:        var(--neutral-200);
+  --bg-surface:       var(--neutral-100);
+  --bg-muted:         var(--neutral-200);
+  --bg-subtle:        var(--neutral-300);
+  --bg-disabled:      var(--neutral-200);
+  --bg-brand:         var(--brand-600);
+  --bg-brand-hover:   var(--brand-700);
+  --bg-brand-pressed: var(--brand-800);
+  --bg-brand-subtle:  var(--brand-50);
+  --bg-success:       var(--success-bg);
+  --bg-warning:       var(--warning-bg);
+  --bg-error:         var(--error-bg);
+  --bg-info:          var(--info-bg);
+
+  /* ---------- Text tokens ----------------------------------------------- */
+
+  --text-primary:     var(--neutral-900);
+  --text-secondary:   var(--neutral-700);
+  --text-tertiary:    var(--neutral-600);
+  --text-placeholder: var(--neutral-500);
+  --text-disabled:    var(--neutral-500);
+  --text-on-dark:     var(--white);
+  --text-on-light:    var(--neutral-900);
+  --text-brand:       var(--brand-600);
+  --text-brand-hover: var(--brand-700);
+  --text-success:     var(--success-text);
+  --text-warning:     var(--warning-text);
+  --text-error:       var(--error-text);
+  --text-info:        var(--info-text);
+
+  /* ---------- Border tokens --------------------------------------------- */
+
+  --border-default: var(--neutral-300);
+  --border-subtle:  var(--neutral-200);
+  --border-muted:   var(--neutral-400);
+  --border-brand:   var(--brand-600);
+  --border-focus:   var(--brand-600);
+  --border-error:   var(--error-border);
+  --border-warning: var(--warning-base);
+
+  /* ---------- Spacing ---------------------------------------------------- */
+
+  --space-2: 2px;   --space-4: 4px;   --space-6: 6px;   --space-8: 8px;
+  --space-12: 12px; --space-16: 16px; --space-20: 20px; --space-24: 24px;
+  --space-28: 28px; --space-32: 32px; --space-36: 36px; --space-40: 40px;
+  --space-48: 48px; --space-60: 60px; --space-80: 80px;
+
+  /* ---------- Radius ----------------------------------------------------- */
+
+  --radius-4: 4px;   --radius-6: 6px;   --radius-8: 8px;
+  --radius-10: 10px; --radius-12: 12px; --radius-16: 16px;
+  --radius-pill: 999px;
+
+  /* ---------- Elevation --------------------------------------------------- */
+
+  --elevation-card:    0 4px 40px rgba(0, 0, 0, 0.05);
+  --elevation-raised:  0 10px 20px rgba(0, 0, 0, 0.10);
+  --elevation-overlay: 0 16px 48px rgba(0, 0, 0, 0.16);
+  --elevation-focus:   0 0 0 3px rgba(86, 20, 187, 0.24);
+
+  /* ---------- Type ramp ---------------------------------------------------- */
+
+  --font-family: 'Articulat CF', 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-demi:    600;
+  --weight-bold:    700;
+}
+
+/* ---------- Type ramp utility classes ------------------------------------- */
+
+.t-display-hero  { font: var(--weight-bold) 54px/58px var(--font-family); letter-spacing: -0.02em; }
+.t-h1            { font: var(--weight-bold) 48px/52px var(--font-family); letter-spacing: -0.02em; }
+.t-h2            { font: var(--weight-bold) 32px/38px var(--font-family); letter-spacing: -0.01em; }
+.t-h3            { font: var(--weight-bold) 24px/30px var(--font-family); letter-spacing: -0.01em; }
+.t-h4            { font: var(--weight-demi) 20px/26px var(--font-family); }
+
+.t-body-lg       { font: var(--weight-medium) 16px/24px var(--font-family); }
+.t-body-md       { font: var(--weight-medium) 14px/20px var(--font-family); }
+.t-body-sm       { font: var(--weight-medium) 12px/16px var(--font-family); }
+
+.t-label-lg      { font: var(--weight-demi) 16px/20px var(--font-family); }
+.t-label-md      { font: var(--weight-demi) 14px/18px var(--font-family); }
+.t-label-sm      { font: var(--weight-demi) 12px/16px var(--font-family); }
+.t-overline      { font: var(--weight-demi) 12px/16px var(--font-family); letter-spacing: 0.06em; text-transform: uppercase; }
+
+.t-caption       { font: var(--weight-regular) 12px/16px var(--font-family); }

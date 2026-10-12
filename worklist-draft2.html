@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Work list view — Draft 2 parity</title>
+<meta name="viewport" content="width=1920">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/worklist.css">
+<link rel="stylesheet" href="css/draft2.css">
+<script src="js/icons.js" defer></script>
+<script src="js/rows-draft2.js" defer></script>
+</head>
+<body>
+
+<!-- Reference rebuild of the original Figma frame "Worklist Draft 2".
+     Not a step forward from v2 — this is where the design started. -->
+<div class="screen screen--draft2">
+
+  <header class="appbar">
+    <div class="logo"><svg width="22" height="19" style="color:var(--text-on-dark)"><use href="#i-logo"/></svg></div>
+    <div class="nav-placeholder t-body-md">General CRM navigation elements here</div>
+  </header>
+
+  <div class="boardbar">
+    <div class="board-identity">
+      <div class="avatar avatar--md t-label-sm">KZ</div>
+      <div class="board-title t-h4">Kenn&rsquo;s Board</div>
+    </div>
+
+    <div class="select t-body-md" style="width:190px">
+      Asset Finance - AU
+      <svg width="16" height="16" style="color:var(--text-secondary)"><use href="#i-chevron-down"/></svg>
+    </div>
+
+    <div class="draft-tabs">
+      <span class="draft-tab t-body-md"><svg width="15" height="15"><use href="#i-grid"/></svg>Kanban</span>
+      <span class="draft-tab draft-tab--active t-label-md"><svg width="15" height="15"><use href="#i-rows"/></svg>Worklist</span>
+    </div>
+
+    <div class="search t-body-md">
+      <svg width="15" height="15"><use href="#i-search"/></svg>
+      Search applications...
+    </div>
+
+    <span class="draft-btn-new t-label-md"><svg width="14" height="14"><use href="#i-plus"/></svg>New</span>
+
+    <span class="draft-link-filter t-label-md"><svg width="14" height="14"><use href="#i-sort"/></svg>Filter</span>
+
+    <div class="select select--placeholder t-body-md" style="width:150px">
+      -Sort by-
+      <svg width="16" height="16" style="color:var(--text-secondary)"><use href="#i-chevron-down"/></svg>
+    </div>
+  </div>
+
+  <main class="content">
+
+    <div class="group">
+      <svg width="16" height="16"><use href="#i-chevron-up"/></svg>
+      <span class="t-label-md">[Version 02]</span>
+      <span class="group__count t-body-md">(03)</span>
+      <span class="group__spacer"></span>
+      <div class="select select--sm select--placeholder t-body-md" style="width:130px">
+        View all
+        <svg width="16" height="16" style="color:var(--text-secondary)"><use href="#i-chevron-down"/></svg>
+      </div>
+    </div>
+
+    <div class="draft-grid draft-colhead t-body-sm">
+      <span></span><span>Lead details</span><span></span><span>Documents</span>
+      <span>Quick view actions</span><span>Stage</span><span>People</span><span>Settlement date</span><span></span>
+    </div>
+
+    <div id="rows" style="display:contents"></div>
+
+    <div style="height:var(--space-24)"></div>
+
+    <div class="group group--warning">
+      <svg width="16" height="16"><use href="#i-chevron-down"/></svg>
+      <span class="t-label-md">Snoozed</span>
+      <span class="group__count t-body-md">(01)</span>
+      <span class="group__spacer"></span>
+      <div class="select select--sm select--placeholder t-body-md" style="width:130px">
+        View all
+        <svg width="16" height="16" style="color:var(--text-secondary)"><use href="#i-chevron-down"/></svg>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

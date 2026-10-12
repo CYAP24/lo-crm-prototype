@@ -1,0 +1,271 @@
+/* ==========================================================================
+   Draft 2 parity — reproduces the original Figma frame "Worklist Draft 2".
+   Loaded AFTER worklist.css and overrides it.
+
+   This file deliberately departs from the redesign: flat table rows with
+   rules instead of elevated cards, plain text view tabs, an outlined New
+   button, and the pink navigation placeholder. It is a reference copy of
+   where the design started, not a step forward from v2.
+   ========================================================================== */
+
+:root {
+  /* The draft's placeholder pink has no equivalent in the design system,
+     so it is scoped here rather than added to tokens.css. */
+  --draft-pink: #FCE9EC;
+  --draft-rule: #EFEFF1;
+}
+
+/* The draft sits on white, not on the grey canvas the redesign uses. */
+.screen--draft2 { background: var(--bg-base); }
+
+/* ---------- App bar ------------------------------------------------------- */
+
+.screen--draft2 .appbar {
+  height: 84px;
+  flex: 0 0 84px;
+  padding: 0 var(--space-24);
+  gap: var(--space-20);
+}
+.screen--draft2 .logo { width: 44px; height: 44px; border-radius: var(--radius-12); }
+
+.screen--draft2 .nav-placeholder {
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-8);
+  background: var(--draft-pink);
+  color: var(--text-tertiary);
+}
+
+/* ---------- Board header -------------------------------------------------- */
+
+.screen--draft2 .boardbar {
+  height: 72px;
+  flex: 0 0 72px;
+  padding: 0 var(--space-24);
+  gap: var(--space-24);
+  border-top: none;
+  border-bottom: 1px solid var(--draft-rule);
+}
+
+.screen--draft2 .board-identity { gap: var(--space-10, 10px); }
+.screen--draft2 .avatar--md { width: 32px; height: 32px; }
+.screen--draft2 .board-title { color: var(--text-primary); }
+
+.screen--draft2 .select { height: 36px; border-radius: var(--radius-8); }
+.screen--draft2 .select--sm { height: 32px; }
+
+/* View tabs are plain text in the draft — no segmented pill. */
+.draft-tabs { display: flex; align-items: center; gap: var(--space-24); flex: none; }
+.draft-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-tertiary);
+}
+.draft-tab--active { color: var(--text-brand); }
+
+.screen--draft2 .search {
+  height: 34px;
+  border-radius: var(--radius-pill);
+  border-color: var(--border-subtle);
+  max-width: 420px;
+}
+
+/* Outlined pill for New, underlined text link for Filter. */
+.draft-btn-new {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 0 var(--space-16);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-brand);
+  background: var(--bg-base);
+  color: var(--text-brand);
+  flex: none;
+}
+.draft-link-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  color: var(--text-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  flex: none;
+}
+
+/* ---------- Content ------------------------------------------------------- */
+
+.screen--draft2 .content {
+  gap: 0;
+  padding: var(--space-16) var(--space-24) var(--space-24);
+}
+
+.screen--draft2 .group {
+  height: 48px;
+  flex: 0 0 48px;
+  border: none;
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  padding: 0 var(--space-12) 0 var(--space-16);
+}
+.screen--draft2 .group--warning {
+  background: #FEF6EA;
+  color: var(--text-primary);
+}
+.screen--draft2 .group--warning .group__count { color: var(--text-tertiary); }
+
+/* ---------- Draft table ----------------------------------------------------
+   One grid shared by the column header and the rows.
+   -------------------------------------------------------------------------- */
+
+.draft-grid {
+  display: grid;
+  grid-template-columns:
+    40px              /* select      */
+    minmax(0, 1fr)    /* lead details */
+    120px             /* contact     */
+    210px             /* documents   */
+    320px             /* actions     */
+    210px             /* stage       */
+    140px             /* people      */
+    130px             /* settlement  */
+    44px;             /* overflow    */
+  align-items: center;
+  padding: 0 var(--space-16);
+}
+
+.draft-colhead {
+  height: 44px;
+  flex: 0 0 44px;
+  color: var(--text-tertiary);
+}
+
+.draft-row {
+  height: 64px;
+  flex: 0 0 64px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--draft-rule);
+}
+
+/* Vertical rules separating the column groups, as in the draft. */
+.draft-row > .cell-docs,
+.draft-row > .cell-actions,
+.draft-row > .cell-stage,
+.draft-row > .cell-people,
+.draft-row > .cell-settle {
+  border-left: 1px solid var(--draft-rule);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: var(--space-16);
+}
+.draft-row > .cell-settle { justify-content: flex-start; }
+
+/* ---------- Row internals --------------------------------------------------- */
+
+.draft-check {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-4);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+}
+
+.draft-lead { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: var(--space-16); }
+.draft-lead__line1 { display: flex; align-items: center; gap: var(--space-6); min-width: 0; }
+.draft-lead__name { color: var(--text-primary); white-space: nowrap; }
+.draft-lead__sep { color: var(--text-tertiary); }
+.draft-lead__amount { color: var(--text-primary); white-space: nowrap; }
+.draft-lead__ref { color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.draft-lead__meta { color: var(--text-tertiary); white-space: nowrap; }
+.draft-lead__pin { color: var(--text-brand); display: flex; }
+
+.draft-contact { display: flex; gap: var(--space-6); }
+.draft-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.draft-docs { display: flex; align-items: center; gap: var(--space-12); }
+.draft-ring { position: relative; width: 32px; height: 32px; flex: none; }
+.draft-ring svg { display: block; transform: rotate(-90deg); }
+.draft-ring__track { stroke: var(--bg-subtle); }
+.draft-ring__label { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-secondary); }
+
+.draft-stats { display: flex; gap: var(--space-12); }
+.draft-stat { display: flex; flex-direction: column; align-items: center; }
+.draft-stat__label { color: var(--text-tertiary); }
+.draft-stat--review   .draft-stat__value { color: var(--text-brand); }
+.draft-stat--rejected .draft-stat__value { color: var(--text-error); }
+.draft-stat--pending  .draft-stat__value { color: var(--accent-orange); }
+
+.draft-actions { display: flex; gap: var(--space-6); }
+.draft-pill {
+  position: relative;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.draft-pill--active { border-color: var(--brand-200); color: var(--text-brand); }
+.draft-pill__count { color: var(--text-tertiary); }
+.draft-pill__dot {
+  position: absolute;
+  top: -3px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--error-base);
+  border: 1.5px solid var(--bg-base);
+}
+
+.draft-stage {
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+  white-space: nowrap;
+}
+
+.draft-stack { display: flex; align-items: center; }
+.draft-stack__item {
+  width: 26px;
+  height: 26px;
+  margin-right: -7px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--bg-base);
+  display: grid;
+  place-items: center;
+  color: var(--text-on-dark);
+  flex: none;
+}
+.draft-stack__item:last-child { margin-right: 0; }
+.draft-stack__item--a { background: var(--brand-600); }
+.draft-stack__item--b { background: var(--accent-orange); }
+.draft-stack__item--c { background: #E8457C; }
+.draft-stack__item--d { background: #0E9F6E; }
+.draft-stack__item--add {
+  background: var(--bg-base);
+  border: 1px solid var(--border-brand);
+  color: var(--text-brand);
+}
+
+.draft-settle { color: var(--text-tertiary); }
+.draft-overflow { display: grid; place-items: center; color: var(--text-tertiary); }

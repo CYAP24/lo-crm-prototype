@@ -1,0 +1,1278 @@
+/* ==========================================================================
+   Concept versions v3–v5.
+   Each is scoped under its own root class. Everything uses design-system
+   tokens; nothing here invents a colour.
+   ========================================================================== */
+
+/* ---------- Shared scaffolding ---------- */
+
+.vx-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: 0 var(--space-32);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.vx-spacer { flex: 1; }
+
+.vx-title { color: var(--text-primary); }
+.vx-sub { color: var(--text-tertiary); }
+
+.vx-chip {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-16);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex: none;
+}
+.vx-chip--on { background: var(--bg-brand-subtle); border-color: var(--border-brand); color: var(--text-brand); }
+
+/* The view name leads the bar — a title that behaves like a menu. */
+.vx-view {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 40px;
+  padding: 0 var(--space-10, 10px) 0 0;
+  color: var(--text-primary);
+  flex: none;
+}
+.vx-view__name { white-space: nowrap; }
+.vx-view svg { color: var(--text-secondary); }
+
+/* Outlined action pill — the lighter-weight alternative to the solid button. */
+.actionbtn {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-24);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--border-brand);
+  background: transparent;
+  color: var(--text-brand);
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+}
+.actionbtn:hover { background: var(--bg-brand-subtle); }
+
+.vx-iconbtn {
+  width: 40px; height: 40px; flex: none;
+  border-radius: var(--radius-8);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  display: grid; place-items: center;
+}
+
+/* Every control in the board bar lands on the same 40px height:
+   the portfolio select, the Kanban/Worklist toggle, chips and buttons. */
+.vx-bar .select { height: 40px; flex: none; }
+.vx-bar .toggle { padding: var(--space-4); }
+.vx-bar .toggle__item { height: 32px; padding: 0 var(--space-14, 14px); }
+.vx-bar .btn { height: 40px; }
+
+.vx-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-20) var(--space-32) var(--space-24);
+  overflow: hidden;
+}
+
+.vx-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+
+.vx-stack { display: flex; align-items: center; }
+.vx-stack span {
+  width: 26px; height: 26px; margin-right: -7px;
+  border-radius: 999px; border: 2px solid var(--bg-base);
+  display: grid; place-items: center; color: #fff; flex: none;
+}
+.vx-stack span:last-child { margin-right: 0; }
+.vx-av-0 { background: var(--brand-600); }
+.vx-av-1 { background: var(--accent-orange); }
+.vx-av-2 { background: #E8457C; }
+.vx-av-3 { background: #0E9F6E; }
+.vx-av-more { background: var(--bg-brand-subtle) !important; color: var(--text-brand) !important; }
+
+/* ---------- Person / organisation chip -------------------------------------
+   Avatar + name + dismiss, in one pill. Shared and unscoped so any version
+   can use it for a broker, an associate, a lender or a partner.
+   -------------------------------------------------------------------------- */
+
+.chip-person {
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-10, 10px) 0 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  max-width: 100%;
+  flex: none;
+}
+.chip-person__av {
+  width: 26px; height: 26px; flex: none;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  color: #fff;
+  font: var(--weight-demi) 10px/1 var(--font-family);
+}
+.chip-person__name {
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-person__x { color: var(--text-tertiary); display: flex; flex: none; }
+
+/* Nobody assigned yet — same footprint, clearly empty. */
+.chip-person--empty {
+  padding: 0 var(--space-12);
+  border-style: dashed;
+  border-color: var(--border-muted);
+  color: var(--text-placeholder);
+  gap: var(--space-6);
+}
+
+.vx-ibtn {
+  width: 34px; height: 34px; flex: none;
+  border-radius: 999px;
+  background: var(--bg-brand-subtle); color: var(--text-brand);
+  display: grid; place-items: center;
+}
+
+/* Stacked document bar — shared by v4 and v5. */
+.vx-bar-seg {
+  display: flex; height: 10px;
+  border-radius: 999px; overflow: hidden;
+  background: var(--neutral-200);
+}
+.vx-bar-seg i { display: block; height: 100%; }
+
+/* ---------- Quick contact --------------------------------------------------
+   Rounded tiles on a light surface, one per channel.
+   -------------------------------------------------------------------------- */
+
+.contactbtns { display: flex; gap: var(--space-10, 10px); }
+.contactbtn {
+  width: 44px; height: 44px; flex: none;
+  border-radius: var(--radius-12);
+  background: var(--bg-muted);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.contactbtn:hover { background: var(--neutral-300); }
+
+/* ---------- Sub-stage tag --------------------------------------------------
+   Carries its master stage's tint and ink, so a tag and its container read as
+   the same colour family.
+   -------------------------------------------------------------------------- */
+
+.substage {
+  height: 28px;
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.substage__dot { width: 6px; height: 6px; border-radius: 999px; flex: none; }
+
+/* ---------- Document status boxes ------------------------------------------
+   The colour-coded alternative to the meter: one bordered box per status,
+   count above label.
+   -------------------------------------------------------------------------- */
+
+.docboxes { display: flex; gap: var(--space-8); justify-content: flex-start; }
+.docbox {
+  /* Fixed width, not flexed: a row showing two statuses must use the same
+     box size as a row showing four, or the column stops reading as a set. */
+  flex: 0 0 70px;
+  height: 46px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px;
+  border-radius: var(--radius-8);
+  border: 1px solid;
+  font: var(--weight-medium) 11px/1.2 var(--font-family);
+  color: var(--text-secondary);
+}
+.docbox b { font: var(--weight-demi) 15px/1 var(--font-family); }
+
+.docbox--review   { background: #FEF8EC; border-color: var(--warning-border); }
+.docbox--review b { color: var(--text-warning); }
+.docbox--rejected   { background: #FEF0EF; border-color: var(--error-border); }
+.docbox--rejected b { color: var(--text-error); }
+.docbox--ok   { background: #ECFAF2; border-color: var(--success-border); }
+.docbox--ok b { color: var(--text-success); }
+.docbox--pending   { background: var(--bg-surface); border-color: var(--border-muted); }
+.docbox--pending b { color: var(--text-secondary); }
+
+/* Nothing in this status: hold the slot, drop the box. */
+.docbox--empty {
+  background: none;
+  border-color: transparent;
+  color: var(--text-placeholder);
+  font: var(--weight-medium) 15px/1 var(--font-family);
+}
+
+/* ---------- Document meter -------------------------------------------------
+   Counts live inside their own segments; the legend below names the colours
+   and carries the pending count, which has no number in the bar.
+   -------------------------------------------------------------------------- */
+
+.docbar { display: flex; flex-direction: column; gap: var(--space-8); width: 100%; min-width: 0; }
+
+.docbar__track {
+  display: flex;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--neutral-200);
+}
+.docbar__seg {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-width: 0;
+  color: #fff;
+  font: var(--weight-demi) 10px/1 var(--font-family);
+  letter-spacing: .01em;
+}
+.docbar__seg--ok       { background: var(--success-base); }
+.docbar__seg--review   { background: var(--accent-amber); }
+.docbar__seg--rejected { background: var(--error-base); }
+.docbar__seg--pending  { background: var(--neutral-300); }
+
+.docbar__cap { display: flex; align-items: center; gap: var(--space-10, 10px); min-width: 0; }
+.docbar__count { color: var(--text-primary); white-space: nowrap; }
+.docbar__key {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--text-tertiary); white-space: nowrap;
+}
+.docbar__dot { width: 7px; height: 7px; border-radius: 999px; flex: none; }
+.docbar__dot--review   { background: var(--accent-amber); }
+.docbar__dot--rejected { background: var(--error-base); }
+.docbar__pending {
+  margin-left: auto;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.v4-legend { display: flex; align-items: center; gap: var(--space-16); color: var(--text-tertiary); }
+.v4-legend i { display: inline-flex; align-items: center; gap: var(--space-6); font-style: normal; }
+
+/* ==========================================================================
+   AI assist — shared by every version that offers Hailo.
+   Deliberately unscoped so new versions pick it up without copying styles.
+   ========================================================================== */
+
+.ai-btn {
+  width: 38px; height: 38px; flex: none;
+  border-radius: var(--radius-8);
+  display: grid; place-items: center;
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  color: var(--text-brand);
+  cursor: pointer;
+}
+.ai-btn.is-on { background: var(--bg-brand); border-color: var(--bg-brand); color: #fff; }
+
+/* A floating overlay, not part of the layout: the list runs full width
+   underneath it and the popup sits on top. */
+.hailo {
+  position: absolute;
+  top: 168px;
+  right: var(--space-24);
+  width: 400px;
+  max-height: calc(100% - 200px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-16);
+  box-shadow: var(--elevation-overlay);
+  overflow: hidden;
+  z-index: 20;
+
+  /* Closed by default; mountHailo adds .is-open */
+  opacity: 0;
+  transform: translateY(8px) scale(.985);
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease;
+}
+.hailo.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.hailo__head {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-12);
+  height: 64px; padding: 0 var(--space-16) 0 var(--space-20);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.hailo__close {
+  width: 30px; height: 30px; flex: none;
+  border-radius: var(--radius-6);
+  display: grid; place-items: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.hailo__close:hover { background: var(--bg-muted); color: var(--text-primary); }
+.hailo__mark {
+  width: 34px; height: 34px; flex: none;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--bg-brand); color: #fff;
+}
+
+.hailo__body {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: var(--space-12);
+  padding: var(--space-20);
+  overflow-y: auto;
+  background: var(--bg-surface);
+}
+
+.hailo-msg {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: var(--space-10, 10px) var(--space-12);
+  border-radius: var(--radius-12) var(--radius-12) var(--radius-4) var(--radius-12);
+  background: var(--bg-brand); color: #fff;
+}
+
+.hailo-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-12);
+  padding: var(--space-12) var(--space-16) var(--space-16);
+}
+.hailo-card--next { border-color: var(--border-brand); background: var(--bg-brand-subtle); }
+.hailo-card__h {
+  display: flex; align-items: center; gap: var(--space-6);
+  color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: var(--space-8);
+}
+.hailo-card--next .hailo-card__h { color: var(--text-brand); }
+.hailo-list { margin: 0; padding-left: 18px; color: var(--text-secondary); }
+.hailo-list li + li { margin-top: 5px; }
+.hailo-list b { color: var(--text-primary); font-weight: var(--weight-demi); }
+
+.hailo-sugg { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+.hailo-sugg__chip {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  height: 30px; padding: 0 var(--space-12);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+}
+
+.hailo__input {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-12);
+  height: 62px; margin: var(--space-16);
+  padding: 0 var(--space-8) 0 var(--space-16);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  color: var(--text-placeholder);
+}
+.hailo__input > :first-child { flex: 1; }
+.hailo-send {
+  margin-left: auto;
+  width: 38px; height: 38px; flex: none;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--bg-brand); color: #fff;
+}
+
+/* ==========================================================================
+   Column chooser — shared by the worklist versions.
+   ========================================================================== */
+
+.colpanel {
+  position: absolute;
+  width: 280px;
+  z-index: 25;
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-12);
+  box-shadow: var(--elevation-overlay);
+  padding: var(--space-12);
+
+  opacity: 0;
+  transform: translateY(6px) scale(.985);
+  pointer-events: none;
+  transition: opacity .14s ease, transform .14s ease;
+}
+.colpanel.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.colpanel__title { color: var(--text-tertiary); padding: var(--space-4) var(--space-8) var(--space-8); }
+.colpanel__row {
+  display: flex; align-items: center; gap: var(--space-12);
+  height: 34px; padding: 0 var(--space-8); border-radius: var(--radius-6);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.colpanel__row:hover { background: var(--bg-surface); }
+.colpanel__row--off { color: var(--text-placeholder); }
+.colpanel__box {
+  width: 18px; height: 18px; flex: none;
+  border-radius: var(--radius-4);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  display: grid; place-items: center; color: #fff;
+}
+.colpanel__box--on { background: var(--bg-brand); border-color: var(--bg-brand); }
+.colpanel__foot {
+  display: flex; gap: var(--space-8);
+  padding: var(--space-12) var(--space-8) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-8);
+}
+
+/* ==========================================================================
+   v1 — priority grouping, the sticky column chooser and the
+   quick-action columns. No contextual CTA; the AI assist carries the action.
+   ========================================================================== */
+
+.v1 { background: var(--bg-base); position: relative; }
+.v1 .vx-bar--views { height: 64px; }
+.v1 .vx-content { gap: 0; padding-top: var(--space-16); }
+
+/* Scroll container the sticky right-hand cells stick to. Tripled gaps between
+   stages push the last group past 1080, so this scrolls vertically too and the
+   column header pins to the top rather than scrolling away. */
+.v1 .v1-scroll {
+  flex: 1; min-height: 0;
+  overflow-x: scroll; overflow-y: auto;
+  display: flex; flex-direction: column;
+  /* `scroll` rather than `auto` on the x axis: twelve columns never fit, so
+     the bar is always needed and a bar that comes and goes just shifts the
+     rows. Firefox gets the same through scrollbar-* below. */
+  scrollbar-width: auto;
+  scrollbar-color: var(--neutral-500) var(--neutral-200);
+}
+
+/* Chromium hides overlay scrollbars until you scroll; spelling the track out
+   keeps the sideways bar on screen, which is the only cue that the table has
+   more columns to the right. */
+.v1 .v1-scroll::-webkit-scrollbar { width: 12px; height: 12px; }
+.v1 .v1-scroll::-webkit-scrollbar-track {
+  background: var(--neutral-200);
+  border-radius: var(--radius-pill);
+}
+.v1 .v1-scroll::-webkit-scrollbar-thumb {
+  background: var(--neutral-500);
+  border: 3px solid var(--neutral-200);
+  border-radius: var(--radius-pill);
+}
+.v1 .v1-scroll::-webkit-scrollbar-thumb:hover { background: var(--neutral-600); }
+.v1 .v1-scroll::-webkit-scrollbar-corner { background: var(--neutral-200); }
+
+/* Twelve columns do not fit 1920 — the table scrolls sideways and the
+   right-hand control stays pinned. That is what the sticky cell is for. */
+.v1 .v1-grid {
+  display: grid;
+  grid-template-columns:
+    40px    /* multi-select         */
+    178px   /* Lead details — sized to the longest name, not to a round number */
+    152px   /* Contact              */
+    160px   /* Loan details         */
+    310px   /* Documents — fits the meter's legend row */
+    320px   /* Quick actions        */
+    150px   /* Recent activity      */
+    190px   /* Sub-stage            */
+    110px   /* Date created         */
+    190px   /* Projected settlement — sized so its label stays on one line */
+    168px   /* Assigned broker      */
+    168px   /* Associate broker     */
+    168px   /* Lender               */
+    168px   /* Partner              */
+    100px;  /* pinned: AI assist + overflow, side by side */
+  align-items: center;
+  /* Columns carry right-aligned content (the meter's pending count, dates),
+     so they need a real gutter between them, not a hairline. */
+  gap: var(--space-36);
+  padding: 0 0 0 var(--space-16);
+  width: max-content;
+  min-width: 100%;
+}
+
+.v1 .v1-head {
+  height: 38px; flex: none;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-muted);
+}
+/* Column labels stay on one line — the column is sized to the label, not the
+   label wrapped to the column. */
+.v1 .v1-head > span { white-space: nowrap; }
+
+/* Each master stage sits in its own light surface so the sections read as
+   separate blocks. Padding here is mirrored by .v1-headwrap so the column
+   labels stay aligned with the cells inside the containers. */
+.v1 .v1-stage {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  /* No right padding: the rows must be able to reach the container's right
+     edge, or the pinned cell stops 8px short at the end of the scroll. */
+  padding: var(--space-8) 0 var(--space-8) var(--space-8);
+  margin-bottom: var(--space-24);
+  background: var(--bg-surface);
+  border-radius: var(--radius-12);
+  /* max-content so the grey keeps up with the grid when it scrolls sideways */
+  width: max-content;
+  min-width: 100%;
+}
+.v1 .v1-headwrap {
+  flex: none;
+  padding: 0 0 0 var(--space-8);
+  width: max-content;
+  min-width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg-base);
+}
+
+/* Six stage groups share one 1080, so headers are tight. */
+.v1 .v1-group {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-10, 10px);
+  height: 36px;
+  padding-left: var(--space-16);
+  color: var(--text-primary);
+}
+
+/* Broker-set group: a step darker than the pipeline stages so it reads as
+   set aside rather than as part of the flow. */
+.v1 .v1-stage--muted { background: var(--bg-muted); }
+
+.v1 .v1-group--toggle { cursor: pointer; }
+.v1 .v1-group__glyph { display: flex; color: var(--text-tertiary); flex: none; }
+/* Leads the header. It cannot sit at the far end: the stage container is as
+   wide as the grid (~2400px), so a right-aligned chevron lands off-screen. */
+.v1 .v1-group__chev {
+  display: flex;
+  flex: none;
+  color: var(--text-tertiary);
+  transition: transform .15s ease;
+}
+/* Expanded points up; collapsed leaves it pointing down. */
+.v1 .v1-stage:not(.is-collapsed) .v1-group__chev { transform: rotate(180deg); }
+
+.v1 .v1-stage.is-collapsed .v1-row { display: none; }
+
+/* Rows sit white on the stage's grey, which is what makes the container read.
+   68px keeps the +15% ask on the 4px grid. */
+.v1 .v1-row {
+  flex: none;
+  height: 68px;
+  background: var(--bg-base);
+  border-radius: var(--radius-8);
+}
+/* Selected (multi-select) tints the row; the Hailo-active row additionally
+   carries a ring, so the two states stay distinguishable when both apply. */
+.v1 .v1-row.is-selected { background: var(--bg-brand-subtle); }
+.v1 .v1-row.is-active {
+  background: var(--bg-brand-subtle);
+  box-shadow: inset 0 0 0 1px var(--border-brand);
+}
+
+/* The select box and lead details scroll with every other column — only the
+   AI assist and the overflow menu are pinned, at the right edge. */
+.v1 .v1-checkcell { display: grid; place-items: center; height: 100%; }
+.v1 .v1-lead { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+
+/* Stage labels stay put, so you always know which group you are inside.
+   They are section headers rather than columns, so they do not scroll. */
+.v1 .v1-group {
+  position: sticky;
+  left: var(--space-8);
+  width: max-content;
+}
+.v1 .v1-check {
+  width: 20px; height: 20px;
+  border-radius: var(--radius-6);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  display: grid; place-items: center;
+  color: #fff;
+  cursor: pointer;
+}
+.v1 .v1-check:hover { border-color: var(--border-brand); }
+.v1 .v1-check.is-checked { background: var(--bg-brand); border-color: var(--bg-brand); }
+.v1 .v1-dash { width: 10px; height: 2px; border-radius: 1px; background: #fff; }
+
+.v1 .v1-docs { display: flex; flex-direction: column; gap: var(--space-6); }
+.v1 .v1-docs__cap { display: flex; justify-content: space-between; color: var(--text-tertiary); }
+
+.v1 .v1-acts { display: flex; gap: var(--space-6); }
+.v1 .v1-pill {
+  position: relative;
+  height: 30px;
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 0 var(--space-10, 10px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.v1 .v1-pill--on { border-color: var(--border-brand); color: var(--text-brand); }
+.v1 .v1-pill__n { color: var(--text-tertiary); }
+.v1 .v1-pill__dot {
+  position: absolute; top: -3px; right: -2px;
+  width: 7px; height: 7px; border-radius: 999px;
+  background: var(--error-base); border: 1.5px solid var(--bg-base);
+}
+
+/* Sticky right-hand cell: the customise control in the header, the row
+   overflow menu below it. Stays put when the table scrolls sideways. */
+/* One pinned cell carrying both right-hand controls, flush against each
+   other. Offset 8px to match the stage container's padding so the cell does
+   not shift when the scroll reaches its end.
+
+     | … scrolling columns … | AI | overflow | 8px |
+                               ^ one cell, right: 8            */
+.v1 .v1-sticky {
+  /* Flush to the scrollport edge — any offset here leaves a strip for the
+     scrolling columns to show through beside it. The inset comes from the
+     cell's own padding instead. */
+  position: sticky; right: 0;
+  display: flex; align-items: center; justify-content: flex-end;
+  /* Both controls live in this one cell, so its opaque background fills the
+     gap between them — nothing scrolls through. */
+  gap: var(--space-12);
+  height: 100%;
+  padding-right: var(--space-24); padding-left: var(--space-8);
+  background: var(--bg-base);
+  border-top-right-radius: var(--radius-8);
+  border-bottom-right-radius: var(--radius-8);
+}
+.v1 .v1-kebab {
+  width: 24px; flex: none;
+  display: grid; place-items: center;
+  color: var(--text-tertiary);
+}
+.v1 .v1-row.is-active .v1-sticky,
+.v1 .v1-row.is-selected .v1-sticky { background: var(--bg-brand-subtle); }
+
+/* Only once something is actually hidden behind it does the pinned cell
+   cast an edge, so the shadow never appears without a reason. */
+.v1 .v1-scroll.is-scrolled .v1-sticky {
+  box-shadow: -14px 0 14px -10px rgba(0, 0, 0, .10);
+}
+/* Purple by default so the customise control reads as an affordance rather
+   than disappearing into the column labels. */
+.v1 .v1-cog {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-8);
+  display: grid; place-items: center;
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+  border: 1px solid var(--border-brand);
+  cursor: pointer;
+}
+.v1 .v1-cog.is-on {
+  background: var(--bg-brand);
+  border-color: var(--bg-brand);
+  color: #fff;
+}
+
+/* ==========================================================================
+   v2 — the colour-coded skin. Shares every v1 rule (its shell carries both
+   classes) and only overrides what should carry stage colour.
+   ========================================================================== */
+
+/* Containers stay on the neutral grey, as in v5. The stage colour shows in
+   the key line, the dot, the label and the sub-stage tags instead of washing
+   the whole block. */
+.v2 .v1-stage[style*="--stage-key"] {
+  box-shadow: inset 3px 0 0 var(--stage-key);
+}
+
+/* The column header sits above the stages, so it stays neutral. */
+.v2 .v1-headwrap { background: var(--bg-base); }
+
+/* ==========================================================================
+   v3 — Tasks, Notes and Activity as their own columns.
+   Shares the v1 base (its shell carries both classes); only the quick-action
+   region differs, so the grid gains two tracks.
+   ========================================================================== */
+
+.v3 .v1-grid {
+  grid-template-columns:
+    40px    /* multi-select         */
+    178px   /* Lead details         */
+    152px   /* Contact              */
+    160px   /* Loan details         */
+    310px   /* Documents            */
+    196px   /* Tasks                */
+    176px   /* Notes                */
+    290px   /* Activity — fits the longest line; longer ones still ellipsis */
+    150px   /* Last updated         */
+    190px   /* Sub-stage            */
+    110px   /* Date created         */
+    190px   /* Projected settlement */
+    168px   /* Assigned broker      */
+    168px   /* Associate broker     */
+    168px   /* Lender               */
+    168px   /* Partner              */
+    100px;  /* pinned: AI + overflow */
+}
+
+/* ---------- Quick-action cells ---------- */
+
+.qa {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10, 10px);
+  min-width: 0;
+}
+.qa__icon { display: flex; flex: none; color: var(--text-secondary); }
+.qa__body { color: var(--text-tertiary); white-space: nowrap; }
+
+.qa-stat { font-weight: var(--weight-demi); }
+.qa-stat--none   { color: var(--text-placeholder); font-weight: var(--weight-medium); }
+.qa-stat--due    { color: var(--accent-amber); }
+.qa-stat--over   { color: var(--error-base); }
+.qa-stat--unread { color: var(--error-base); }
+.qa-sep { color: var(--border-muted); margin: 0 var(--space-6); }
+.qa-total { color: var(--text-tertiary); margin-right: var(--space-4); }
+
+/* Activity carries two lines: what happened, and when. */
+.qa--stack { align-items: flex-start; }
+.qa--stack .qa__icon { margin-top: 2px; }
+.qa__lines { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.qa__line {
+  color: var(--text-primary);
+  /* Italic so the activity sentence reads as narration, not field data. */
+  font-style: italic;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qa__time { color: var(--text-tertiary); white-space: nowrap; }
+
+/* ==========================================================================
+   Inline quick actions (v2) — plain text in place of the pill group.
+   ========================================================================== */
+
+.qai { display: flex; align-items: center; gap: var(--space-8); white-space: nowrap; }
+.qai__item {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.qai__item:hover .qai__label { text-decoration: underline; }
+.qai__item svg { color: var(--text-tertiary); }
+.qai__label { color: var(--text-primary); }
+.qai__n { position: relative; color: var(--text-tertiary); font-weight: var(--weight-demi); }
+.qai__n.is-alert { color: var(--error-base); }
+.qai__dot {
+  position: absolute; top: -4px; right: -7px;
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--error-base);
+}
+.qai__sep { color: var(--border-muted); }
+
+/* ==========================================================================
+   Deal panel — full-height overlay with Tasks / Notes / Activity.
+   ========================================================================== */
+
+.dp {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 440px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .14);
+  z-index: 30;
+
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.dp.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.dp__head {
+  flex: none;
+  display: flex; align-items: flex-start; gap: var(--space-12);
+  padding: var(--space-24) var(--space-20) var(--space-16);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.dp__title { color: var(--text-primary); }
+.dp__name  { color: var(--text-primary); margin-top: var(--space-6); }
+.dp__meta  { color: var(--text-tertiary); margin-top: var(--space-2); }
+
+.dp__close {
+  width: 32px; height: 32px; flex: none;
+  border-radius: var(--radius-8);
+  display: grid; place-items: center;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.dp__close:hover { background: var(--bg-muted); color: var(--text-primary); }
+
+.dp__tabs {
+  flex: none;
+  display: flex; gap: var(--space-4);
+  padding: var(--space-12) var(--space-20) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.dp__tab {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 0 var(--space-12) var(--space-12);
+  color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  font: var(--weight-demi) 14px/1.4 var(--font-family);
+}
+.dp__tab:hover { color: var(--text-secondary); }
+.dp__tab.is-active { color: var(--text-brand); border-bottom-color: var(--border-brand); }
+.dp__tabn {
+  font: var(--weight-demi) 11px/1 var(--font-family);
+  padding: 3px 6px; border-radius: var(--radius-pill);
+  background: var(--bg-muted); color: var(--text-secondary);
+}
+.dp__tab.is-active .dp__tabn { background: var(--bg-brand-subtle); color: var(--text-brand); }
+
+.dp__body {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-16) var(--space-20) var(--space-24);
+  background: var(--bg-surface);
+}
+
+/* ---------- Broker Assist, as a panel section ---------- */
+
+/* Four tabs across 440px: trim the padding so Broker Assist fits without
+   the row wrapping. */
+.dp__tabs { gap: 0; padding-left: var(--space-16); padding-right: var(--space-16); }
+.dp__tab { padding: 0 var(--space-6) var(--space-12); white-space: nowrap; }
+.dp__tab .dp__tabn { padding: 3px 5px; }
+
+.dp__tabmark { display: flex; color: var(--text-brand); }
+.dp__tab--glyph { gap: var(--space-4); }
+.dp__tab--glyph:not(.is-active) .dp__tabmark { color: var(--text-tertiary); }
+
+.dp-assist { display: flex; flex-direction: column; gap: var(--space-12); }
+
+/* Matches the hailo card's input, but squared off to the panel edge. */
+.dp__ask {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-12);
+  height: 62px;
+  margin: var(--space-16) var(--space-20);
+  padding: 0 var(--space-8) 0 var(--space-16);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  color: var(--text-placeholder);
+}
+.dp__ask > :first-child { flex: 1; }
+
+/* ---------- Shared panel bits ---------- */
+
+.dp-av {
+  width: 28px; height: 28px; flex: none;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  color: #fff;
+  font: var(--weight-demi) 10px/1 var(--font-family);
+}
+.dp-av--xs { width: 20px; height: 20px; font-size: 9px; }
+.dp-dot { color: var(--border-muted); }
+.dp-section {
+  color: var(--text-tertiary);
+  margin: var(--space-16) 0 var(--space-8);
+}
+
+/* ---------- Tasks ---------- */
+
+.dp-actionbar { display: flex; align-items: center; gap: var(--space-8); }
+.dp-addbtn {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  height: 34px; padding: 0 var(--space-14, 14px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-brand);
+  color: var(--text-brand);
+  background: var(--bg-base);
+  cursor: pointer;
+}
+.dp-filter {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  height: 34px; padding: 0 var(--space-12);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.dp-task {
+  display: flex; gap: var(--space-12);
+  padding: var(--space-12);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  margin-bottom: var(--space-8);
+}
+.dp-task.is-done .dp-task__title { color: var(--text-tertiary); text-decoration: line-through; }
+.dp-check {
+  width: 18px; height: 18px; flex: none; margin-top: 1px;
+  border-radius: var(--radius-4);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  display: grid; place-items: center; color: #fff;
+}
+.dp-check.is-on { background: var(--bg-brand); border-color: var(--bg-brand); }
+.dp-task__body { min-width: 0; }
+.dp-task__title { color: var(--text-primary); }
+.dp-task__meta {
+  display: flex; align-items: center; gap: var(--space-6);
+  margin-top: var(--space-6);
+  color: var(--text-tertiary);
+}
+.dp-due--overdue { color: var(--error-base); font-weight: var(--weight-demi); }
+.dp-due--due { color: var(--text-warning); font-weight: var(--weight-demi); }
+
+/* ---------- Notes ---------- */
+
+.dp-note { display: flex; gap: var(--space-12); margin-bottom: var(--space-16); }
+.dp-note__body { min-width: 0; flex: 1; }
+.dp-note__head { display: flex; align-items: baseline; gap: var(--space-8); }
+.dp-note__time { color: var(--text-tertiary); }
+.dp-note__text {
+  color: var(--text-secondary);
+  margin-top: 3px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  padding: var(--space-10, 10px) var(--space-12);
+}
+.dp-tag { color: var(--text-brand); font-weight: var(--weight-demi); }
+.dp-file {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  margin-top: var(--space-6);
+  padding: var(--space-6) var(--space-10, 10px);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-muted);
+  background: var(--bg-base);
+  color: var(--text-brand);
+}
+
+.dp-composer {
+  margin-top: var(--space-16);
+  background: var(--bg-base);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-12);
+  padding: var(--space-12);
+}
+.dp-composer__field { color: var(--text-placeholder); min-height: 40px; }
+.dp-composer__tools { display: flex; align-items: center; gap: var(--space-8); }
+.dp-tool {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  color: var(--text-tertiary);
+}
+.dp-send {
+  margin-left: auto;
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--bg-brand); color: #fff;
+}
+
+/* ---------- Activity ---------- */
+
+.dp-timeline { position: relative; }
+.dp-ev { display: flex; gap: var(--space-12); }
+.dp-ev__rail {
+  position: relative; flex: none; width: 10px;
+  display: flex; justify-content: center;
+}
+.dp-ev__rail::before {
+  content: ''; position: absolute; top: 0; bottom: -4px; width: 1px;
+  background: var(--border-muted);
+}
+.dp-ev:last-child .dp-ev__rail::before { bottom: auto; height: 10px; }
+.dp-ev__dot {
+  position: relative; z-index: 1;
+  width: 9px; height: 9px; margin-top: 5px;
+  border-radius: 999px;
+  border: 2px solid var(--bg-surface);
+  box-sizing: content-box;
+}
+.dp-ev__dot--status  { background: var(--neutral-500); }
+.dp-ev__dot--broker  { background: var(--brand-600); }
+.dp-ev__dot--client  { background: var(--accent-teal); }
+.dp-ev__dot--lender  { background: var(--success-base); }
+.dp-ev__dot--partner { background: var(--accent-orange); }
+
+.dp-ev__body { padding-bottom: var(--space-16); min-width: 0; }
+.dp-ev__text { color: var(--text-primary); }
+.dp-ev__meta { display: flex; align-items: center; gap: var(--space-6); color: var(--text-tertiary); margin-top: 2px; }
+.dp-kind { font-weight: var(--weight-demi); }
+.dp-kind--status  { color: var(--text-tertiary); }
+.dp-kind--broker  { color: var(--text-brand); }
+.dp-kind--client  { color: var(--accent-teal); }
+.dp-kind--lender  { color: var(--text-success); }
+.dp-kind--partner { color: var(--text-warning); }
+
+/* ==========================================================================
+   v3 column spacing — more air before Tasks, less between Notes and Activity.
+   Header and row cells shift together so the columns stay aligned.
+   ========================================================================== */
+
+.v3 .qa--tasks,
+.v3 .qh--tasks { margin-left: var(--space-20); }
+
+.v3 .qa--activity,
+.v3 .qh--activity { margin-left: calc(-1 * var(--space-16)); }
+
+/* ==========================================================================
+   Row popups — Tasks / Notes / Activity (v1)
+   A floating card anchored to the pill that opened it. Deliberately lifted
+   off the table by a heavy shadow: it is an overlay, not another container.
+   ========================================================================== */
+
+.pop {
+  position: fixed;
+  z-index: 70;
+  display: none;
+  flex-direction: column;
+  width: 340px;
+  max-height: 440px;
+  background: var(--bg-base);
+  border-radius: var(--radius-12);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06),
+              0 18px 44px rgba(16, 24, 40, 0.18);
+}
+.pop.is-open { display: flex; }
+
+.pop--tasks    { width: 376px; }
+.pop--activity { width: 320px; }
+.pop--notes    { width: 318px; }
+
+/* ---------- Head ---------------------------------------------------------- */
+
+.pop__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-16) var(--space-16) var(--space-12);
+}
+.pop__glyph { display: flex; color: var(--text-brand); }
+.pop__title { color: var(--text-primary); white-space: nowrap; }
+.pop__spacer { flex: 1; }
+
+.pop__tabs { display: flex; gap: var(--space-12); margin-left: var(--space-12); }
+.pop__tab { color: var(--text-tertiary); cursor: pointer; padding-bottom: 2px; }
+.pop__tab.is-active {
+  color: var(--text-primary);
+  border-bottom: 1.5px solid var(--text-primary);
+}
+
+.pop__add,
+.pop__close {
+  display: flex;
+  color: var(--text-brand);
+  cursor: pointer;
+}
+.pop__close { color: var(--text-tertiary); }
+.pop__close:hover { color: var(--text-primary); }
+
+/* ---------- Body ---------------------------------------------------------- */
+
+.pop__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--space-16) var(--space-16);
+}
+.pop__body::-webkit-scrollbar { width: 6px; }
+.pop__body::-webkit-scrollbar-thumb {
+  background: var(--neutral-400);
+  border-radius: var(--radius-pill);
+}
+
+.pop-av {
+  width: 18px; height: 18px;
+  flex: 0 0 18px;
+  border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; justify-content: center;
+  font: var(--weight-demi) 8px/1 var(--font-family);
+  color: var(--text-on-dark);
+}
+
+.pop-kebab { display: flex; color: var(--text-tertiary); cursor: pointer; }
+
+/* ---------- Tasks --------------------------------------------------------- */
+
+.pop-task {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  margin-bottom: var(--space-8);
+}
+.pop-task__body { flex: 1; min-width: 0; }
+
+.pop-radio {
+  width: 15px; height: 15px;
+  flex: 0 0 15px;
+  margin-top: 2px;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.pop-task__title { color: var(--text-primary); }
+.pop-task__desc  { color: var(--text-tertiary); margin-top: var(--space-4); }
+
+.pop-task__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: var(--space-12);
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--text-tertiary);
+}
+.pop-meta-label { font-style: italic; color: var(--text-tertiary); }
+.pop-meta-val   { color: var(--text-tertiary); }
+
+.pop-due {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-4);
+  background: var(--brand-100);
+  color: var(--text-brand);
+  font-style: italic;
+}
+.pop-due__x { font-style: normal; cursor: pointer; opacity: .7; }
+
+.pop-task--done {
+  align-items: center;
+  background: var(--bg-surface);
+  border-color: transparent;
+}
+.pop-task--done .pop-task__title { color: var(--text-tertiary); }
+.pop-tick {
+  width: 16px; height: 16px;
+  flex: 0 0 16px;
+  border-radius: var(--radius-pill);
+  background: var(--success-base);
+  color: var(--text-on-dark);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- Activity ------------------------------------------------------ */
+
+.pop-ev { display: flex; gap: var(--space-8); }
+.pop-ev__badge {
+  width: 24px; height: 24px;
+  flex: 0 0 24px;
+  border-radius: var(--radius-6);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+}
+.pop-ev__badge--brand { background: var(--brand-600); color: var(--text-on-dark); }
+
+.pop-ev__body { flex: 1; min-width: 0; padding-bottom: var(--space-16); }
+.pop-ev--comment .pop-ev__body {
+  border-left: 2px solid var(--brand-500);
+  padding-left: var(--space-10, 10px);
+  margin-left: -2px;
+}
+.pop-ev--comment { align-items: flex-start; }
+.pop-ev--comment .pop-ev__badge { margin-right: var(--space-4); }
+
+.pop-ev__stamp { color: var(--text-tertiary); }
+.pop-ev__date  { color: var(--text-primary); font-weight: var(--weight-demi); }
+.pop-ev__time  { color: var(--text-primary); }
+.pop-ev__by    { color: var(--text-tertiary); }
+
+.pop-ev__text { color: var(--text-secondary); margin-top: var(--space-4); }
+.pop-ev__text--log { font-style: italic; color: var(--text-tertiary); }
+.pop-ev__chev {
+  display: inline-flex;
+  vertical-align: -1px;
+  margin-right: var(--space-4);
+  color: var(--text-brand);
+  transform: rotate(-90deg);
+  cursor: pointer;
+}
+
+/* ---------- Notes --------------------------------------------------------- */
+
+.pop--notes .pop__body { padding-top: var(--space-4); }
+
+.pop-note { padding-bottom: var(--space-12); }
+.pop-note--clipped { opacity: .9; }
+
+.pop-note__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+.pop-note__who  { color: var(--text-primary); }
+.pop-note__when { color: var(--text-tertiary); }
+.pop-note__head .pop-kebab { margin-left: auto; }
+.pop-note__text { color: var(--text-tertiary); }
+
+.pop__composer {
+  position: relative;
+  margin: 0 var(--space-16) var(--space-16);
+}
+.pop-field {
+  min-height: 72px;
+  padding: var(--space-12);
+  padding-right: 44px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  color: var(--text-placeholder);
+}
+.pop-send {
+  position: absolute;
+  right: var(--space-8);
+  bottom: var(--space-8);
+  width: 28px; height: 28px;
+  border-radius: var(--radius-6);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.pop-send:hover { background: var(--bg-brand-hover); }
+
+/* The pill that opened a card reads as held-down while it is open. */
+.v1 .v1-pill.is-on {
+  border-color: var(--border-brand);
+  color: var(--text-brand);
+  background: var(--bg-brand-subtle);
+}
+.v1 .v1-pill[data-pop] { cursor: pointer; }

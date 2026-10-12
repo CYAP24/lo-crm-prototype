@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LoanOptions CRM — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+/* ==========================================================================
+   Prototype shell.
+   Deliberately dark so the harness never reads as part of the mock it frames.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #16181D;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+body { display: flex; flex-direction: column; }
+
+/* ---------- Toolbar ---------- */
+
+.bar {
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 16px;
+  background: #1D2026;
+  border-bottom: 1px solid #2A2E36;
+  color: #E7E9EE;
+}
+
+.bar__brand { display: flex; align-items: center; gap: 10px; flex: none; }
+.bar__mark {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--bg-brand); color: #fff;
+  display: grid; place-items: center;
+}
+.bar__title { font: 600 13px/1 var(--font-family); letter-spacing: .01em; }
+.bar__sub   { font: 400 12px/1 var(--font-family); color: #878D9A; }
+
+.seg {
+  display: flex; gap: 2px; padding: 3px;
+  border-radius: 9px; background: #2A2E36;
+  flex: 0 1 auto; min-width: 0; overflow-x: auto;
+  scrollbar-width: none;
+}
+.seg::-webkit-scrollbar { display: none; }
+.seg button {
+  appearance: none; border: 0; cursor: pointer;
+  display: flex; flex-direction: column; gap: 1px; align-items: flex-start;
+  padding: 5px 12px; border-radius: 6px;
+  background: transparent; color: #AEB4C0;
+  font-family: var(--font-family);
+}
+.seg button:hover { color: #E7E9EE; }
+.seg button[aria-selected="true"] { background: var(--bg-brand); color: #fff; }
+.seg__label { font: 600 12px/1.3 var(--font-family); }
+.seg__sub   { font: 400 10px/1.2 var(--font-family); opacity: .72; }
+
+.bar__spacer { flex: 1; }
+
+.ctrl {
+  appearance: none; cursor: pointer;
+  height: 30px; padding: 0 12px;
+  border-radius: 7px; border: 1px solid #343944;
+  background: #23272F; color: #C7CCD6;
+  font: 500 12px/1 var(--font-family);
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.ctrl:hover { border-color: #434A58; color: #E7E9EE; }
+.ctrl[aria-pressed="true"] { background: var(--bg-brand); border-color: var(--bg-brand); color: #fff; }
+
+.kbd {
+  font: 500 10px/1 var(--font-family);
+  padding: 3px 5px; border-radius: 4px;
+  background: #2E333D; color: #9BA2B0; border: 1px solid #3A404B;
+}
+
+/* ---------- Stage ---------- */
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  padding: 24px;
+  overflow: auto;
+}
+
+.pane { display: flex; flex-direction: column; gap: 10px; flex: none; }
+
+.pane__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  color: #AEB4C0;
+}
+.pane__name { font: 600 12px/1 var(--font-family); color: #E7E9EE; }
+.pane__meta { font: 400 11px/1 var(--font-family); color: #787F8C; }
+
+.pane__select {
+  appearance: none; cursor: pointer;
+  height: 26px; padding: 0 26px 0 9px;
+  border-radius: 6px; border: 1px solid #343944;
+  background: #23272F; color: #C7CCD6;
+  font: 500 11px/1 var(--font-family);
+  background-image: linear-gradient(45deg, transparent 50%, #878D9A 50%), linear-gradient(135deg, #878D9A 50%, transparent 50%);
+  background-position: calc(100% - 13px) 11px, calc(100% - 9px) 11px;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+
+/* The holder is sized to the SCALED dimensions so centring stays correct;
+   the inner element keeps its true 1920x1080 box and is transformed. */
+.holder {
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45);
+}
+.holder__inner { width: 1920px; height: 1080px; transform-origin: top left; }
+.holder iframe { width: 1920px; height: 1080px; border: 0; display: block; }
+
+.hint {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px; border-radius: 8px;
+  background: rgba(29,32,38,.94); border: 1px solid #343944;
+  color: #9BA2B0; font: 400 11px/1 var(--font-family);
+  pointer-events: none; opacity: 1; transition: opacity .4s ease;
+}
+.hint--gone { opacity: 0; }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar__brand">
+    <div class="bar__mark">
+      <svg width="14" height="12" viewBox="0 0 21 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14 8 3l6 11 5-9"/></svg>
+    </div>
+    <div>
+      <div class="bar__title">Work list view</div>
+      <div class="bar__sub">LoanOptions CRM prototype</div>
+    </div>
+  </div>
+
+  <div class="seg" id="seg" role="tablist"></div>
+
+  <span class="bar__spacer"></span>
+
+  <button class="ctrl" id="compareBtn" aria-pressed="false">Compare <span class="kbd">C</span></button>
+  <button class="ctrl" id="zoomBtn">Fit <span class="kbd">Z</span></button>
+  <a class="ctrl" id="openBtn" target="_blank" rel="noopener">Open full size &nearr;</a>
+</div>
+
+<div class="stage" id="stage"></div>
+
+<div class="hint" id="hint">
+  <span><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> switch</span>
+  <span><span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> step</span>
+  <span><span class="kbd">C</span> compare</span>
+  <span><span class="kbd">Z</span> zoom</span>
+</div>
+
+<script>
+/* ======================================================================
+   Add a version here and it appears everywhere — tabs, compare pickers,
+   keyboard shortcuts and deep links.
+   ====================================================================== */
+const VERSIONS = [
+  { id:'v1', label:'v1', sub:'Pipeline + AI', file:'worklist-v1.html',
+    note:'Grouped by master stage · sticky column chooser · quick actions · Broker Assist' },
+  { id:'v2', label:'v2', sub:'Colour coded', file:'worklist-v2.html',
+    note:'v1 base · stage colour throughout · documents as status boxes' },
+  { id:'v3', label:'v3', sub:'Split actions', file:'worklist-v3.html',
+    note:'v1 base · Tasks, Notes and Activity as separate columns' }
+];
+
+const W = 1920, H = 1080;
+
+/* Versions get rewritten in place during iteration, so the filename alone is
+   not enough to bust the browser cache — a stale frame would show the previous
+   design under the current name. One token per shell load keeps frames fresh. */
+const BUILD = Date.now();
+const bust = (file) => `${file}?b=${BUILD}`;
+
+const state = {
+  current: 'v2',
+  compare: false,
+  left: 'v1',
+  right: 'v2',
+  fit: true
+};
+
+const $ = (s) => document.querySelector(s);
+const byId = (id) => VERSIONS.find(v => v.id === id) || VERSIONS[0];
+
+/* ---------- URL state so a view can be bookmarked or shared ---------- */
+
+function readHash() {
+  const h = decodeURIComponent(location.hash.replace(/^#/, ''));
+  if (!h) return;
+  if (h.startsWith('compare=')) {
+    const [l, r] = h.slice(8).split(',');
+    if (byId(l) && byId(r)) { state.compare = true; state.left = l; state.right = r; }
+  } else if (VERSIONS.some(v => v.id === h)) {
+    state.compare = false;
+    state.current = h;
+  }
+}
+
+function writeHash() {
+  const h = state.compare ? `compare=${state.left},${state.right}` : state.current;
+  history.replaceState(null, '', '#' + h);
+}
+
+/* ---------- Toolbar ---------- */
+
+function renderTabs() {
+  $('#seg').innerHTML = VERSIONS.map(v => `
+    <button role="tab" data-id="${v.id}" aria-selected="${!state.compare && state.current === v.id}" title="${v.note}">
+      <span class="seg__label">${v.label}</span>
+      <span class="seg__sub">${v.sub}</span>
+    </button>`).join('');
+
+  $('#seg').querySelectorAll('button').forEach(b => {
+    b.onclick = () => { state.compare = false; state.current = b.dataset.id; render(); };
+  });
+
+  $('#compareBtn').setAttribute('aria-pressed', String(state.compare));
+  $('#zoomBtn').firstChild.nodeValue = state.fit ? 'Fit ' : '100% ';
+  $('#openBtn').href = bust(state.compare ? byId(state.left).file : byId(state.current).file);
+}
+
+/* ---------- Stage ---------- */
+
+function paneMarkup(id, side) {
+  const v = byId(id);
+  const picker = side
+    ? `<select class="pane__select" data-side="${side}">
+         ${VERSIONS.map(o => `<option value="${o.id}" ${o.id === id ? 'selected' : ''}>${o.label} — ${o.sub}</option>`).join('')}
+       </select>`
+    : `<span class="pane__meta">${v.note}</span>`;
+  return `
+    <div class="pane" data-pane="${side || 'single'}">
+      <div class="pane__head">
+        <span class="pane__name">${v.label}${side ? '' : ' · ' + v.sub}</span>
+        ${picker}
+      </div>
+      <div class="holder">
+        <div class="holder__inner"><iframe src="${bust(v.file)}" title="${v.label}" loading="eager"></iframe></div>
+      </div>
+    </div>`;
+}
+
+function render() {
+  const stage = $('#stage');
+  stage.innerHTML = state.compare
+    ? paneMarkup(state.left, 'left') + paneMarkup(state.right, 'right')
+    : paneMarkup(state.current, null);
+
+  stage.querySelectorAll('.pane__select').forEach(sel => {
+    sel.onchange = () => { state[sel.dataset.side] = sel.value; render(); };
+  });
+
+  renderTabs();
+  writeHash();
+  scale();
+}
+
+/* Scale each frame to fit, sizing the holder to the scaled box so the
+   flex centring stays honest. */
+function scale() {
+  const stage = $('#stage');
+  const panes = [...stage.querySelectorAll('.pane')];
+  if (!panes.length) return;
+
+  const gap = 24, padding = 48, headH = 32;
+  const availW = (stage.clientWidth - padding - (panes.length - 1) * gap) / panes.length;
+  const availH = stage.clientHeight - padding - headH;
+
+  const s = state.fit ? Math.min(1, availW / W, availH / H) : 1;
+
+  panes.forEach(p => {
+    const holder = p.querySelector('.holder');
+    const inner = p.querySelector('.holder__inner');
+    holder.style.width = Math.round(W * s) + 'px';
+    holder.style.height = Math.round(H * s) + 'px';
+    inner.style.transform = `scale(${s})`;
+  });
+}
+
+/* ---------- Controls ---------- */
+
+$('#compareBtn').onclick = () => {
+  state.compare = !state.compare;
+  if (state.compare && state.left === state.right) {
+    state.right = state.current;
+    state.left = VERSIONS.find(v => v.id !== state.current).id;
+  }
+  render();
+};
+
+$('#zoomBtn').onclick = () => { state.fit = !state.fit; renderTabs(); scale(); };
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'SELECT') return;
+  const k = e.key.toLowerCase();
+
+  if (k >= '1' && k <= String(VERSIONS.length)) {
+    state.compare = false;
+    state.current = VERSIONS[+k - 1].id;
+    render();
+  } else if (k === 'arrowright' || k === 'arrowleft') {
+    const i = VERSIONS.findIndex(v => v.id === state.current);
+    const next = (i + (k === 'arrowright' ? 1 : VERSIONS.length - 1)) % VERSIONS.length;
+    state.compare = false;
+    state.current = VERSIONS[next].id;
+    render();
+  } else if (k === 'c') {
+    $('#compareBtn').click();
+  } else if (k === 'z') {
+    $('#zoomBtn').click();
+  }
+});
+
+window.addEventListener('resize', scale);
+window.addEventListener('hashchange', () => { readHash(); render(); });
+
+readHash();
+render();
+
+setTimeout(() => $('#hint').classList.add('hint--gone'), 5000);
+</script>
+
+</body>
+</html>
