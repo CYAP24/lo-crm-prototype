@@ -66,6 +66,9 @@ css/variants.css  Concept styles, scoped per version (v3–v5).
 js/data.js        Shared deal data + document vocabulary for the concepts.
 js/popups.js      Row popups — Tasks / Notes / Activity cards, with their
                   seeded mock content.
+js/tour.js        Points-of-interest tour — engine and the step list per
+                  version.
+css/tour.css      Spotlight and callout styles.
 js/variants.js    Concept renderers (v3–v5).
 worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
                       the shell; open it directly if you need it.
@@ -105,6 +108,37 @@ the presentation changes.
 The draft-parity page carries **its own copy of the row data** in
 `js/rows-draft2.js`. That is deliberate — it is a frozen reference, so editing
 `ROWS` for the redesign must not change what it shows.
+
+## Points-of-interest tour
+
+The first time a version is viewed it spotlights its main controls, one at a
+time. Everything dims except the control being introduced, a callout says what
+it does, and **the step only advances once that control is actually used** —
+the cog is clicked, the sparkle is clicked, the table is scrolled. Nothing is
+blocked: the dim is purely visual, so the prototype stays explorable and a step
+simply waits its turn. `Esc` or **Skip** ends it.
+
+| | Steps |
+|---|---|
+| **v1** | Column chooser · Broker Assist · the quick-action popups · scrolling sideways for the rest of the columns |
+| **v2** | Quick actions · Broker Assist in the sidebar |
+| **v3** | None — nothing in it differs from v1 |
+
+v2 deliberately repeats neither the column chooser nor the sideways scroll:
+they behave exactly as they do in v1, so only what changed is worth pointing at.
+
+**Replaying.** The toolbar's **Highlight the points of interest** button clears
+what every version remembers and drops back to v1, which carries the full set.
+
+**Progress** is per-version in `sessionStorage`, so leaving a version half-done
+and coming back resumes on the same step rather than starting over. It clears
+when the tab closes — the "exited the prototype" case — and survives a reload.
+
+The tour lives in the version page rather than the shell, so it scales with the
+frame and behaves the same opened full size. The shell drives it through a URL
+parameter: `tour=auto` (default, skip if finished), `tour=force` (replay from
+the top), `tour=off` (the side-by-side compare view, where two at once would be
+chaos). To change the steps, edit `TOURS` at the top of `js/tour.js`.
 
 ## Broker Assist
 

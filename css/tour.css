@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Points-of-interest tour.
+   Sizes are in the artboard's own 1920-space, so the callout scales with
+   the frame and reads at the same weight as the UI it is describing.
+   ========================================================================== */
+
+/* Fixed, not absolute: the artboard clips its own overflow, and the tour
+   has to be able to light anything inside it. */
+.tour { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+.tour.is-gone { opacity: 0; transition: opacity .24s ease; }
+
+/* The spotlight. One element: everything outside it is darkened by a very
+   wide shadow, which keeps the lit area a real hole rather than a cut-out
+   that has to be kept in sync. */
+.tour__hole {
+  position: fixed;
+  border-radius: var(--radius-10);
+  box-shadow: 0 0 0 9999px rgba(12, 14, 22, .58);
+  pointer-events: none;
+  transition: top .36s cubic-bezier(.4, 0, .2, 1),
+              left .36s cubic-bezier(.4, 0, .2, 1),
+              width .36s cubic-bezier(.4, 0, .2, 1),
+              height .36s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* A ring that breathes, so the eye lands on the lit control rather than
+   just on the one bright patch. */
+.tour__hole::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--radius-12);
+  border: 2px solid var(--brand-400);
+  animation: tour-pulse 1.9s ease-out infinite;
+}
+
+@keyframes tour-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(155, 107, 240, .55); opacity: 1; }
+  70%  { box-shadow: 0 0 0 14px rgba(155, 107, 240, 0); opacity: .85; }
+  100% { box-shadow: 0 0 0 0 rgba(155, 107, 240, 0); opacity: 1; }
+}
+
+/* ---------- Callout ------------------------------------------------------ */
+
+.tour__pop {
+  position: fixed;
+  width: 380px;
+  padding: var(--space-20);
+  border-radius: var(--radius-12);
+  background: var(--bg-base);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, .08),
+              0 24px 60px rgba(12, 14, 22, .34);
+  pointer-events: auto;
+  transition: top .36s cubic-bezier(.4, 0, .2, 1),
+              left .36s cubic-bezier(.4, 0, .2, 1),
+              opacity .2s ease;
+}
+
+/* Dimmed while the step it just completed is still on screen. */
+.tour.is-waiting .tour__pop { opacity: 0; }
+.tour.is-waiting .tour__hole { opacity: .4; }
+
+.tour__step {
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-brand);
+  margin-bottom: var(--space-8);
+}
+
+.tour__title {
+  font: var(--weight-demi) 20px/26px var(--font-family);
+  color: var(--text-primary);
+}
+
+.tour__body {
+  font: var(--weight-medium) 15px/22px var(--font-family);
+  color: var(--text-tertiary);
+  margin-top: var(--space-6);
+}
+
+.tour__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-16);
+}
+
+.tour__cue {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font: var(--weight-demi) 14px/18px var(--font-family);
+  color: var(--text-brand);
+}
+/* A small travelling dot, so the cue reads as an instruction and not a label. */
+.tour__cue::before {
+  content: '';
+  width: 7px; height: 7px; flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--brand-500);
+  animation: tour-nudge 1.3s ease-in-out infinite;
+}
+@keyframes tour-nudge {
+  0%, 100% { transform: translateX(0);   opacity: .45; }
+  50%      { transform: translateX(4px); opacity: 1; }
+}
+
+.tour__skip {
+  appearance: none;
+  cursor: pointer;
+  height: 32px;
+  padding: 0 var(--space-12);
+  border-radius: var(--radius-8);
+  border: 1px solid var(--border-default);
+  background: var(--bg-base);
+  color: var(--text-tertiary);
+  font: var(--weight-demi) 13px/1 var(--font-family);
+}
+.tour__skip:hover { border-color: var(--border-muted); color: var(--text-primary); }
+
+/* Anything the viewer opens during a step has to sit above the dim, or
+   completing the step appears to do nothing. */
+body.tour-on .pop.is-open,
+body.tour-on .dp.is-open,
+body.tour-on .hailo.is-open,
+body.tour-on .colpanel.is-open { z-index: 9100; }

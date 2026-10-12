@@ -77,6 +77,27 @@ body { display: flex; flex-direction: column; }
 .ctrl:hover { border-color: #434A58; color: #E7E9EE; }
 .ctrl[aria-pressed="true"] { background: var(--bg-brand); border-color: var(--bg-brand); color: #fff; }
 
+/* The tour is the one control that changes what the frame does rather than
+   how it is shown, so it carries the brand rather than the chrome grey. */
+.ctrl--tour {
+  border-color: #4A3A6B;
+  background: #2B2142;
+  color: #D7C6FA;
+}
+.ctrl--tour::before {
+  content: '';
+  width: 7px; height: 7px; border-radius: 999px;
+  background: var(--brand-400);
+  box-shadow: 0 0 0 0 rgba(155, 107, 240, .6);
+  animation: bar-pulse 2s ease-out infinite;
+}
+.ctrl--tour:hover { border-color: #6A5295; color: #EDE4FF; }
+@keyframes bar-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(155, 107, 240, .6); }
+  70%  { box-shadow: 0 0 0 7px rgba(155, 107, 240, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(155, 107, 240, 0); }
+}
+
 .kbd {
   font: 500 10px/1 var(--font-family);
   padding: 3px 5px; border-radius: 4px;
@@ -156,6 +177,7 @@ body { display: flex; flex-direction: column; }
 
   <span class="bar__spacer"></span>
 
+  <button class="ctrl ctrl--tour" id="tourBtn" title="Replay the spotlight tour from v1">Highlight the points of interest</button>
   <button class="ctrl" id="compareBtn" aria-pressed="false">Compare <span class="kbd">C</span></button>
   <button class="ctrl" id="zoomBtn">Fit <span class="kbd">Z</span></button>
   <a class="ctrl" id="openBtn" target="_blank" rel="noopener">Open full size &nearr;</a>
@@ -190,7 +212,12 @@ const W = 1920, H = 1080;
    not enough to bust the browser cache — a stale frame would show the previous
    design under the current name. One token per shell load keeps frames fresh. */
 const BUILD = Date.now();
-const bust = (file) => `${file}?b=${BUILD}`;
+
+/* The version pages read `tour` to decide whether to run their spotlight
+   tour: off in the side-by-side view, where two at once would be chaos,
+   and forced for one render after the toolbar button is pressed. */
+let tourForce = false;
+const bust = (file, mode) => `${file}?b=${BUILD}&tour=${mode}`;
 
 const state = {
   current: 'v2',
@@ -237,13 +264,16 @@ function renderTabs() {
 
   $('#compareBtn').setAttribute('aria-pressed', String(state.compare));
   $('#zoomBtn').firstChild.nodeValue = state.fit ? 'Fit ' : '100% ';
-  $('#openBtn').href = bust(state.compare ? byId(state.left).file : byId(state.current).file);
+  /* Opened on its own it is still a first view, so the tour applies there
+     too — and if it has already been seen, 'auto' leaves it alone. */
+  $('#openBtn').href = bust(state.compare ? byId(state.left).file : byId(state.current).file, 'auto');
 }
 
 /* ---------- Stage ---------- */
 
 function paneMarkup(id, side) {
   const v = byId(id);
+  const mode = side ? 'off' : (tourForce ? 'force' : 'auto');
   const picker = side
     ? `<select class="pane__select" data-side="${side}">
          ${VERSIONS.map(o => `<option value="${o.id}" ${o.id === id ? 'selected' : ''}>${o.label} — ${o.sub}</option>`).join('')}
@@ -256,7 +286,7 @@ function paneMarkup(id, side) {
         ${picker}
       </div>
       <div class="holder">
-        <div class="holder__inner"><iframe src="${bust(v.file)}" title="${v.label}" loading="eager"></iframe></div>
+        <div class="holder__inner"><iframe src="${bust(v.file, mode)}" title="${v.label}" loading="eager"></iframe></div>
       </div>
     </div>`;
 }
@@ -274,6 +304,7 @@ function render() {
   renderTabs();
   writeHash();
   scale();
+  tourForce = false;      // one render only
 }
 
 /* Scale each frame to fit, sizing the holder to the scaled box so the
@@ -310,6 +341,16 @@ $('#compareBtn').onclick = () => {
 };
 
 $('#zoomBtn').onclick = () => { state.fit = !state.fit; renderTabs(); scale(); };
+
+/* Replaying clears what each version remembers of its tour and drops back to
+   v1, which is where the full set of points lives. */
+$('#tourBtn').onclick = () => {
+  VERSIONS.forEach(v => { try { sessionStorage.removeItem(`lo-tour:${v.id}`); } catch (e) {} });
+  tourForce = true;
+  state.compare = false;
+  state.current = VERSIONS[0].id;
+  render();
+};
 
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'SELECT') return;
