@@ -288,7 +288,7 @@ const URGENCY = {
 const navBar = () => `
   <nav class="nav">
     <div class="nav__brand">
-      <div class="nav__mark"><svg width="20" height="18"><use href="#i-logo"/></svg></div>
+      <div class="nav__mark"><svg width="22" height="13"><use href="#i-logo"/></svg></div>
       <span class="nav__wordmark t-label-lg">loanoptions</span>
       <span class="nav__product t-body-lg">CRM</span>
     </div>

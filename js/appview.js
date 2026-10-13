@@ -355,8 +355,8 @@ function avRight(d) {
 
     <div class="av-card av-card--ai">
       <div class="av-card__head av-card__head--ai" data-av-collapse>
-        <span class="av-card__glyph">${icon('ai-agent', 15)}</span>
-        <span class="t-label-lg">AI Support Agent</span>
+        <span class="av-card__glyph av-card__glyph--assist">${icon('assist', 16)}</span>
+        <span class="t-label-lg">Broker Assist</span>
         <span class="av-spacer"></span>
         <span class="av-card__chev">${icon('chevron-down', 15)}</span>
       </div>
@@ -387,15 +387,16 @@ function avRight(d) {
 
 function appViewInner(d) {
   const step = (s, i) => `
-    <span class="av-step ${s.active ? 'is-active' : ''} ${s.done ? 'is-done' : ''} ${i === 0 ? 'is-first' : ''}">
-      ${s.done ? icon('check-circle', 16) : `<span class="t-body-sm">${s.label}</span>`}
+    <span class="av-step ${s.active ? 'is-active' : ''} ${s.done ? 'is-done' : ''}
+                 ${i === 0 ? 'is-first' : ''} ${i === AV_STEPS.length - 1 ? 'is-last' : ''}">
+      ${s.done ? icon('check-circle', 16) : `<span>${s.label}</span>`}
     </span>`;
 
   return `
   <div class="av__top">
-    <span class="av__logo">${icon('logo', 26)}</span>
-    <div class="av-path">${AV_STEPS.map(step).join('')}</div>
+    <span class="av__logo"><svg width="30" height="18"><use href="#i-logo"/></svg></span>
     <span class="av-spacer"></span>
+    <div class="av-path">${AV_STEPS.map(step).join('')}</div>
     <span class="av-assign t-body-sm">(04) <b>Assign</b> ${icon('arrow-forward', 14)}</span>
     <span class="av__rule"></span>
     <span class="av__kebab">${icon('kebab', 14)}</span>

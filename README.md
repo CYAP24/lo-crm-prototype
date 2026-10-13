@@ -55,6 +55,8 @@ and one that appears and disappears just shifts the rows.
 
 ```
 assets/fonts/    Articulat CF (Regular / Medium / DemiBold / Bold)
+assets/brand/    logo.svg and assist.svg, exported from CRM-2026. The sprite
+                 in js/icons.js carries copies of both; these are the sources.
 css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ramp.
                  Variable names match the code syntax set on the Figma variables.
 css/worklist.css Layout + components. Shared by all versions.
@@ -122,7 +124,7 @@ working file. Three columns on the 1920 artboard, 420 / 790 / 420 with the
 |---|---|
 | **Left** | Identity, call/email/SMS, overall progress, the activity feed and internal notes |
 | **Middle** | Quick Summary with the four score dials, then Loan / Personal / Employment / Financial / Assets sections |
-| **Right** | Next required actions, Documents, and the AI Support Agent |
+| **Right** | Next required actions, Documents, and Broker Assist |
 
 **Interactions are deliberately thin**, as asked — it is a mock, not a working
 form. Nothing submits and no field edits:
@@ -149,6 +151,15 @@ and the financial figures are fixed mock values from the frame.
 
 The score dials are drawn as SVG arcs rather than dropped in as artwork, so the
 arc follows the value — change a number in `AV_SCORES` and the dial follows.
+
+**The stage path** is a run of chevrons, each a rectangle that comes to a 12px
+point on the right. The left edge is deliberately straight: notching it too
+would eat 12px of label and "Application submitted" no longer fits the 126px
+the frame allows. What separates the steps is the 8px gap, not a notch.
+
+Its three greys are not design-system tokens, so they are sampled from the
+frame rather than guessed — `#E5E5E5` for a step not yet reached, white for one
+already done, and `#F3E9FF` with `#5614BB` text for the one in progress.
 
 v2 and v3 stop at the row; only v1 passes `appView` to the shared mount.
 

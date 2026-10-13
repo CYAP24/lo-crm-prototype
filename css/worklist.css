@@ -26,6 +26,10 @@ html, body {
   width: 1920px;
   height: min(1080px, 100vh);
   margin: 0 auto;
+  /* The deal panel and the application view are absolutely positioned to
+     this box. Without it they resolve against the viewport, which only
+     looks right while the window happens to be 1920 wide. */
+  position: relative;
   background: var(--bg-canvas);
   display: flex;
   flex-direction: column;
