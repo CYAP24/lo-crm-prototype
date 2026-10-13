@@ -35,63 +35,17 @@
   background: var(--bg-brand); color: var(--text-on-dark);
 }
 
-/* Chevron pipeline.
-
-   Each step is a notched chevron: its right edge comes to a 12px point and
-   its left edge is cut by the same 12px, so the run interlocks. Steps are
-   equal width and sit 8px apart, and that 8px is what reads as the thin
-   separator between them.
-
-   Colours are sampled from the frame rather than guessed, because the
-   greys are not design-system tokens: a step not yet reached is #E5E5E5,
-   one already done is white, and the one in progress is #F3E9FF with
-   #5614BB text.
-   -------------------------------------------------------------------------- */
-
-/* 1305px wide in the frame, ending 65px short of the controls. It shrinks
-   rather than grows, so the run keeps its proportions and the steps stay
-   at the frame's 137.9px each: (1305 - 8 gaps x 8px) / 9. */
+/* The stage pipeline, as a flat export of the frame (1305x32). It shrinks
+   rather than grows so it keeps its proportions, and sits 65px short of the
+   controls as the frame has it. */
 .av-path {
   flex: 0 1 1305px;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  height: auto;
   margin-right: 49px;
+  object-fit: contain;
+  object-position: right center;
 }
-
-/* The step is a plain rectangle that comes to a 12px point on the right;
-   its left edge is straight. That is the frame's own geometry, and it
-   matters: notching the left as well would eat 12px of label, and
-   "Application submitted" (119px at 12px Articulat) no longer fits the
-   126px the frame gives it. The separation between steps is the 8px gap,
-   not a notch.
-
-   The point sits inside the step's own box, so padding-right clears it and
-   the label centres on the remaining 126px — which is where the frame
-   centres it too, slightly left of the step's true middle. */
-.av-step {
-  flex: 1 1 0;
-  min-width: 0;
-  height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  padding-right: 12px;
-  background: #E5E5E5;
-  color: var(--text-tertiary);
-  font: var(--weight-medium) 12px/18px var(--font-family);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
-}
-.av-step span {
-  min-width: 0;
-  padding: 0 var(--space-4);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* The run closes square — the last step has nothing to point at. */
-.av-step.is-last { padding-right: 0; clip-path: none; }
-
-.av-step.is-done   { background: #FFFFFF; color: var(--success-base); }
-.av-step.is-active { background: #F3E9FF; color: var(--text-brand); }
 
 .av-assign { color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-6); }
 .av-assign b { color: var(--text-primary); }

@@ -55,8 +55,9 @@ and one that appears and disappears just shifts the rows.
 
 ```
 assets/fonts/    Articulat CF (Regular / Medium / DemiBold / Bold)
-assets/brand/    logo.svg and assist.svg, exported from CRM-2026. The sprite
-                 in js/icons.js carries copies of both; these are the sources.
+assets/brand/    logo.svg and assist.svg, exported from CRM-2026 — the sprite
+                 in js/icons.js carries copies, these are the sources.
+                 stage-path.png is used directly, see below.
 css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ramp.
                  Variable names match the code syntax set on the Figma variables.
 css/worklist.css Layout + components. Shared by all versions.
@@ -152,14 +153,20 @@ and the financial figures are fixed mock values from the frame.
 The score dials are drawn as SVG arcs rather than dropped in as artwork, so the
 arc follows the value — change a number in `AV_SCORES` and the dial follows.
 
-**The stage path** is a run of chevrons, each a rectangle that comes to a 12px
-point on the right. The left edge is deliberately straight: notching it too
-would eat 12px of label and "Application submitted" no longer fits the 126px
-the frame allows. What separates the steps is the 8px gap, not a notch.
+**The stage path is a flat image** — `assets/brand/stage-path.png`, the frame's
+own run of chevrons exported at 1305×32 and dropped in at 1:1.
 
-Its three greys are not design-system tokens, so they are sampled from the
-frame rather than guessed — `#E5E5E5` for a step not yet reached, white for one
-already done, and `#F3E9FF` with `#5614BB` text for the one in progress.
+It was built in CSS first and did not hold up. The chevrons have to interlock
+tightly, and a clip-path run cannot do both halves of that: notch the left edge
+and the labels no longer fit ("Application submitted" needs 119px of the 126px
+a step has), leave it straight and visible gaps open up between the steps.
+Rather than keep trading one off against the other it is a picture for now.
+
+That means it does not reflect the deal — every application shows
+*Application pending*. When the stage needs to be real, this is the piece to
+rebuild, and the greys to match are `#E5E5E5` for a step not yet reached, white
+for one already done, and `#F3E9FF` with `#5614BB` text for the one in
+progress, sampled from the frame.
 
 v2 and v3 stop at the row; only v1 passes `appView` to the shared mount.
 

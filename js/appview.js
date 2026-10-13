@@ -9,18 +9,12 @@
    expand, lists scroll. The fields are presentational — nothing submits.
    ========================================================================== */
 
-/* The pipeline across the top. The first two are done, so they show a tick
-   and no label, exactly as the frame does. */
-const AV_STEPS = [
-  { done: true }, { done: true },
-  { label: 'Application pending', active: true },
-  { label: 'Loan docs pending' },
-  { label: 'Application submitted' },
-  { label: 'Application approved' },
-  { label: 'Tax invoice' },
-  { label: 'Settlement' },
-  { label: 'Closed' }
-];
+/* The stage pipeline is a flat export of the frame's own run of chevrons
+   (assets/brand/stage-path.png, 1305x32). Building it in CSS did not hold
+   up: the chevrons have to interlock tightly, and a clip-path run either
+   leaves gaps between the steps or eats the labels. Static for now — when
+   it needs to reflect a real stage, this is the piece to rebuild. */
+const AV_PATH_IMG = 'assets/brand/stage-path.png';
 
 /* Score gauges. The maximum differs — the lead score is out of 100, the
    credit scores out of 1000 — so each one carries its own. */
@@ -386,17 +380,11 @@ function avRight(d) {
 /* ---------- Shell ---------------------------------------------------------- */
 
 function appViewInner(d) {
-  const step = (s, i) => `
-    <span class="av-step ${s.active ? 'is-active' : ''} ${s.done ? 'is-done' : ''}
-                 ${i === 0 ? 'is-first' : ''} ${i === AV_STEPS.length - 1 ? 'is-last' : ''}">
-      ${s.done ? icon('check-circle', 16) : `<span>${s.label}</span>`}
-    </span>`;
-
   return `
   <div class="av__top">
     <span class="av__logo"><svg width="30" height="18"><use href="#i-logo"/></svg></span>
     <span class="av-spacer"></span>
-    <div class="av-path">${AV_STEPS.map(step).join('')}</div>
+    <img class="av-path" src="${AV_PATH_IMG}" width="1305" height="32" alt="Application pending — stage 3 of 9">
     <span class="av-assign t-body-sm">(04) <b>Assign</b> ${icon('arrow-forward', 14)}</span>
     <span class="av__rule"></span>
     <span class="av__kebab">${icon('kebab', 14)}</span>
