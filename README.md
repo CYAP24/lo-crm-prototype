@@ -69,6 +69,8 @@ js/popups.js      Row popups — Tasks / Notes / Activity cards, with their
 js/tour.js        Points-of-interest tour — engine and the step list per
                   version.
 css/tour.css      Spotlight and callout styles.
+js/appview.js     Application view — the screen a deal opens into (v1).
+css/appview.css   Its styles.
 js/variants.js    Concept renderers (v3–v5).
 worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
                       the shell; open it directly if you need it.
@@ -108,6 +110,42 @@ the presentation changes.
 The draft-parity page carries **its own copy of the row data** in
 `js/rows-draft2.js`. That is deliberate — it is a frozen reference, so editing
 `ROWS` for the redesign must not change what it shows.
+
+## Application view
+
+In **v1**, clicking into a deal opens the full application screen — a rebuild
+of the Figma frame **`Draft #2 - 1920px TO CODE`** (node `4124:6173`) on the
+working file. Three columns on the 1920 artboard, 420 / 790 / 420 with the
+113px gutters the frame uses:
+
+| Column | |
+|---|---|
+| **Left** | Identity, call/email/SMS, overall progress, the activity feed and internal notes |
+| **Middle** | Quick Summary with the four score dials, then Loan / Personal / Employment / Financial / Assets sections |
+| **Right** | Next required actions, Documents, and the AI Support Agent |
+
+**Interactions are deliberately thin**, as asked — it is a mock, not a working
+form. Nothing submits and no field edits:
+
+- every section folds away from its header, and the assistant collapses from its own
+- the middle column scrolls, and each list (activity, notes, tasks, documents) scrolls inside its card
+- the expand control on Activity and Internal notes trades height between the two
+- the external/internal tabs switch
+- `Esc` or the `×` closes it
+
+A click only opens the view from the dead space in a row — the checkbox,
+contact buttons, quick-action pills, sparkle, kebab and person chips all keep
+doing their own job.
+
+**What is real and what is dressing.** The name, reference, amount, loan type
+and the six document rows with their statuses come from the deal you clicked,
+so the view keeps telling the same story as the list. Scores, dates, addresses
+and the financial figures are fixed mock values from the frame.
+
+The score dials are drawn as SVG arcs rather than dropped in as artwork, so the
+arc follows the value — change a number in `AV_SCORES` and the dial follows.
+
+v2 and v3 stop at the row; only v1 passes `appView` to the shared mount.
 
 ## Points-of-interest tour
 

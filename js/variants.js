@@ -648,7 +648,10 @@ function renderWorklist(opts = {}) {
   <aside class="dp" id="dealpanel"></aside>
 
   <!-- Floating row popup: Tasks / Notes / Activity -->
-  <div class="pop" id="rowpop"></div>`;
+  <div class="pop" id="rowpop"></div>
+
+  <!-- Full-screen application view, opened by clicking into a deal -->
+  <div class="av" id="appview"></div>`;
 }
 
 function mountV1(app, opts = {}) {
@@ -812,6 +815,10 @@ function mountV1(app, opts = {}) {
     app.querySelectorAll('.ai-btn').forEach(b => b.addEventListener('click', closePop));
   }
 
+  /* Clicking into a deal opens the full application view. v1 only: the
+     other versions are list experiments and stop at the row. */
+  if (opts.appView) mountAppView(app);
+
   /* Nothing opens on load — the view lands clean, and the column chooser is
      one click on the cog. */
 }
@@ -824,7 +831,7 @@ const renderV3 = () => renderWorklist({ splitActions: true });
 
 const RENDERERS = { v1: renderV1, v2: renderV2, v3: renderV3 };
 const MOUNTERS  = {
-  v1: mountV1,
+  v1: (app) => mountV1(app, { appView: true }),
   v2: (app) => mountV1(app, { assistInPanel: true }),
   v3: mountV1
 };

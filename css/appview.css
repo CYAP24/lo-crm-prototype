@@ -1,0 +1,472 @@
+/* ==========================================================================
+   Application view — the screen a deal opens into.
+   Measurements follow the Figma frame "Draft #2 - 1920px TO CODE":
+   columns 420 / 790 / 420 inside a 32px margin, which leaves 113px gutters.
+   ========================================================================== */
+
+.av {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  background: var(--bg-canvas);
+}
+.av.is-open { display: flex; }
+
+.av-spacer { flex: 1; }
+
+/* ---------- Top bar ------------------------------------------------------- */
+
+.av__top {
+  flex: none;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: 0 var(--space-32);
+  background: var(--bg-base);
+}
+
+.av__logo {
+  width: 49px; height: 49px; flex: none;
+  border-radius: var(--radius-12);
+  display: grid; place-items: center;
+  background: var(--bg-brand); color: var(--text-on-dark);
+}
+
+/* Chevron pipeline. Each step is notched on both sides; the first one is
+   square on the left so the run starts clean. */
+.av-path { display: flex; align-items: center; gap: 8px; margin-left: var(--space-12); }
+
+.av-step {
+  height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 var(--space-20) 0 var(--space-24);
+  background: var(--neutral-200);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%, 12px 50%);
+}
+.av-step.is-first { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%); }
+.av-step.is-done   { color: var(--success-base); }
+.av-step.is-active { background: var(--brand-100); color: var(--text-brand); }
+.av-step.is-active span { font-weight: var(--weight-demi); }
+
+.av-assign { color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-6); }
+.av-assign b { color: var(--text-primary); }
+.av-assign svg { color: var(--text-brand); }
+
+.av__rule { width: 1px; height: 27px; background: var(--border-subtle); }
+.av__kebab,
+.av__close {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.av__close:hover { color: var(--text-primary); }
+
+/* ---------- Body ---------------------------------------------------------- */
+
+.av__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 420px 790px 420px;
+  justify-content: space-between;
+  padding: var(--space-16) var(--space-32) var(--space-20);
+}
+
+.av-col { min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); }
+
+/* ---------- Cards --------------------------------------------------------- */
+
+.av-card,
+.av-ident,
+.av-section,
+.av-summary {
+  background: var(--bg-base);
+  border-radius: var(--radius-16);
+}
+
+.av-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+.av-card__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+.av-card__glyph { display: flex; color: var(--text-brand); }
+
+.av-plus,
+.av-grow,
+.av-kebab {
+  display: flex;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.av-plus { color: var(--text-brand); }
+.av-grow:hover, .av-kebab:hover { color: var(--text-primary); }
+
+/* Every list in this view scrolls inside its card rather than growing it,
+   which is what keeps the three columns the same height. */
+.av-scroll { overflow-y: auto; min-height: 0; }
+.av-scroll::-webkit-scrollbar { width: 4px; }
+.av-scroll::-webkit-scrollbar-track { background: transparent; }
+.av-scroll::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: var(--radius-pill);
+}
+.av-scroll::-webkit-scrollbar-thumb:hover { background: var(--neutral-400); }
+
+/* ---------- Left: identity ------------------------------------------------ */
+
+.av-ident { flex: none; padding: var(--space-16); }
+
+.av-ident__row { display: flex; align-items: center; gap: var(--space-8); }
+.av-ident__av {
+  width: 36px; height: 36px; flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--brand-100); color: var(--text-brand);
+  display: grid; place-items: center;
+  font: var(--weight-demi) 13px/1 var(--font-family);
+}
+.av-ident__who { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.av-ident__who span:first-child { color: var(--text-primary); }
+.av-ident__who span:last-child  { color: var(--text-tertiary); }
+.av-ident__edit { display: flex; color: var(--text-tertiary); cursor: pointer; }
+
+.av-ident__acts { display: flex; gap: var(--space-8); margin-top: var(--space-12); }
+.av-cta {
+  flex: 1;
+  height: 54px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4);
+  border-radius: var(--radius-10);
+  background: var(--bg-surface);
+  color: var(--text-brand);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  cursor: pointer;
+}
+.av-cta:hover { background: var(--brand-50); }
+.av-cta span { color: var(--text-secondary); }
+
+.av-prog { margin-top: var(--space-16); }
+.av-prog__top { display: flex; justify-content: space-between; align-items: center; }
+.av-prog__top span:first-child { color: var(--text-tertiary); }
+.av-prog__top span:last-child  { color: var(--text-brand); }
+.av-prog__track {
+  height: 8px;
+  margin-top: var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--neutral-200);
+  overflow: hidden;
+}
+.av-prog__track i { display: block; height: 100%; background: var(--bg-brand); border-radius: inherit; }
+
+/* ---------- Left: activity + notes ---------------------------------------- */
+
+.av-card--activity { flex: 0 0 311px; }
+.av-card--notes    { flex: 1; min-height: 240px; }
+
+/* The expand control simply trades height between the two cards. */
+.av-card--activity.is-tall { flex: 1 1 auto; }
+.av-card--notes.is-tall    { flex: 2; }
+
+.av-tabs { display: flex; gap: var(--space-12); }
+.av-tab { color: var(--text-tertiary); cursor: pointer; padding-bottom: 2px; }
+.av-tab.is-active { color: var(--text-primary); border-bottom: 1.5px solid var(--text-primary); }
+
+.av-acts { padding: var(--space-16); }
+
+.av-ev { display: flex; gap: var(--space-8); }
+.av-ev__badge {
+  width: 24px; height: 24px; flex: none;
+  border-radius: var(--radius-6);
+  display: grid; place-items: center;
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+}
+.av-ev__badge.is-brand { background: var(--brand-600); color: var(--text-on-dark); }
+.av-ev__body { flex: 1; min-width: 0; padding-bottom: var(--space-16); }
+.av-ev--comment .av-ev__body {
+  border-left: 2px solid var(--brand-500);
+  padding-left: 10px;
+}
+.av-ev__stamp { color: var(--text-tertiary); }
+.av-ev__stamp b { color: var(--text-primary); font-weight: var(--weight-demi); }
+.av-ev__text { color: var(--text-secondary); margin-top: var(--space-4); }
+.av-ev__text.is-log { font-style: italic; color: var(--text-tertiary); }
+.av-ev__chev { display: inline-flex; vertical-align: -1px; margin-right: var(--space-4); color: var(--text-brand); }
+
+.av-notes { padding: var(--space-12) var(--space-16) 0; }
+.av-note { padding-bottom: var(--space-12); }
+.av-note__head { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-4); }
+.av-note__head span:first-child { color: var(--text-primary); }
+.av-note__head .t-body-sm { color: var(--text-tertiary); }
+.av-note__head .av-kebab { margin-left: auto; }
+.av-note__text { color: var(--text-tertiary); }
+
+.av-composer {
+  flex: none;
+  position: relative;
+  margin: var(--space-8) var(--space-16) var(--space-16);
+  min-height: 72px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  color: var(--text-placeholder);
+}
+.av-send {
+  position: absolute;
+  right: var(--space-8); bottom: var(--space-8);
+  width: 28px; height: 28px;
+  border-radius: var(--radius-6);
+  background: var(--bg-brand); color: var(--text-on-dark);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.av-send:hover { background: var(--bg-brand-hover); }
+
+/* ---------- Middle -------------------------------------------------------- */
+
+.av-col--mid { gap: var(--space-12); }
+
+.av-midbar { flex: none; display: flex; align-items: center; }
+.av-pick {
+  display: inline-flex; align-items: center; gap: var(--space-8);
+  height: 33px; padding: 0 var(--space-12);
+  border-radius: var(--radius-8);
+  background: var(--brand-50);
+  color: var(--text-brand);
+  cursor: pointer;
+}
+.av-save {
+  display: inline-flex; align-items: center; gap: var(--space-8);
+  height: 40px; padding: 0 var(--space-16);
+  border-radius: var(--radius-10);
+  border: 1px solid var(--border-default);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.av-save:hover { border-color: var(--border-brand); color: var(--text-brand); }
+
+.av-mid { display: flex; flex-direction: column; gap: var(--space-16); padding-right: var(--space-4); }
+
+/* Quick summary */
+
+.av-summary { flex: none; padding-top: var(--space-20); }
+.av-summary__title { padding: 0 var(--space-16); color: var(--text-primary); }
+.av-summary__row {
+  display: flex; align-items: center; gap: var(--space-12);
+  padding: var(--space-16) var(--space-16) var(--space-20);
+}
+.av-gauges { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+
+.av-gauge { display: flex; flex-direction: column; align-items: center; }
+.av-gauge__dial { position: relative; width: 86px; height: 86px; display: grid; place-items: center; }
+.av-gauge__n {
+  position: absolute;
+  font: var(--weight-bold) 14.5px/1 var(--font-family);
+  color: #211D30;
+}
+.av-gauge__label {
+  margin-top: -2px;
+  font: var(--weight-medium) 12px/16.5px var(--font-family);
+  color: rgba(136, 136, 136, .7);
+  text-align: center;
+}
+
+.av-attn {
+  flex: none;
+  width: 189px;
+  display: flex; flex-direction: column; gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-left: 1px solid var(--border-subtle);
+}
+.av-attn__label { font: var(--weight-medium) 10px/15px var(--font-family); color: var(--text-tertiary); }
+.av-attn__item { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
+.av-attn__ic { display: flex; }
+.av-attn__ic.is-warn { color: var(--accent-amber); }
+.av-attn__ic.is-err  { color: var(--error-base); }
+
+.av-summary__foot {
+  height: 42px;
+  display: grid; place-items: center;
+  border-top: 1px solid var(--border-subtle);
+}
+.av-link { color: var(--text-brand); text-decoration: underline; cursor: pointer; }
+
+/* Sections */
+
+.av-section { flex: none; padding: var(--space-20); }
+.av-section__head {
+  display: flex; align-items: center; gap: var(--space-12);
+  cursor: pointer;
+}
+.av-section__title { color: var(--text-primary); }
+.av-section__ai { display: flex; color: var(--accent-amber); }
+.av-section__ok { display: flex; color: var(--success-base); }
+.av-section__chev { display: flex; color: var(--text-tertiary); transition: transform .2s ease; }
+
+/* Collapse by max-height rather than the 1fr -> 0fr grid trick: this
+   container's height is indefinite, so a 0fr track still resolves to the
+   item's content size and nothing moves. The cap only has to clear the
+   tallest section. */
+.av-section__body {
+  overflow: hidden;
+  max-height: 400px;
+  transition: max-height .28s ease, opacity .2s ease;
+}
+.av-section__body > .av-fields { padding-top: var(--space-16); }
+
+.av-section.is-collapsed .av-section__body { max-height: 0; opacity: 0; }
+.av-section.is-collapsed .av-section__chev { transform: rotate(-90deg); }
+
+/* Grid, not flex-wrap: the frame's 239/238/239 inside 750px leaves nothing
+   spare, so a sub-pixel rounding up drops the third field onto its own row.
+   Three equal tracks cannot round wrong. */
+.av-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 17px; }
+
+/* Three to a row at any width. The frame has them at 239/238/239 inside
+   750px, but a fixed width loses the third column as soon as the scrollbar
+   takes its 4px, so the thirds are computed instead. */
+.av-field { min-width: 0; display: flex; flex-direction: column; gap: var(--space-6); }
+.av-field__label { font: var(--weight-medium) 11px/16.5px var(--font-family); color: #6E6A81; }
+
+.av-input {
+  position: relative;
+  height: 36px;
+  display: flex; align-items: center;
+  padding: 0 13px;
+  border: 1px solid #E3E2E9;
+  border-radius: var(--radius-10);
+  background: #F6F6F9;
+}
+.av-input__val {
+  flex: 1;
+  font: var(--weight-regular) 14px/1 var(--font-family);
+  color: #211D30;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.av-input__val--mid { font-size: 13px; text-align: center; }
+.av-input__fix { font: var(--weight-regular) 12px/18px var(--font-family); color: #6E6A81; }
+.av-input__fix--pre { margin-right: var(--space-8); }
+.av-input__fix--suf { margin-left: var(--space-8); }
+.av-input__chev { display: flex; color: var(--text-tertiary); margin-left: var(--space-8); }
+
+.av-mid__foot { flex: none; display: grid; place-items: center; padding: var(--space-16) 0 var(--space-24); }
+.av-submit {
+  height: 36px; padding: 0 var(--space-24);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand); color: var(--text-on-dark);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.av-submit:hover { background: var(--bg-brand-hover); }
+
+/* ---------- Right --------------------------------------------------------- */
+
+.av-col--right > .av-card:nth-child(1) { flex: 0 0 285px; }
+.av-col--right > .av-card:nth-child(2) { flex: 1 1 auto; min-height: 200px; }
+
+.av-tasks { padding: var(--space-16); display: flex; flex-direction: column; gap: var(--space-8); }
+
+.av-task {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-12);
+  min-height: 42px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+.av-task__t { flex: 1; color: var(--text-primary); }
+.av-task.is-done { background: var(--bg-surface); border-color: transparent; }
+.av-task.is-done .av-task__t { color: var(--text-tertiary); text-decoration: line-through; }
+.av-tick { display: flex; color: var(--success-base); }
+
+.av-radio {
+  width: 16px; height: 16px; flex: none;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.av-docs { padding: 0 var(--space-20); }
+
+.av-doc {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-12) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.av-doc:last-child { border-bottom: 0; }
+.av-doc__mark { display: flex; color: var(--text-tertiary); }
+.av-doc__mark.is-ok { color: var(--success-base); }
+.av-doc__mark.is-rejected { color: var(--error-base); }
+.av-doc__name { color: var(--text-primary); text-decoration: underline; cursor: pointer; }
+.av-doc__go { display: flex; color: var(--text-tertiary); }
+
+.av-pill {
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  white-space: nowrap;
+}
+.av-pill.is-review   { background: var(--info-bg);    color: var(--info-text); }
+.av-pill.is-pending  { background: var(--warning-bg); color: var(--warning-text); }
+.av-pill.is-rejected { background: var(--error-bg);   color: var(--error-text); }
+
+/* AI support agent */
+
+.av-card--ai { flex: none; }
+.av-card__head--ai {
+  background: var(--brand-50);
+  color: var(--text-brand);
+  cursor: pointer;
+  border-bottom: 0;
+}
+.av-card__head--ai .av-card__glyph { color: var(--text-brand); }
+.av-card__chev { display: flex; transition: transform .2s ease; }
+
+.av-card__body { overflow: hidden; }
+.av-card--ai.is-collapsed .av-card__body { display: none; }
+.av-card--ai.is-collapsed .av-card__chev { transform: rotate(-180deg); }
+
+.av-ai__msg { padding: var(--space-16) var(--space-12) var(--space-12); }
+.av-ai__stamp { color: var(--text-tertiary); }
+.av-ai__stamp b { color: var(--text-primary); font-weight: var(--weight-demi); }
+.av-ai__text { color: var(--text-secondary); margin-top: var(--space-4); }
+
+.av-ai__input {
+  position: relative;
+  margin: 0 var(--space-12) var(--space-16);
+  height: 120px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-surface);
+}
+.av-ai__ph { color: var(--text-placeholder); }
+.av-ai__tools {
+  position: absolute;
+  left: var(--space-8); right: var(--space-8); bottom: var(--space-8);
+  display: flex; align-items: center; gap: var(--space-6);
+}
+.av-chip {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  height: 24px; padding: 0 var(--space-8);
+  border-radius: var(--radius-6);
+  border: 1px solid var(--brand-200);
+  background: var(--bg-base);
+  color: var(--text-brand);
+}
+.av-ai__tools .av-send { position: static; }
+
+/* The tour belongs to the worklist underneath, so it steps aside while
+   the application view is up. */
+body.appview-open .tour { display: none; }

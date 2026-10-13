@@ -157,6 +157,50 @@ const ICON_SPRITE = `
     <circle cx="5" cy="19" r="1.9"/><circle cx="12" cy="19" r="1.9"/><circle cx="19" cy="19" r="1.9"/>
   </symbol>
 
+
+  <!-- ---------- Application view ---------- -->
+  <symbol id="i-pencil" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.2 2.6a1.6 1.6 0 0 1 2.2 2.2L5.6 12.6l-3 .8.8-3z"/>
+  </symbol>
+  <symbol id="i-expand" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.6 2.4h4v4M6.4 13.6h-4v-4M13.6 2.4 9.2 6.8M2.4 13.6l4.4-4.4"/>
+  </symbol>
+  <symbol id="i-check-circle" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="8" r="6.2"/><path d="m5.3 8.2 1.9 1.9 3.5-3.9"/>
+  </symbol>
+  <symbol id="i-check-fill" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="7" fill="currentColor"/>
+    <path d="m5 8.2 2 2 4-4.3" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-warn-tri" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2.6 14.4 13.4H1.6z"/><path d="M8 6.6v3M8 11.6v.01"/>
+  </symbol>
+  <symbol id="i-x-circle" viewBox="0 0 16 16">
+    <circle cx="8" cy="8" r="7" fill="currentColor"/>
+    <path d="m5.8 5.8 4.4 4.4M10.2 5.8l-4.4 4.4" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-save" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.4 2.6h7l3 3v8a.8.8 0 0 1-.8.8H3.4a.8.8 0 0 1-.8-.8V3.4a.8.8 0 0 1 .8-.8z"/>
+    <path d="M5.2 2.6v4h5.2v-4M5.2 10.2h5.6"/>
+  </symbol>
+  <symbol id="i-arrow-forward" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.4 3.4 14 8l-4.6 4.6"/><path d="M14 8H4.6A2.6 2.6 0 0 0 2 10.6v2"/>
+  </symbol>
+  <symbol id="i-article" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.4" y="2.4" width="11.2" height="11.2" rx="2"/><path d="M5 5.8h6M5 8.4h6M5 11h3.6"/>
+  </symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m6.3 4 4 4-4 4"/>
+  </symbol>
+  <symbol id="i-sort" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.4 2.8v10.4M2.2 11l2.2 2.2L6.6 11M11.6 13.2V2.8M9.4 5l2.2-2.2L13.8 5"/>
+  </symbol>
+  <symbol id="i-ai-agent" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2.6" y="5" width="10.8" height="8" rx="2.4"/>
+    <path d="M8 5V2.6M5.6 8.6v1M10.4 8.6v1M1 8.4v2M15 8.4v2"/>
+    <circle cx="8" cy="2" r="1"/>
+  </symbol>
+
 </defs></svg>`;
 
 document.addEventListener('DOMContentLoaded', () => {
