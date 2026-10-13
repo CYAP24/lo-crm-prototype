@@ -596,6 +596,7 @@
    AI assist and the overflow menu are pinned, at the right edge. */
 .v1 .v1-checkcell { display: grid; place-items: center; height: 100%; }
 .v1 .v1-lead { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.v1 .v1-lead__name { color: var(--text-primary); }
 
 /* Stage labels stay put, so you always know which group you are inside.
    They are section headers rather than columns, so they do not scroll. */

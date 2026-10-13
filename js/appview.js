@@ -452,15 +452,15 @@ function mountAppView(app) {
       }));
   };
 
-  /* A row opens its deal, but only from the dead space between controls —
-     every control in the row keeps doing its own job. */
-  const INERT = '.v1-check,.v1-checkcell,.contact-btn,.v1-pill,.ai-btn,.v1-kebab,.chip-person,.qai__item,.qa,.v1-sticky';
-
-  app.querySelectorAll('[data-deal-row]').forEach(row => {
-    row.addEventListener('click', (e) => {
-      if (e.target.closest(INERT)) return;
+  /* The lead-details cell is the way in — the name and reference are what
+     identify the deal, so that is what opens it. Every other cell in the row
+     keeps doing its own job, and marking the cell here means the affordance
+     only ever appears where the click actually works. */
+  app.querySelectorAll('[data-deal-row] .v1-lead').forEach(cell => {
+    cell.classList.add('is-openable');
+    cell.addEventListener('click', (e) => {
       e.stopPropagation();
-      open(Number(row.dataset.dealRow));
+      open(Number(cell.closest('[data-deal-row]').dataset.dealRow));
     });
   });
 

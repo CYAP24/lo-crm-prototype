@@ -536,7 +536,7 @@ function renderWorklist(opts = {}) {
       <div class="v1-lead" style="gap:2px;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;min-width:0">
           ${d.pinned ? `<span style="color:var(--text-brand);display:flex">${icon('pin', 13)}</span>` : ''}
-          <span class="t-label-md" style="color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</span>
+          <span class="v1-lead__name t-label-md" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</span>
         </div>
         <div class="t-body-sm" style="color:var(--text-tertiary);white-space:nowrap">${d.ref}</div>
       </div>

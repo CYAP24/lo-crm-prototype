@@ -467,6 +467,19 @@
 }
 .av-ai__tools .av-send { position: static; }
 
+/* ---------- The way in ----------------------------------------------------
+   Only the lead-details cell opens the application view, so only it gets the
+   affordance. The class is added by the mount, which means it can never
+   appear on a version that has not wired the view up.
+   -------------------------------------------------------------------------- */
+
+.v1-lead.is-openable { cursor: pointer; }
+.v1-lead.is-openable:hover .v1-lead__name {
+  color: var(--text-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* The tour belongs to the worklist underneath, so it steps aside while
    the application view is up. */
 body.appview-open .tour { display: none; }

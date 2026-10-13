@@ -133,9 +133,14 @@ form. Nothing submits and no field edits:
 - the external/internal tabs switch
 - `Esc` or the `×` closes it
 
-A click only opens the view from the dead space in a row — the checkbox,
-contact buttons, quick-action pills, sparkle, kebab and person chips all keep
-doing their own job.
+**The way in is the lead-details cell** — the name and reference are what
+identify the deal, so that is what opens it. It takes a pointer and the name
+underlines on hover. Every other cell keeps doing its own job: the pills still
+open their popups, the sparkle still opens Broker Assist.
+
+The affordance is added by the mount rather than written into the stylesheet,
+so it can only ever appear on a version that has actually wired the view up —
+v2 and v3 render the same cell and leave it inert.
 
 **What is real and what is dressing.** The name, reference, amount, loan type
 and the six document rows with their statuses come from the deal you clicked,
