@@ -196,9 +196,9 @@ function avMiddle(d) {
   return `
   <div class="av-col av-col--mid">
     <div class="av-midbar">
-      <span class="av-pick t-body-md">${icon('sort', 15)} Quick Summary ${icon('chevron-down', 15)}</span>
+      <span class="av-pick">${icon('sort', 15)} Quick Summary ${icon('chevron-down', 15)}</span>
       <span class="av-spacer"></span>
-      <span class="av-save t-label-md">${icon('save', 16)} Save Changes</span>
+      <span class="av-save">${icon('save', 16)} Save Changes</span>
     </div>
 
     <div class="av-scroll av-mid">

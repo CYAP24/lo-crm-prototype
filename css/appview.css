@@ -249,24 +249,43 @@
 .av-col--mid { gap: var(--space-12); }
 
 .av-midbar { flex: none; display: flex; align-items: center; }
-.av-pick {
-  display: inline-flex; align-items: center; gap: var(--space-8);
-  height: 33px; padding: 0 var(--space-12);
-  border-radius: var(--radius-8);
-  background: var(--brand-50);
-  color: var(--text-brand);
-  cursor: pointer;
-}
+/* Both toolbar controls lift off the ground the same way the frame has
+   them: a soft 1px/1px/3px shadow at radius 10, a near-white translucent
+   fill, dark label, purple glyph. Neither is a brand-filled button — the
+   only brand colour is the icon. */
+.av-pick,
 .av-save {
-  display: inline-flex; align-items: center; gap: var(--space-8);
-  height: 40px; padding: 0 var(--space-16);
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--radius-10);
-  border: 1px solid var(--border-default);
-  background: var(--bg-base);
-  color: var(--text-primary);
+  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, .12);
+  font: var(--weight-medium) 12px/18px var(--font-family);
   cursor: pointer;
+  transition: box-shadow .16s ease;
 }
-.av-save:hover { border-color: var(--border-brand); color: var(--text-brand); }
+.av-pick svg,
+.av-save svg { color: var(--text-brand); }
+
+.av-pick:hover,
+.av-save:hover { box-shadow: 1px 2px 6px 0 rgba(0, 0, 0, .16); }
+
+.av-pick {
+  gap: var(--space-4);
+  padding: var(--space-8);
+  background: rgba(233, 236, 239, .8);
+  border: 1px solid var(--neutral-100);
+  backdrop-filter: blur(3px);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.av-save {
+  gap: var(--space-6);
+  padding: 6.5px 13px 7.5px;
+  background: rgba(248, 249, 250, .7);
+  border: 1px solid #E3E2E9;
+  color: #211D30;
+}
 
 .av-mid { display: flex; flex-direction: column; gap: var(--space-16); padding-right: var(--space-4); }
 
