@@ -130,7 +130,7 @@ The draft-parity page carries **its own copy of the row data** in
 
 ## Application view
 
-In **v1**, clicking into a deal opens the full application screen — a rebuild
+Clicking into a deal opens the full application screen — a rebuild
 of the Figma frame **`Draft #2 - 1920px TO CODE`** (node `4124:6173`) on the
 working file. Three columns on the 1920 artboard, 420 / 790 / 420 with the
 113px gutters the frame uses:
@@ -161,8 +161,7 @@ underlines on hover. Every other cell keeps doing its own job: the pills still
 open their popups, the sparkle still opens Broker Assist.
 
 The affordance is added by the mount rather than written into the stylesheet,
-so it can only ever appear on a version that has actually wired the view up —
-v2 and v3 render the same cell and leave it inert.
+so it can only ever appear on a version that has actually wired the view up.
 
 **What is real and what is dressing.** The name, reference, amount, loan type
 and the six document rows with their statuses come from the deal you clicked,
@@ -187,7 +186,10 @@ rebuild, and the greys to match are `#E5E5E5` for a step not yet reached, white
 for one already done, and `#F3E9FF` with `#5614BB` text for the one in
 progress, sampled from the frame.
 
-v2 and v3 stop at the row; only v1 passes `appView` to the shared mount.
+All three versions open into it: each passes `appView` to the shared mount.
+They still differ in the row itself — v2 keeps Broker Assist in its quick-view
+sidebar, v3 keeps the split action columns — but the screen behind a deal is
+the same one.
 
 ## Points-of-interest tour
 

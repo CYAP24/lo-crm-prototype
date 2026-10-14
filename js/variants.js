@@ -830,10 +830,13 @@ const renderV2 = () => renderWorklist({ colourful: true, inlineActions: true });
 const renderV3 = () => renderWorklist({ splitActions: true });
 
 const RENDERERS = { v1: renderV1, v2: renderV2, v3: renderV3 };
+/* Every version opens a deal into the application view now; v2 keeps its
+   own difference, which is Broker Assist living in the quick-view sidebar
+   rather than floating as its own card. */
 const MOUNTERS  = {
   v1: (app) => mountV1(app, { appView: true }),
-  v2: (app) => mountV1(app, { assistInPanel: true }),
-  v3: mountV1
+  v2: (app) => mountV1(app, { appView: true, assistInPanel: true }),
+  v3: (app) => mountV1(app, { appView: true })
 };
 
 document.addEventListener('DOMContentLoaded', () => {
