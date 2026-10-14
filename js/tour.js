@@ -35,8 +35,8 @@ const TOURS = {
     {
       sel: '.v1-row .ai-btn',
       title: 'Ask Broker Assist',
-      body: 'The sparkle sits on every deal. It summarises where that one is up to and what is blocking it.',
-      cue: 'Click the sparkle'
+      body: 'The mark sits on every deal. It summarises where that one is up to and what is blocking it.',
+      cue: 'Click the Broker Assist mark'
     },
     {
       sel: '.v1-row .v1-acts',
@@ -76,8 +76,8 @@ const TOURS = {
     {
       sel: '.v1-row .ai-btn',
       title: 'Broker Assist lives in the sidebar',
-      body: 'In this version the sparkle opens Broker Assist as a fourth tab of that same sidebar — one surface instead of two.',
-      cue: 'Click the sparkle'
+      body: 'In this version the mark opens Broker Assist as a fourth tab of that same sidebar — one surface instead of two.',
+      cue: 'Click the Broker Assist mark'
     }
   ]
 };

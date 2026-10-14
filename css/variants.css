@@ -287,7 +287,9 @@
   color: var(--text-brand);
   cursor: pointer;
 }
-.ai-btn.is-on { background: var(--bg-brand); border-color: var(--bg-brand); color: #fff; }
+/* Held-down reads as a brand tint rather than a brand fill: the mark is a
+   purple-to-red gradient, so it would vanish on a purple ground. */
+.ai-btn.is-on { background: var(--bg-brand-subtle); border-color: var(--border-brand); }
 
 /* A floating overlay, not part of the layout: the list runs full width
    underneath it and the popup sits on top. */
@@ -328,11 +330,14 @@
   cursor: pointer;
 }
 .hailo__close:hover { background: var(--bg-muted); color: var(--text-primary); }
+/* Same reason as .ai-btn.is-on — a tinted disc, not a filled one, so the
+   gradient mark stays legible. */
 .hailo__mark {
   width: 34px; height: 34px; flex: none;
   border-radius: 999px;
   display: grid; place-items: center;
-  background: var(--bg-brand); color: #fff;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
 }
 
 .hailo__body {

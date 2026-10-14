@@ -273,7 +273,7 @@ const PANEL_TABS = {
   notes:    { label: 'Notes',        render: panelNotes,    count: (d) => d.notes },
   activity: { label: 'Activity',     render: panelActivity, count: (d) => d.events },
   /* No count — a summary is one thing, so a number would say nothing. */
-  assist:   { label: 'Broker Assist', render: panelAssist,  glyph: 'sparkle' }
+  assist:   { label: 'Broker Assist', render: panelAssist,  glyph: 'assist' }
 };
 
 /* Which sections the panel offers. v2 folds Broker Assist in; the others
@@ -400,7 +400,7 @@ function hailoPanelInner(d) {
   const li = (a) => a.map(x => `<li>${x}</li>`).join('');
   return `
     <div class="hailo__head">
-      <span class="hailo__mark">${icon('sparkle', 16)}</span>
+      <span class="hailo__mark">${icon('assist', 18)}</span>
       <div style="flex:1;min-width:0">
         <div class="t-label-md" style="color:var(--text-primary)">Broker Assist</div>
         <div class="t-caption" style="color:var(--text-tertiary)">Summarising ${d.name}</div>
@@ -579,7 +579,7 @@ function renderWorklist(opts = {}) {
       ${personChip(d.partner)}
 
       <span class="v1-sticky">
-        <span class="ai-btn" data-deal-btn="${i}" title="Ask Broker Assist to summarise this deal">${icon('sparkle', 16)}</span>
+        <span class="ai-btn" data-deal-btn="${i}" title="Ask Broker Assist to summarise this deal">${icon('assist', 18)}</span>
         <span class="v1-kebab">${icon('kebab')}</span>
       </span>
     </div>`;
