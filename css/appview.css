@@ -403,6 +403,14 @@
 
 /* ---------- Right --------------------------------------------------------- */
 
+/* The column runs to the screen edge rather than stopping at the body's
+   bottom padding, so the assistant docked inside it can sit flush. Doing
+   it here keeps the maths in one place — the card itself then needs no
+   negative margin, and its raised state can anchor to bottom: 0. */
+.av-col--right {
+  position: relative;
+  margin-bottom: calc(-1 * var(--space-20));
+}
 .av-col--right > .av-card:nth-child(1) { flex: 0 0 285px; }
 .av-col--right > .av-card:nth-child(2) { flex: 1 1 auto; min-height: 200px; }
 
@@ -456,10 +464,39 @@
 /* Outlined rather than bare: the card is white on a #F5F5F5 ground, and
    its tinted header already carries an edge, so without this the body
    below just dissolves into the page. */
+/* The assistant is a dock, not another card in the stack: it runs to the
+   bottom edge of the screen, losing the body's bottom padding along with
+   its own lower corners and border, so it reads as attached rather than
+   floating with the others. */
 .av-card--ai {
   flex: none;
   border: 1px solid var(--border-subtle);
+  border-bottom: 0;
+  border-radius: var(--radius-16) var(--radius-16) 0 0;
 }
+
+/* Expanded it rises over Documents, stopping just under that card's
+   heading so you can still see what is behind. The top is expressed as
+   the stack above it — the actions card, the column gap, and a heading —
+   rather than a magic number. */
+.av-card--ai.is-raised {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  top: calc(285px + var(--space-16) + 48px);
+  z-index: 6;
+  box-shadow: var(--elevation-overlay);
+}
+
+/* Expanded, the thread takes the new room and the prompt stays put. */
+.av-card--ai .av-card__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.av-card--ai .av-ai__msg { flex: 1; min-height: 0; overflow-y: auto; }
+.av-card--ai .av-ai__input { flex: none; }
 .av-card__head--ai {
   background: linear-gradient(90deg, #E7E9EC 0%, #DBC8FB 100%);
   color: var(--text-brand);
@@ -470,8 +507,9 @@
 .av-card__chev { display: flex; transition: transform .2s ease; }
 
 .av-card__body { overflow: hidden; }
-.av-card--ai.is-collapsed .av-card__body { display: none; }
-.av-card--ai.is-collapsed .av-card__chev { transform: rotate(-180deg); }
+/* The glyph points up because up is what the control does; it flips to
+   point back down once the panel is open. */
+.av-card--ai.is-raised .av-card__chev { transform: rotate(180deg); }
 
 .av-ai__msg { padding: var(--space-16) var(--space-12) var(--space-12); }
 .av-ai__stamp { color: var(--text-tertiary); }

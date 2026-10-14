@@ -348,11 +348,11 @@ function avRight(d) {
     </div>
 
     <div class="av-card av-card--ai">
-      <div class="av-card__head av-card__head--ai" data-av-collapse>
+      <div class="av-card__head av-card__head--ai" data-av-expand>
         <span class="av-card__glyph av-card__glyph--assist">${icon('assist', 16)}</span>
         <span class="t-label-lg">Broker Assist</span>
         <span class="av-spacer"></span>
-        <span class="av-card__chev">${icon('chevron-down', 15)}</span>
+        <span class="av-card__chev">${icon('chevron-up', 15)}</span>
       </div>
       <div class="av-card__body">
         <div class="av-ai__msg">
@@ -425,8 +425,8 @@ function mountAppView(app) {
     av.querySelectorAll('.av-section__head').forEach(h =>
       h.addEventListener('click', () => h.closest('.av-section').classList.toggle('is-collapsed')));
 
-    av.querySelectorAll('[data-av-collapse]').forEach(h =>
-      h.addEventListener('click', () => h.closest('.av-card').classList.toggle('is-collapsed')));
+    av.querySelectorAll('[data-av-expand]').forEach(h =>
+      h.addEventListener('click', () => h.closest('.av-card').classList.toggle('is-raised')));
 
     /* Only one can be expanded: they occupy the same space. */
     av.querySelectorAll('[data-av-grow]').forEach(b =>

@@ -144,7 +144,10 @@ working file. Three columns on the 1920 artboard, 420 / 790 / 420 with the
 **Interactions are deliberately thin**, as asked — it is a mock, not a working
 form. Nothing submits and no field edits:
 
-- every section folds away from its header, and the assistant collapses from its own
+- every section folds away from its header
+- Broker Assist is docked to the bottom edge rather than stacked with the other
+  cards; its chevron raises it over Documents, stopping just under that card's
+  heading so you can still see what is behind
 - the middle column scrolls, and each list (activity, notes, tasks, documents) scrolls inside its card
 - the expand control on Activity or Internal notes lifts that panel over the
   whole left column, covering the identity block and the other panel; only one
