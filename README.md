@@ -9,6 +9,19 @@ Static 1920×1080 mock-ups built on the design system in the Figma file
 python serve.py
 ```
 
+### Seeing your changes
+
+Run `python stamp.py` after editing anything under `css/` or `js/`, and
+before committing. It rewrites every page's `<link>` and `<script src>` to
+`...css?v=<hash of that file>`.
+
+Without it, an edit can be live on the server and still invisible in the
+browser: the URL `css/appview.css` is the same whether or not its contents
+changed, and GitHub Pages serves it with `max-age=600`, so a browser that
+already has a copy keeps using it. A content hash makes a changed file a
+different URL, so it is fetched — and an unchanged file keeps its hash and
+stays cached. It is safe to run twice.
+
 `serve.py` is a plain static server that sends `no-store`. That matters here:
 versions get rewritten **in place** during iteration, so the filename never
 changes and a normal server lets the browser keep showing the previous design
@@ -62,6 +75,7 @@ css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ram
                  Variable names match the code syntax set on the Figma variables.
 css/worklist.css Layout + components. Shared by all versions.
 css/draft2.css   Overrides for the draft-parity page only.
+stamp.py         Rewrites asset links with a content hash, see above.
 js/icons.js      SVG sprite + icon() helper. Shared by all versions.
 js/rows.js       Row data (ROWS) + renderer for the redesign versions.
 js/rows-draft2.js Frozen data + renderer for the draft-parity page.
