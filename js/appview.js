@@ -428,10 +428,14 @@ function mountAppView(app) {
     av.querySelectorAll('[data-av-collapse]').forEach(h =>
       h.addEventListener('click', () => h.closest('.av-card').classList.toggle('is-collapsed')));
 
+    /* Only one can be expanded: they occupy the same space. */
     av.querySelectorAll('[data-av-grow]').forEach(b =>
       b.addEventListener('click', (e) => {
         e.stopPropagation();
-        b.closest('.av-card').classList.toggle('is-tall');
+        const card = b.closest('.av-card');
+        const opening = !card.classList.contains('is-tall');
+        av.querySelectorAll('.av-card.is-tall').forEach(c => c.classList.remove('is-tall'));
+        card.classList.toggle('is-tall', opening);
       }));
 
     av.querySelectorAll('.av-tab').forEach(t =>

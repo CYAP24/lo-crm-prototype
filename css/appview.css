@@ -117,7 +117,7 @@
 
 /* Every list in this view scrolls inside its card rather than growing it,
    which is what keeps the three columns the same height. */
-.av-scroll { overflow-y: auto; min-height: 0; }
+.av-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .av-scroll::-webkit-scrollbar { width: 4px; }
 .av-scroll::-webkit-scrollbar-track { background: transparent; }
 .av-scroll::-webkit-scrollbar-thumb {
@@ -175,9 +175,18 @@
 .av-card--activity { flex: 0 0 311px; }
 .av-card--notes    { flex: 1; min-height: 240px; }
 
-/* The expand control simply trades height between the two cards. */
-.av-card--activity.is-tall { flex: 1 1 auto; }
-.av-card--notes.is-tall    { flex: 2; }
+/* Expanded, a panel takes the whole column rather than trading height with
+   its neighbour — there is not enough room between the two to share, and
+   the point of expanding is to read a long thread. It lifts over the
+   identity block and the other card, and the shadow says so. */
+.av-col--left { position: relative; }
+
+.av-card.is-tall {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-shadow: var(--elevation-overlay);
+}
 
 .av-tabs { display: flex; gap: var(--space-12); }
 .av-tab { color: var(--text-tertiary); cursor: pointer; padding-bottom: 2px; }
@@ -433,7 +442,7 @@
   border: 1px solid var(--border-subtle);
 }
 .av-card__head--ai {
-  background: var(--brand-50);
+  background: linear-gradient(90deg, #E7E9EC 0%, #DBC8FB 100%);
   color: var(--text-brand);
   cursor: pointer;
   border-bottom: 0;

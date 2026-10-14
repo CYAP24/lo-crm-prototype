@@ -146,7 +146,9 @@ form. Nothing submits and no field edits:
 
 - every section folds away from its header, and the assistant collapses from its own
 - the middle column scrolls, and each list (activity, notes, tasks, documents) scrolls inside its card
-- the expand control on Activity and Internal notes trades height between the two
+- the expand control on Activity or Internal notes lifts that panel over the
+  whole left column, covering the identity block and the other panel; only one
+  can be expanded, since they take the same space
 - the external/internal tabs switch
 - `Esc` or the `×` closes it
 
