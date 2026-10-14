@@ -4,13 +4,18 @@
    columns 420 / 790 / 420 inside a 32px margin, which leaves 113px gutters.
    ========================================================================== */
 
+/* The whole view, header included, sits on one flat ground rather than the
+   worklist's canvas grey. It is also what the stage-path export has behind
+   its own rounded ends, so that image blends instead of showing corners. */
+.av { --av-ground: #F5F5F5; }
+
 .av {
   position: absolute;
   inset: 0;
   z-index: 200;
   display: none;
   flex-direction: column;
-  background: var(--bg-canvas);
+  background: var(--av-ground);
 }
 .av.is-open { display: flex; }
 
@@ -25,7 +30,7 @@
   align-items: center;
   gap: var(--space-16);
   padding: 0 var(--space-32);
-  background: var(--bg-base);
+  background: var(--av-ground);
 }
 
 .av__logo {
