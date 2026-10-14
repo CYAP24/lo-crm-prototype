@@ -425,7 +425,13 @@
 
 /* AI support agent */
 
-.av-card--ai { flex: none; }
+/* Outlined rather than bare: the card is white on a #F5F5F5 ground, and
+   its tinted header already carries an edge, so without this the body
+   below just dissolves into the page. */
+.av-card--ai {
+  flex: none;
+  border: 1px solid var(--border-subtle);
+}
 .av-card__head--ai {
   background: var(--brand-50);
   color: var(--text-brand);
