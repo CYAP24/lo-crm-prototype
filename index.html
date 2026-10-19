@@ -190,7 +190,7 @@ body { display: flex; flex-direction: column; }
 <div class="stage" id="stage"></div>
 
 <div class="hint" id="hint">
-  <span><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> switch</span>
+  <span><span id="hintKeys"></span> switch</span>
   <span><span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> step</span>
   <span><span class="kbd">C</span> compare</span>
   <span><span class="kbd">Z</span> zoom</span>
@@ -207,7 +207,12 @@ const VERSIONS = [
   { id:'v2', label:'v2', sub:'Colour coded', file:'worklist-v2.html',
     note:'v1 base · stage colour throughout · documents as status boxes' },
   { id:'v3', label:'v3', sub:'Split actions', file:'worklist-v3.html',
-    note:'v1 base · Tasks, Notes and Activity as separate columns' }
+    note:'v1 base · Tasks, Notes and Activity as separate columns' },
+  /* Not a work-list version — a standalone copy of the application view,
+     being reworked into a different screen. It sits in the shell so it can
+     be opened the same way as the rest. */
+  { id:'s2', label:'s2', sub:'New screen', file:'screen2.html',
+    note:'Copy of the application view · a different screen, in progress' }
 ];
 
 const W = 1920, H = 1080;
@@ -382,6 +387,9 @@ window.addEventListener('hashchange', () => { readHash(); render(); });
 
 readHash();
 render();
+
+/* One key per version, so the hint cannot fall behind the VERSIONS array. */
+$('#hintKeys').innerHTML = VERSIONS.map((v, i) => `<span class="kbd">${i + 1}</span>`).join(' ');
 
 setTimeout(() => $('#hint').classList.add('hint--gone'), 5000);
 </script>

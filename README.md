@@ -88,11 +88,14 @@ js/tour.js        Points-of-interest tour — engine and the step list per
 css/tour.css      Spotlight and callout styles.
 js/appview.js     Application view — the screen a deal opens into (v1).
 css/appview.css   Its styles.
+js/screen2.js     Screen 2 — a standalone copy of the application view, being
+css/screen2.css   reworked into a different screen. See below.
 js/variants.js    Concept renderers (v3–v5).
 worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
                       the shell; open it directly if you need it.
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
+screen2.html          Screen 2 — the copy of the application view.
 ```
 
 ## Versions
@@ -190,6 +193,32 @@ All three versions open into it: each passes `appView` to the shared mount.
 They still differ in the row itself — v2 keeps Broker Assist in its quick-view
 sidebar, v3 keeps the split action columns — but the screen behind a deal is
 the same one.
+
+## Screen 2 — the copy of the application view
+
+`screen2.html` is a **standalone duplicate of the application view**, the
+starting point for a different screen. It is a copy rather than a second
+skin, because the two are meant to diverge: the `av` prefix was renamed to
+`s2` throughout, so `js/screen2.js` and `css/screen2.css` can be reshaped
+freely without any of it reaching the screen a deal opens into.
+
+It still shares what is genuinely common — `css/tokens.css`, the icon sprite
+in `js/icons.js`, and the deal data in `js/data.js`.
+
+Two things differ from the original, both because this is a screen in its own
+right rather than an overlay over the work list:
+
+- it renders on load, from `DEALS[0]`, instead of waiting for a row to be
+  clicked — so the `.is-open` gate and the row-opening wiring are gone
+- the close `×` is gone from the top bar: there is nothing behind it to close
+  back to
+
+The interactions that were asked for are all still there — sections collapse,
+Activity and Internal notes expand over the column, Broker Assist raises, the
+external/internal tabs switch, the lists scroll.
+
+It is registered in the shell as the **s2** tab, so it opens the same way as
+the work-list versions, and on its own at `/screen2.html`.
 
 ## Points-of-interest tour
 
