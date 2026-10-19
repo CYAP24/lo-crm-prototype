@@ -29,9 +29,10 @@ under the current name. If you ever serve this another way, hard-refresh
 (`Ctrl+Shift+R`) after any edit.
 
 Then open <http://localhost:8137/> — that's the work-list prototype view,
-which is the easiest way in. The other screen has its own prototype view at
+which is the easiest way in. The other screens have their own prototype
+views at <http://localhost:8137/kanban.html> and
 <http://localhost:8137/screen2.html>. Individual versions are at
-`/worklist-v2.html`, `/screen2-v1.html` etc. if you want one on its own.
+`/worklist-v2.html`, `/kanban-v1.html` etc. if you want one on its own.
 
 Opening the `.html` directly with `file://` will **not** work — the stylesheets
 and fonts won't resolve. It needs to be served.
@@ -44,10 +45,11 @@ screen's versions and lets you switch between them:
 | Page | Screen | Versions |
 |---|---|---|
 | `index.html` | The work list | v1, v2, v3 |
+| `kanban.html` | The kanban board | v1 |
 | `screen2.html` | Screen 2 | v1 |
 
-Each numbers its versions **from v1 in its own right**: screen 2's v1 and the
-work list's v1 are different screens, not two takes on one.
+Each numbers its versions **from v1 in its own right**: the kanban's v1 and
+the work list's v1 are different screens, not two takes on one.
 
 | Control | |
 |---|---|
@@ -128,6 +130,8 @@ js/tour.js        Points-of-interest tour — engine and the step list per
 css/tour.css      Spotlight and callout styles.
 js/appview.js     Application view — the screen a deal opens into (v1).
 css/appview.css   Its styles.
+js/kanban.js      Kanban board — the deals as cards. See below.
+css/kanban.css    Its styles, on top of worklist.css.
 js/screen2.js     Screen 2 — a standalone copy of the application view, being
 css/screen2.css   reworked into a different screen. See below.
 js/variants.js    Concept renderers (v3–v5).
@@ -136,6 +140,8 @@ worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
 index.html            The work-list prototype view — v1, v2, v3.
+kanban.html           The kanban prototype view — v1.
+kanban-v1.html        Kanban, v1 — the board.
 screen2.html          The screen-2 prototype view — v1.
 screen2-v1.html       Screen 2, v1 — the copy of the application view.
 ```
@@ -235,6 +241,51 @@ All three versions open into it: each passes `appView` to the shared mount.
 They still differ in the row itself — v2 keeps Broker Assist in its quick-view
 sidebar, v3 keeps the split action columns — but the screen behind a deal is
 the same one.
+
+## Kanban view
+
+`kanban-v1.html` is a rebuild of the Figma frame **`Draft #2 - 1440 px`**
+(node `4235:8867`) — the deals as cards on a board, grouped by the master
+pipeline stage.
+
+**It runs on the same deals as the work list.** `js/data.js` already carried
+everything a card needs, so nothing is invented: the name, reference, amount,
+product, created and last-activity dates, the stage and its day count, the
+documents, the people on the deal and the task / note / activity counts all
+come from the deal. The column counts are the real ones, so they move when
+the data does.
+
+| Column | |
+|---|---|
+| Qualifying, Discovery, In Progress, Approval, Settlement | `MASTER_STAGES`, in order |
+| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses |
+
+**The artboard is this project's 1920, not the frame's 1440.** The column is
+the unit and keeps the frame's size (340 wide, 12px gutter, 312px cards), so
+the wider artboard shows more of the board rather than a wider board. Six
+columns still do not fit, so the board scrolls sideways — as it does in the
+frame, where four of the six are visible.
+
+**What is drawn rather than dropped in.** The documents ring follows the
+deal's own documents through `docPct`, the way the application view's score
+dials follow their values. At 0% the round cap leaves a single dot at twelve
+o'clock, which is what the frame shows for a deal with nothing collected.
+
+**Where it leaves the frame**, and why:
+
+- the icons are the sprite's, not the frame's exports — `js/icons.js` already
+  carried every one of them
+- the three document counts take the semantic tokens (info / error / warning)
+  rather than the frame's raw hexes
+- the assignee hues come from this project's accents, keyed by initials in
+  `KB_PERSON`, rather than the frame's own identity colours
+- the per-column filter reads `View all` on every column; the frame shows a
+  filter glyph on two of them, and there is no filter state to drive it yet
+
+**Interactions are thin**, as on the other screens: the columns scroll, the
+board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
+a card does not open the application view — both are the obvious next
+things.
 
 ## Screen 2 — the copy of the application view
 

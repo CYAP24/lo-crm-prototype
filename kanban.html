@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanban — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/shell.css?v=6e52a65e">
+<script>
+/* ======================================================================
+   The kanban prototype view — its own version list, numbered from v1.
+
+   Add a version here and it appears everywhere — tabs, compare pickers,
+   keyboard shortcuts and deep links. The chrome itself is js/shell.js,
+   shared with the other prototype views.
+   ====================================================================== */
+window.SHELL = {
+  title: 'Kanban view',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v1',
+  tour:  false,
+  versions: [
+    { id:'v1', label:'v1', sub:'Board', file:'kanban-v1.html',
+      note:'Deals as cards, grouped by master pipeline stage · from the CRM-2026 frame' }
+  ]
+};
+</script>
+<script src="js/shell.js?v=467b5747" defer></script>
+</head>
+<body>
+</body>
+</html>

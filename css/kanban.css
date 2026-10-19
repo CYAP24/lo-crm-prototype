@@ -1,0 +1,414 @@
+/* ==========================================================================
+   Kanban view — the board the work list can switch to.
+   --------------------------------------------------------------------------
+   Measurements follow the Figma frame "Draft #2 - 1440 px" (node 4235:8867):
+   columns 340 wide with a 12px gutter, 312px cards stacked 12px apart, and
+   the card's own 286px content column inset 13px from its edges.
+
+   The frame is 1440 and this artboard is the project's 1920, so the board
+   shows more columns rather than wider ones — the column is the unit, and
+   it keeps the frame's size.
+
+   Everything here sits on top of css/worklist.css, which carries the reset,
+   the artboard, the app bar and the shared components.
+   ========================================================================== */
+
+/* The board's ground, sampled from the frame — the same flat grey the
+   application view stands on, so the two screens share a floor. */
+.kb { --kb-ground: #F5F5F5; }
+
+.kb {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+
+.kb-spacer { flex: 1; }
+
+/* A hairline between toolbar controls, as the frame draws it. */
+.kb-rule { width: 1px; height: 28px; background: var(--border-subtle); flex: none; }
+
+/* ---------- Toolbar -------------------------------------------------------- */
+
+.kb-bar {
+  flex: none;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-24);
+  padding: 0 var(--space-16) 0 var(--space-32);
+  background: var(--bg-base);
+}
+
+.kb-board-name { display: flex; align-items: center; gap: var(--space-8); flex: none; }
+.kb-board-name__ava {
+  width: 28px; height: 28px;
+  background: var(--brand-400);
+  font: var(--weight-demi) 11px/16.5px var(--font-family);
+}
+.kb-board-name__label { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-primary); }
+
+/* The frame's control shell: a hairline box over the page rather than a
+   filled field, with the shadow doing the lifting. */
+.kb-select {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border: 1px solid rgba(206, 212, 218, .5);
+  border-radius: var(--radius-10);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, .12);
+  font: var(--weight-medium) 12px/16.5px var(--font-family);
+  color: var(--text-secondary);
+  flex: none;
+  cursor: pointer;
+}
+.kb-select svg { color: var(--text-secondary); }
+.kb-select--wide { width: 189px; justify-content: space-between; }
+
+.kb-views { display: flex; align-items: center; gap: var(--space-12); flex: none; }
+.kb-view {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--weight-medium) 12px/20px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  opacity: .8;
+}
+.kb-view.is-on {
+  font-weight: var(--weight-demi);
+  color: var(--text-brand);
+  opacity: 1;
+}
+
+.kb-search {
+  width: 336px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  flex: none;
+}
+.kb-search svg { color: var(--text-tertiary); flex: none; }
+.kb-search__ph { font: var(--weight-medium) 12px/20px var(--font-family); color: var(--text-placeholder); }
+
+.kb-new {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 12px/1 var(--font-family);
+  color: var(--text-brand);
+  flex: none;
+  cursor: pointer;
+}
+.kb-new svg { color: var(--text-brand); }
+
+.kb-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-demi) 12px/16.5px var(--font-family);
+  color: var(--text-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  flex: none;
+  cursor: pointer;
+}
+
+/* ---------- Board ---------------------------------------------------------- */
+
+/* The x axis is `scroll` rather than `auto`: six columns never fit the
+   artboard, so the bar is always needed, and one that comes and goes would
+   shift every column each time a card is filtered out. */
+.kb-board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-12);
+  padding: 0 var(--space-16) var(--space-16);
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.kb-col {
+  width: 340px;
+  flex: none;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border-radius: var(--radius-16);
+  background: var(--kb-ground);
+}
+
+.kb-col__head {
+  flex: none;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 0 0 11px;
+  margin-bottom: var(--space-16);
+}
+.kb-col__name { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-primary); }
+.kb-col__n    { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-placeholder); }
+
+/* The per-column filter. It reads as a field rather than a button because
+   it carries the column's own view, which is the thing being changed. */
+.kb-col__filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 33px;
+  padding: 0 var(--space-8);
+  border-radius: var(--radius-10);
+  background: var(--bg-muted);
+  font: var(--weight-medium) 12px/16.5px var(--font-family);
+  color: var(--text-secondary);
+  flex: none;
+  cursor: pointer;
+}
+.kb-col__filter svg { color: var(--text-secondary); }
+.kb-col__filter.is-on { background: var(--brand-100); color: var(--text-brand); }
+.kb-col__filter.is-on svg { color: var(--text-brand); }
+
+/* Each column scrolls on its own, so a long stage never pushes the board
+   taller than the frame. */
+.kb-col__scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--space-8);
+}
+.kb-col__scroll::-webkit-scrollbar { width: 4px; }
+.kb-col__scroll::-webkit-scrollbar-thumb {
+  background: var(--border-muted);
+  border-radius: var(--radius-pill);
+}
+.kb-col__scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Card ----------------------------------------------------------- */
+
+.kb-card {
+  flex: none;
+  width: 312px;
+  padding: 7px 13px 13px;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+}
+
+.kb-card__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 25px;
+}
+.kb-card__pin { display: grid; place-items: center; color: var(--text-brand); flex: none; }
+/* Label and value are a flex pair rather than two words with a space
+   between them: the label is italic, and a literal space beside an italic
+   closes up enough to read as one word. */
+.kb-card__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-medium) 10px/16.5px var(--font-family);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.kb-card__meta i { font-style: italic; font-weight: var(--weight-regular); }
+
+/* The sprite's kebab stands upright; the frame lays it down. */
+.kb-card__kebab {
+  color: var(--text-tertiary);
+  display: grid;
+  place-items: center;
+  flex: none;
+  cursor: pointer;
+  transform: rotate(90deg);
+}
+
+.kb-card__body { display: flex; flex-direction: column; gap: var(--space-12); }
+
+/* Identity --------------------------------------------------------------- */
+
+.kb-card__id { display: flex; align-items: flex-end; gap: var(--space-4); }
+
+.kb-lead {
+  width: 36px; height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--brand-400);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 11px/16.5px var(--font-family);
+  color: var(--brand-400);
+}
+
+.kb-card__who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.kb-card__names { display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.kb-card__name {
+  font: var(--weight-demi) 12px/1 var(--font-family);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kb-card__ref {
+  font: var(--weight-regular) 12px/1 var(--font-family);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.kb-card__go { color: var(--text-primary); display: grid; place-items: center; flex: none; }
+
+.kb-card__created {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-medium) 10px/1 var(--font-family);
+  color: var(--text-tertiary);
+}
+.kb-card__created i { font-style: italic; font-weight: var(--weight-regular); }
+
+/* The one quick action the frame puts on the card. */
+.kb-card__act {
+  width: 36px; height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-8);
+  background: var(--bg-muted);
+  color: var(--text-brand);
+  box-shadow: 1px 2px 1.5px rgba(0, 0, 0, .14);
+  cursor: pointer;
+}
+
+/* Amount and stage -------------------------------------------------------- */
+
+.kb-card__deal { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+.kb-card__amount { min-width: 0; }
+.kb-card__money {
+  display: block;
+  font: var(--weight-demi) 16px/20px var(--font-family);
+  color: var(--text-primary);
+}
+.kb-card__product {
+  display: block;
+  font: var(--weight-regular) 10px/16.5px var(--font-family);
+  color: var(--text-tertiary);
+}
+.kb-card__stage {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 18px;
+  background: rgba(86, 20, 187, .1);
+  font: var(--weight-medium) 10px/15px var(--font-family);
+  color: var(--text-brand);
+  white-space: nowrap;
+}
+
+/* Documents --------------------------------------------------------------- */
+
+.kb-card__docs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+}
+
+.kb-ring { position: relative; width: 38px; height: 38px; flex: none; }
+.kb-ring__n {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: var(--weight-bold) 9px/12.445px var(--font-family);
+  color: var(--text-primary);
+}
+
+.kb-card__docs-label {
+  flex: 1;
+  min-width: 0;
+  font: var(--weight-medium) 10px/1.1 var(--font-family);
+  color: var(--text-secondary);
+}
+
+.kb-card__counts { display: flex; align-items: stretch; gap: var(--space-8); flex: none; }
+.kb-count { display: flex; flex-direction: column; gap: var(--space-2); }
+.kb-count + .kb-count { padding-left: var(--space-8); border-left: 1px solid var(--border-subtle); }
+.kb-count__n     { font: var(--weight-demi) 10px/1 var(--font-family); }
+.kb-count__label { font: var(--weight-medium) 10px/1 var(--font-family); color: var(--text-tertiary); }
+
+/* Who and what is outstanding --------------------------------------------- */
+
+.kb-card__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding-top: var(--space-4);
+}
+
+.kb-people { display: flex; align-items: center; flex: none; }
+.kb-face {
+  width: 25px; height: 25px;
+  display: grid;
+  place-items: center;
+  border: 1.76px solid;
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 9.7px/14.5px var(--font-family);
+  color: var(--text-on-dark);
+  flex: none;
+}
+.kb-face + .kb-face { margin-left: -7px; }
+.kb-face--add {
+  background: var(--bg-base);
+  border: 0.88px solid var(--text-brand);
+  color: var(--text-brand);
+}
+
+.kb-counters {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) var(--space-8);
+  border: 0.5px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  flex: none;
+}
+.kb-counter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.kb-counter__n { font: var(--weight-medium) 10px/16.5px var(--font-family); }
+.kb-counter.is-unread { color: var(--text-brand); }
+.kb-counter.is-unread .kb-counter__n { font-weight: var(--weight-demi); }
+.kb-counters__dot {
+  position: absolute;
+  top: -2.5px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--error-base);
+}
