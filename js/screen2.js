@@ -441,7 +441,16 @@ function mountScreen2(app, deal = DEALS[0]) {
     }));
 }
 
+/* One entry per version of this screen, the way the work list does it: the
+   page sets `window.S2_VARIANT` and the shell's version list points at the
+   page. A second version goes here as a skin over the same mount rather
+   than another copy of it. */
+const S2_MOUNTERS = {
+  v1: (app) => mountScreen2(app)
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
-  if (app) mountScreen2(app);
+  const mount = S2_MOUNTERS[window.S2_VARIANT] || S2_MOUNTERS.v1;
+  if (app) mount(app);
 });

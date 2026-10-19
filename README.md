@@ -28,18 +28,30 @@ changes and a normal server lets the browser keep showing the previous design
 under the current name. If you ever serve this another way, hard-refresh
 (`Ctrl+Shift+R`) after any edit.
 
-Then open <http://localhost:8137/> — that's the prototype shell, which is the
-easiest way in. Individual screens are at `/worklist-v2.html` etc. if you want
-one on its own.
+Then open <http://localhost:8137/> — that's the work-list prototype view,
+which is the easiest way in. The other screen has its own prototype view at
+<http://localhost:8137/screen2.html>. Individual versions are at
+`/worklist-v2.html`, `/screen2-v1.html` etc. if you want one on its own.
 
 Opening the `.html` directly with `file://` will **not** work — the stylesheets
 and fonts won't resolve. It needs to be served.
 
-## Prototype shell (`index.html`)
+## Prototype views
+
+Each screen gets its own prototype view — a dark harness that frames that
+screen's versions and lets you switch between them:
+
+| Page | Screen | Versions |
+|---|---|---|
+| `index.html` | The work list | v1, v2, v3 |
+| `screen2.html` | Screen 2 | v1 |
+
+Each numbers its versions **from v1 in its own right**: screen 2's v1 and the
+work list's v1 are different screens, not two takes on one.
 
 | Control | |
 |---|---|
-| `1` `2` `3` | Jump to a version |
+| `1` `2` `3` … | Jump to a version — one key per version |
 | `←` `→` | Step through versions |
 | `C` | Compare — two versions side by side, each with its own picker |
 | `Z` | Toggle fit-to-window / 100% |
@@ -47,8 +59,32 @@ and fonts won't resolve. It needs to be served.
 The view is in the URL, so any state can be bookmarked or pasted to someone:
 `#v2`, or `#compare=v1,v2`.
 
-To add a version, append one entry to the `VERSIONS` array at the bottom of
-`index.html` — tabs, compare pickers, shortcuts and deep links all follow.
+### The shared shell
+
+The harness itself — toolbar, tabs, compare, scaling, shortcuts, deep links —
+is `js/shell.js` and `css/shell.css`, one copy for both views. A prototype
+view is just a page that declares what it frames, inline, before that script:
+
+```js
+window.SHELL = {
+  title: 'Work list view',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v2',                 // which version opens first
+  tour:  true,                 // show the replay-the-tour button
+  versions: [
+    { id:'v1', label:'v1', sub:'Pipeline + AI', file:'worklist-v1.html',
+      note:'…the line under the toolbar' }
+  ]
+};
+```
+
+To add a version, append one entry to that `versions` array — tabs, compare
+pickers, shortcuts and deep links all follow. To add a **screen**, copy one of
+the two pages and point it at that screen's versions.
+
+Two controls look after themselves: compare stands down when there is only one
+version, since there is nothing to hold it against, and the tour button appears
+only where `tour` is set — screen 2 has no tour yet.
 
 ## The artboard and scrolling
 
@@ -73,7 +109,11 @@ assets/brand/    logo.svg and assist.svg, exported from CRM-2026 — the sprite
                  stage-path.png is used directly, see below.
 css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ramp.
                  Variable names match the code syntax set on the Figma variables.
-css/worklist.css Layout + components. Shared by all versions.
+css/shell.css    The prototype views' own chrome — the dark harness, not the
+                 mocks it frames. Shared by index.html and screen2.html.
+js/shell.js      The harness itself: tabs, compare, scaling, shortcuts, deep
+                 links. Driven by the page's window.SHELL.
+css/worklist.css Layout + components. Shared by all work-list versions.
 css/draft2.css   Overrides for the draft-parity page only.
 stamp.py         Rewrites asset links with a content hash, see above.
 js/icons.js      SVG sprite + icon() helper. Shared by all versions.
@@ -95,7 +135,9 @@ worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
                       the shell; open it directly if you need it.
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
-screen2.html          Screen 2 — the copy of the application view.
+index.html            The work-list prototype view — v1, v2, v3.
+screen2.html          The screen-2 prototype view — v1.
+screen2-v1.html       Screen 2, v1 — the copy of the application view.
 ```
 
 ## Versions
@@ -196,7 +238,7 @@ the same one.
 
 ## Screen 2 — the copy of the application view
 
-`screen2.html` is a **standalone duplicate of the application view**, the
+`screen2-v1.html` is a **standalone duplicate of the application view**, the
 starting point for a different screen. It is a copy rather than a second
 skin, because the two are meant to diverge: the `av` prefix was renamed to
 `s2` throughout, so `js/screen2.js` and `css/screen2.css` can be reshaped
@@ -217,8 +259,15 @@ The interactions that were asked for are all still there — sections collapse,
 Activity and Internal notes expand over the column, Broker Assist raises, the
 external/internal tabs switch, the lists scroll.
 
-It is registered in the shell as the **s2** tab, so it opens the same way as
-the work-list versions, and on its own at `/screen2.html`.
+It has its own prototype view at `screen2.html`, where it is **v1** — the
+numbering starts again, because this is a different screen rather than another
+take on the work list. The page itself is `screen2-v1.html`, and it opens on
+its own at `/screen2-v1.html`.
+
+A second version of this screen goes the way the work list's do: a page that
+sets `window.S2_VARIANT`, an entry in `S2_MOUNTERS` at the bottom of
+`js/screen2.js` skinning the same mount, and one line in the `versions` array
+in `screen2.html`.
 
 ## Points-of-interest tour
 
