@@ -156,14 +156,27 @@ function kbCard(d, i) {
    in all three, so a change there lands in all three.
    ========================================================================== */
 
+/* How long a deal has gone untouched, which is what turns a normal state
+   into one worth shouting about. */
+const kbDaysSince = (date) => Math.round((parseDMY(TODAY) - parseDMY(date)) / 86400000);
+
 /* The four states, in the order a broker should notice them. Each one is
    read off the deal rather than set by hand:
 
      immediate  a high-urgency deal still in Qualifying — nobody has worked it
-     urgent     documents the client has sent that nobody has checked, or a
-                task past its due date
+     urgent     the deal is slipping: more than one task past its due date, or
+                documents the client sent that have sat unchecked for a week
+                and a half
      warning    flagged by the system rather than by the pipeline
      (none)     nothing wants attention
+
+   **The thresholds are what keep the board honest.** An alert on every card
+   is the same as no alerts at all, so a state has to mean something is
+   actually wrong: one overdue task is ordinary slippage, two is a deal being
+   neglected; a document in review for two days is the process working, one
+   sitting for ten is not. Over the 26 mock deals that gives 2 immediate, 7
+   urgent, 2 warning and 15 quiet — a board a broker could triage rather than
+   a wall of amber.
 
    `duplicate` is the one thing the model could not express, so js/data.js
    gained it. Everything else was already there. */
@@ -173,13 +186,13 @@ function kbState(d) {
   if (d.urgency === 'high' && d.master === 'qualifying' && !d.snoozed)
     return { id:'immediate', glyph:'alarm', label:'New lead - call now', action:'Call by today 4:07pm' };
 
-  if (c.review > 0)
+  if (d.tasksOverdue >= 2)
+    return { id:'urgent', glyph:'alarm',
+             label:`${d.tasksOverdue} tasks overdue`, action:'Action now' };
+
+  if (c.review > 0 && kbDaysSince(d.activity) >= 10)
     return { id:'urgent', glyph:'alarm',
              label:`${c.review} document${c.review > 1 ? 's' : ''} to review`, action:'Review now' };
-
-  if (d.tasksOverdue > 0)
-    return { id:'urgent', glyph:'alarm',
-             label:`${d.tasksOverdue} task${d.tasksOverdue > 1 ? 's' : ''} overdue`, action:'Action now' };
 
   if (d.duplicate)
     return { id:'warning', glyph:'alert', label:'Possible duplicate', action:'Review now' };

@@ -309,13 +309,16 @@ and the chrome are shared rather than copied.
 | State | When | How it shows |
 |---|---|---|
 | Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, and a red outline on v2 and v3 |
-| Urgent | Documents the client has sent that nobody has checked, or a task past its due date | Amber banner naming the count |
+| Urgent | The deal is slipping: more than one task past its due date, or documents that have sat unchecked for ten days | Amber banner naming the count |
 | Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
 | None | Nothing wants attention | No banner |
 
-Across the 26 deals that currently gives 2 immediate, 20 urgent, 2 warning and
-2 with no banner. The board leans amber because most of the mock deals have a
-document in review — that is the data talking, not the design.
+**The thresholds are what keep the board honest.** An alert on every card is
+the same as no alerts at all, so a state has to mean something is actually
+wrong: one overdue task is ordinary slippage, two is a deal being neglected;
+a document in review for two days is the process working, one sitting for ten
+is not. Over the 26 deals that gives **2 immediate, 7 urgent, 2 warning and 15
+quiet** — a board a broker could triage rather than a wall of amber.
 
 **`duplicate` is the one field the model gained for this.** Everything else a
 card shows was already in `js/data.js`. The task rows are derived from
