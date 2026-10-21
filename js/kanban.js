@@ -132,6 +132,11 @@ function kbCard(d, i, mode) {
      day and stage, and the three ways to reach them. */
   const callNow = !!st && st.id === 'immediate';
 
+  /* A parked deal does not offer the three ways to reach the client — the
+     whole point is that nobody is ringing them yet — so the contact buttons
+     give way to when it comes back. */
+  const snoozed = kbBucket(d) === 'snoozed';
+
   const banner = st ? `
     <div class="kb-c__banner">
       <span class="kb-c__banner-label">${icon(st.glyph, 15)}${st.label}</span>
@@ -144,11 +149,13 @@ function kbCard(d, i, mode) {
         <span class="kb-c__name">${d.name}</span>
         <span class="kb-c__amount">${money(d.amount)}</span>
       </div>
-      <div class="kb-c__contact">
-        <span class="kb-cp kb-cp--on" title="Call">${icon('phone', 14)}</span>
-        <span class="kb-cp" title="SMS">${icon('chat', 14)}</span>
-        <span class="kb-cp" title="Email">${icon('mail', 14)}</span>
-      </div>
+      ${snoozed
+        ? `<span class="kb-snooze">${icon('clock', 14)} Snoozed until ${d.snoozedUntil}</span>`
+        : `<div class="kb-c__contact">
+             <span class="kb-cp kb-cp--on" title="Call">${icon('phone', 14)}</span>
+             <span class="kb-cp" title="SMS">${icon('chat', 14)}</span>
+             <span class="kb-cp" title="Email">${icon('mail', 14)}</span>
+           </div>`}
     </div>
     <div class="kb-c__stage">
       <span>Day ${d.day}</span>

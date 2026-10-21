@@ -260,7 +260,14 @@ the data does.
 |---|---|
 | New lead | Arrivals nobody has called yet. Sits in front of the pipeline, on a light red ground |
 | Qualifying, Discovery, In Progress, Approval, Settlement | `MASTER_STAGES`, in order |
-| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses |
+| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses. A step darker than the others, its cards at 70%, and the contact buttons replaced by `Snoozed until <date>` |
+
+New lead and Snoozed are the two ends of the same idea — one is the arrivals
+tray, the other is what has been deliberately parked — so they are the two
+columns that do not look like the pipeline between them. A parked deal also
+drops its call, SMS and email buttons: there is no point offering to ring
+someone you have put off until February, so the card says when it comes back
+instead. `snoozedUntil` is on the deal, beside the `snoozed` flag.
 
 **New lead is the board's own column, not a new pipeline stage.** `KB_STAGES`
 puts it in front of `MASTER_STAGES` locally, because that array is the work

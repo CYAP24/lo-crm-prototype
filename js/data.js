@@ -33,6 +33,9 @@ const MASTER_STAGES = [
     custom:true, glyph:'clock', collapsed:true }
 ];
 
+/* `snoozedUntil` is when a paused deal comes back. The kanban's Snoozed
+   column says it on the card, in place of the contact buttons — there is no
+   point offering to ring someone you have deliberately parked. */
 /* `duplicate` marks an application the system thinks it has seen before —
    the same client and amount arriving twice. It is set on the deal rather
    than worked out, because nothing else in the model implies it, and the
@@ -97,7 +100,7 @@ const DEALS = [
 
   { name:'Tom Blakely', amount:92500, ref:'#APP-2026-0849', product:'Vehicle finance', created:'08/01/26', activity:'16/01/26', duplicate:true,
     urgency:'low', pinned:false, stage:'Awaiting payslips', day:4, tone:'warning', master:'discovery',
-    lastAction:'SMS sent', assigned:['JF','Jess F.'], associate:['SM','Sam M.'], lender:null, partner:['TM','TruckMart'], snoozed:true,
+    lastAction:'SMS sent', assigned:['JF','Jess F.'], associate:['SM','Sam M.'], lender:null, partner:['TM','TruckMart'], snoozed:true, snoozedUntil:'30/01/26',
     docs:['ok','rejected','rejected','pending','pending','pending'],
     tasksDue:2, tasksOverdue:0, notesUnread:0,
     activityText:"Jess F. sent an SMS to Tom", activityTime:'4:13pm',
@@ -242,7 +245,7 @@ const DEALS = [
     tasks:5, notes:3, events:10, unread:false, people:['SM','DP','RH'], extra:2,
     settlement:'11/03/26' },
   { name:'Noor Siddiqui', amount:275000, ref:'#APP-2026-0787', product:'Asset finance', created:'01/01/26', activity:'10/01/26',
-    urgency:'low', pinned:false, stage:'Client overseas', day:14, tone:'warning', master:'snoozed', snoozed:true,
+    urgency:'low', pinned:false, stage:'Client overseas', day:14, tone:'warning', master:'snoozed', snoozed:true, snoozedUntil:'16/02/26',
     lastAction:'Note added', assigned:['JF','Jess F.'], associate:['SM','Sam M.'], lender:null, partner:['TM','TruckMart'],
     docs:['ok','ok','rejected','pending','review','pending'],
     tasksDue:0, tasksOverdue:0, notesUnread:1,
@@ -250,7 +253,7 @@ const DEALS = [
     tasks:0, notes:3, events:4, unread:true, people:['JF','SM','JF'], extra:1,
     settlement:null },
   { name:'Dylan Hayes', amount:165000, ref:'#APP-2026-0790', product:'Business loan', created:'06/01/26', activity:'13/01/26',
-    urgency:'high', pinned:false, stage:'On hold – pricing', day:15, tone:'warning', master:'snoozed', snoozed:true,
+    urgency:'high', pinned:false, stage:'On hold – pricing', day:15, tone:'warning', master:'snoozed', snoozed:true, snoozedUntil:'06/02/26',
     lastAction:'Lender update', assigned:['JF','Jess F.'], associate:['DP','Dev P.'], lender:['WP','Westpac'], partner:['AA','Acme Autos'],
     docs:['pending','ok','pending','rejected','review','ok'],
     tasksDue:0, tasksOverdue:1, notesUnread:0,
@@ -258,7 +261,7 @@ const DEALS = [
     tasks:1, notes:2, events:8, unread:false, people:['JF','DP','RH'], extra:4,
     settlement:null },
   { name:'Ravi Chandra', amount:420000, ref:'#APP-2026-0702', product:'Business loan', created:'10/01/26', activity:'17/01/26',
-    urgency:'med', pinned:false, stage:'Awaiting client decision', day:8, tone:'warning', master:'snoozed', snoozed:true,
+    urgency:'med', pinned:false, stage:'Awaiting client decision', day:8, tone:'warning', master:'snoozed', snoozed:true, snoozedUntil:'02/02/26',
     lastAction:'Email sent', assigned:['SM','Sam M.'], associate:['JF','Jess F.'], lender:null, partner:null,
     docs:['ok','pending','rejected','pending','ok','review'],
     tasksDue:1, tasksOverdue:0, notesUnread:1,

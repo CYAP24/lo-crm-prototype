@@ -160,6 +160,13 @@
    colour invented for it. */
 .kb-col[data-stage="newlead"] { background: var(--error-bg); }
 
+/* Snoozed is the opposite end of the same idea: deliberately parked, so the
+   column sits a step darker than the others and its cards hold back. The
+   fade is on the card rather than the column so the heading and its count
+   stay readable. */
+.kb-col[data-stage="snoozed"] { background: var(--neutral-200); }
+.kb-col[data-stage="snoozed"] .kb-c { opacity: .7; }
+
 .kb-col__head {
   flex: none;
   height: 33px;
@@ -302,6 +309,21 @@
   cursor: pointer;
 }
 .kb-cp--on { background: var(--kb-c-call); border-color: transparent; color: var(--text-brand); }
+
+/* What stands where the contact buttons stand on every other card. */
+.kb-snooze {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.kb-snooze svg { flex: none; }
 
 .kb-c__stage {
   display: flex;
