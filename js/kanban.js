@@ -126,6 +126,12 @@ function kbCard(d, i, mode) {
   const tasks = kbTasks(d);
   const c = docCounts(d);
 
+  /* A card asking to be called right now drops its tasks and its documents,
+     in both versions: the only thing being asked for is the call, and rows
+     of progress underneath argue with it. What is left is who, how much, the
+     day and stage, and the three ways to reach them. */
+  const callNow = !!st && st.id === 'immediate';
+
   const banner = st ? `
     <div class="kb-c__banner">
       <span class="kb-c__banner-label">${icon(st.glyph, 15)}${st.label}</span>
@@ -165,14 +171,8 @@ function kbCard(d, i, mode) {
 
   const open = `<article class="kb-c kb-c--${mode} ${st ? 'is-' + st.id : ''}" data-deal-row="${i}">`;
 
-  /* v1 — one body, and the tasks are tinted blocks inside it.
-
-     A card asking to be called right now drops its tasks and its documents:
-     the only thing being asked for is the call, and a progress bar under a
-     red banner argues with it. What is left is who, how much, and the three
-     ways to reach them. */
+  /* v1 — one body, and the tasks are tinted blocks inside it. */
   if (mode === 'cues') {
-    const callNow = !!st && st.id === 'immediate';
     return `${open}
       ${banner}
       <div class="kb-c__body">
@@ -191,24 +191,28 @@ function kbCard(d, i, mode) {
   }
 
   /* v2 — no tints and no bar: the state is carried by the words and their
-     colour alone. */
+     colour alone. The rule above takes the divider with the rows it
+     separates, so a call-now card is not left with a line across nothing. */
+  const middle = callNow ? '' : `
+    ${tasks.length ? `<div class="kb-c__list">${tasks.map((t, n) => `
+      <div class="kb-c__list-row ${t.overdue ? 'is-overdue' : ''}">
+        <span class="kb-c__list-label ${n ? 'is-hidden' : ''}">Upcoming tasks</span>
+        <span class="kb-c__list-task">${t.label}</span>
+        <span class="kb-c__list-due">${t.due}</span>
+      </div>`).join('')}</div>` : ''}
+    <span class="kb-c__hr"></span>
+    <div class="kb-c__docs-line">
+      <span class="kb-c__docs-label">Documents</span>
+      <span class="kb-c__docs-n">${c.ok} of ${d.docs.length}</span>
+      <span class="kb-spacer"></span>
+      <span class="kb-c__docs-breakdown">${kbDocWords(c)}</span>
+    </div>`;
+
   return `${open}
     ${banner}
     <div class="kb-c__body">
       ${head}
-      ${tasks.length ? `<div class="kb-c__list">${tasks.map((t, n) => `
-        <div class="kb-c__list-row ${t.overdue ? 'is-overdue' : ''}">
-          <span class="kb-c__list-label ${n ? 'is-hidden' : ''}">Upcoming tasks</span>
-          <span class="kb-c__list-task">${t.label}</span>
-          <span class="kb-c__list-due">${t.due}</span>
-        </div>`).join('')}</div>` : ''}
-      <span class="kb-c__hr"></span>
-      <div class="kb-c__docs-line">
-        <span class="kb-c__docs-label">Documents</span>
-        <span class="kb-c__docs-n">${c.ok} of ${d.docs.length}</span>
-        <span class="kb-spacer"></span>
-        <span class="kb-c__docs-breakdown">${kbDocWords(c)}</span>
-      </div>
+      ${middle}
       ${owner}
     </div>
     ${actions}
