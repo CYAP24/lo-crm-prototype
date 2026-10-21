@@ -255,9 +255,14 @@
 .kb-c__banner-label svg { flex: none; }
 .kb-c__banner-action { font: var(--weight-regular) 12px/16px var(--font-family); }
 
+/* The first two are tinted: a pale ground carrying its own darker ink. The
+   system warning inverts that pair — dark ground, light ink — because it is
+   the one state that is not about the deal, and reading differently is the
+   point. The primitives rather than the text and background tokens, since
+   both are being used as the opposite of what they are named for. */
 .is-immediate .kb-c__banner { background: var(--error-base); color: var(--text-on-dark); }
 .is-urgent    .kb-c__banner { background: var(--warning-bg);  color: var(--warning-text); }
-.is-warning   .kb-c__banner { background: var(--bg-muted);    color: var(--text-primary); }
+.is-warning   .kb-c__banner { background: var(--neutral-900); color: var(--neutral-200); }
 
 /* ---------- Body ----------------------------------------------------------- */
 
