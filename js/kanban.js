@@ -254,18 +254,58 @@ function kbBucket(d) {
   return d.snoozed ? 'snoozed' : d.master;
 }
 
-function kbColumn(stage, card) {
+/* What the heading reports, in the order a broker reads it: how many, how
+   much, and what is late. Each one is summed from the column's own deals, so
+   the heading cannot drift from the cards under it. */
+const kbColumnStats = (deals) => ({
+  n: deals.length,
+  value: deals.reduce((t, d) => t + d.amount, 0),
+  overdue: deals.reduce((t, d) => t + d.tasksOverdue, 0)
+});
+
+/* The heading differs between the versions the same way the cards do.
+
+   v1 states the two totals as chips, which is the language of its tinted
+   task blocks, and shortens the value to fit one — $1.2M rather than the
+   whole figure.
+
+   v2 keeps them as a line of text with colour doing the work, and spells the
+   value out, since nothing else on that card is abbreviated either.
+
+   Both drop the overdue count when there is none: an empty "0 overdue"
+   on every column is the thing that stops the real ones registering. */
+function kbColumnHead(stage, deals, mode) {
+  const s = kbColumnStats(deals);
+
+  const top = `
+    <div class="kb-col__top">
+      <span class="kb-col__name">${stage.label}</span>
+      <span class="kb-col__n">(${String(s.n).padStart(2, '0')})</span>
+      <span class="kb-spacer"></span>
+      <span class="kb-col__filter" title="${stage.note}">
+        View all ${icon('chevron-down', 11)}
+      </span>
+    </div>`;
+
+  const stats = mode === 'cues'
+    ? `<div class="kb-col__stats">
+         <span class="kb-stat">${moneyShort(s.value)}</span>
+         ${s.overdue ? `<span class="kb-stat kb-stat--over">${s.overdue} overdue</span>` : ''}
+       </div>`
+    : `<div class="kb-col__line">
+         <span class="kb-col__value">${money(s.value)}</span>
+         ${s.overdue ? `<span class="kb-col__dot">·</span>
+         <span class="kb-col__over">${s.overdue} task${s.overdue > 1 ? 's' : ''} overdue</span>` : ''}
+       </div>`;
+
+  return `<div class="kb-col__head">${top}${stats}</div>`;
+}
+
+function kbColumn(stage, card, mode) {
   const deals = DEALS.filter(d => kbBucket(d) === stage.id);
   return `
     <section class="kb-col" data-stage="${stage.id}">
-      <div class="kb-col__head">
-        <span class="kb-col__name">${stage.label}</span>
-        <span class="kb-col__n">(${String(deals.length).padStart(2, '0')})</span>
-        <span class="kb-spacer"></span>
-        <span class="kb-col__filter" title="${stage.note}">
-          View all ${icon('chevron-down', 11)}
-        </span>
-      </div>
+      ${kbColumnHead(stage, deals, mode)}
       <div class="kb-col__scroll">
         ${deals.map(d => card(d, DEALS.indexOf(d))).join('')}
       </div>
@@ -307,9 +347,10 @@ const kbBar = () => `
     <span class="kb-select">-Sort by- ${icon('chevron-down', 11)}</span>
   </div>`;
 
-/* The board is the same in both versions — only the card differs, so each
-   version passes its own card renderer rather than its own board. */
-function renderKanban(card) {
+/* The board is the same in both versions — the mode decides the card and
+   the column heading, which are the two things they disagree about. */
+function renderKanban(mode) {
+  const card = (d, i) => kbCard(d, i, mode);
   return `
   <div class="kb">
     <header class="appbar">
@@ -320,7 +361,7 @@ function renderKanban(card) {
     ${kbBar()}
 
     <div class="kb-board">
-      ${KB_STAGES.map(s => kbColumn(s, card)).join('')}
+      ${KB_STAGES.map(s => kbColumn(s, card, mode)).join('')}
     </div>
   </div>`;
 }
@@ -337,8 +378,8 @@ function mountKanban(app) {
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
    the page. A third version goes here as another skin over the same card. */
 const KB_RENDERERS = {
-  v1: () => renderKanban((d, i) => kbCard(d, i, 'cues')),
-  v2: () => renderKanban((d, i) => kbCard(d, i, 'text'))
+  v1: () => renderKanban('cues'),
+  v2: () => renderKanban('text')
 };
 const KB_MOUNTERS = {
   v1: mountKanban,

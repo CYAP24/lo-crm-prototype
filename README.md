@@ -312,10 +312,18 @@ Both versions use the alert-state card from the CRM-2026 `To upload` page
 card renderer to `renderKanban`, so the columns, the toolbar and the chrome
 are shared rather than copied.
 
-| | What differs |
-|---|---|
-| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it |
-| **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words |
+| | The card | The column heading |
+|---|---|---|
+| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it | The totals as chips, with the value shortened to `$1.2M` |
+| **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words | The totals as a line of text, value spelled out, colour doing the work |
+
+**Each heading carries four things**, in the order a broker reads them: the
+stage, how many deals, what they are worth, and what is late. The first two
+share the control row with `View all`; the totals sit on a second line, so
+the row does not have to choose between them and the filter. Both are summed
+from the column's own deals, so a heading cannot drift from the cards under
+it — and both drop the overdue count when there is none, since an empty
+`0 overdue` on every column is what stops the real ones registering.
 
 **The four states are read off the deal**, not set by hand — `kbState()` in
 `js/kanban.js` is the whole rule:
