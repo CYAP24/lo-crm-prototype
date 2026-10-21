@@ -154,6 +154,12 @@
   background: var(--kb-ground);
 }
 
+/* New lead is the one column that is not a stage the deal has worked
+   through — it is the arrivals tray. The light red ground says so before the
+   heading is read, and it is the system's own error tint rather than a new
+   colour invented for it. */
+.kb-col[data-stage="newlead"] { background: var(--error-bg); }
+
 .kb-col__head {
   flex: none;
   height: 33px;

@@ -258,8 +258,16 @@ the data does.
 
 | Column | |
 |---|---|
+| New lead | Arrivals nobody has called yet. Sits in front of the pipeline, on a light red ground |
 | Qualifying, Discovery, In Progress, Approval, Settlement | `MASTER_STAGES`, in order |
 | Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses |
+
+**New lead is the board's own column, not a new pipeline stage.** `KB_STAGES`
+puts it in front of `MASTER_STAGES` locally, because that array is the work
+list's spine too and an arrivals tray is a board idea rather than a change to
+the pipeline. Membership is the immediate state: a deal that wants calling
+right now *is* a new arrival, which is what keeps the call-now card exclusive
+to that one column instead of scattered down the board.
 
 **The artboard is this project's 1920, not the frame's 1440.** The column is
 the unit and keeps the frame's size (340 wide, 12px gutter, 312px cards), so
@@ -307,7 +315,7 @@ are shared rather than copied.
 
 | State | When | How it shows |
 |---|---|---|
-| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, and a red outline on v1 |
+| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, a red outline on v1, and the card moves to the New lead column |
 | Urgent | The deal is slipping: more than one task past its due date, or documents that have sat unchecked for ten days | Amber banner naming the count |
 | Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
 | None | Nothing wants attention | No banner |
@@ -316,8 +324,13 @@ are shared rather than copied.
 the same as no alerts at all, so a state has to mean something is actually
 wrong: one overdue task is ordinary slippage, two is a deal being neglected;
 a document in review for two days is the process working, one sitting for ten
-is not. Over the 26 deals that gives **2 immediate, 7 urgent, 2 warning and 15
+is not. Over the 27 deals that gives **3 immediate, 7 urgent, 2 warning and 15
 quiet** — a board a broker could triage rather than a wall of amber.
+
+**A call-now card drops its tasks and its documents** in both versions. The
+only thing being asked for is the call, and rows of progress underneath argue
+with it; what is left is who, how much, the day and stage, and the three ways
+to reach them.
 
 **`duplicate` is the one field the model gained for this.** Everything else a
 card shows was already in `js/data.js`. The task rows are derived from

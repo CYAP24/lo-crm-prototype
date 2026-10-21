@@ -45,9 +45,9 @@ const kbDaysSince = (date) => Math.round((parseDMY(TODAY) - parseDMY(date)) / 86
    is the same as no alerts at all, so a state has to mean something is
    actually wrong: one overdue task is ordinary slippage, two is a deal being
    neglected; a document in review for two days is the process working, one
-   sitting for ten is not. Over the 26 mock deals that gives 2 immediate, 7
+   sitting for ten is not. Over the 27 mock deals that gives 3 immediate, 7
    urgent, 2 warning and 15 quiet — a board a broker could triage rather than
-   a wall of amber.
+   a wall of amber. The three immediate ones are the New lead column.
 
    `duplicate` is the one thing the model could not express, so js/data.js
    gained it. Everything else was already there. */
@@ -221,9 +221,31 @@ function kbCard(d, i, mode) {
 
 /* ---------- Columns -------------------------------------------------------- */
 
-/* Snoozed is broker-set, so it wins over whatever stage the application is
+/* The board's own columns: the master stages with New lead in front of them.
+   A lead that has just arrived has not been qualified yet, so it sits before
+   Qualifying rather than inside it.
+
+   The stage list is local to the kanban rather than added to MASTER_STAGES,
+   because that array is the work list's spine too and an arrivals column is
+   a board idea, not a change to the pipeline. */
+const KB_STAGES = [
+  { id:'newlead', label:'New lead', note:'Just arrived, nobody has called yet' },
+  ...MASTER_STAGES
+];
+
+/* Which column a deal sits in. Two rules override the pipeline stage:
+
+   A deal that wants calling right now is a new arrival by definition, so it
+   goes to New lead — which is what keeps the call-now card exclusive to that
+   column instead of scattered down the board.
+
+   Snoozed is broker-set, and it wins over whatever stage the application is
    technically in — the same rule the grouped work list uses. */
-const kbBucket = (d) => (d.snoozed ? 'snoozed' : d.master);
+function kbBucket(d) {
+  const st = kbState(d);
+  if (st && st.id === 'immediate') return 'newlead';
+  return d.snoozed ? 'snoozed' : d.master;
+}
 
 function kbColumn(stage, card) {
   const deals = DEALS.filter(d => kbBucket(d) === stage.id);
@@ -291,7 +313,7 @@ function renderKanban(card) {
     ${kbBar()}
 
     <div class="kb-board">
-      ${MASTER_STAGES.map(s => kbColumn(s, card)).join('')}
+      ${KB_STAGES.map(s => kbColumn(s, card)).join('')}
     </div>
   </div>`;
 }

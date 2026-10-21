@@ -47,6 +47,18 @@ const DEALS = [
     tasks:5, notes:2, events:3, unread:true, people:['KZ','JF','CE','SM'], extra:2,
     settlement:null, nextAction:'Call client' },
 
+  /* A lead that arrived this afternoon: nothing requested, nothing done.
+     The kanban's New lead column needs arrivals to hold, and the work list
+     gains one more row in Qualifying. */
+  { name:'Ruben Alvarez', amount:145000, ref:'#APP-2026-0901', product:'Vehicle finance', created:'22/01/26', activity:'22/01/26',
+    urgency:'high', pinned:false, stage:'New enquiry', day:1, tone:'brand', master:'qualifying',
+    lastAction:'Enquiry received', assigned:['KZ','Kenn Z.'], associate:null, lender:null, partner:['CF','CityFleet'],
+    docs:['pending','pending','pending','pending','pending','pending'],
+    tasksDue:1, tasksOverdue:0, notesUnread:0,
+    activityText:"Enquiry received from the website", activityTime:'4:07pm',
+    tasks:1, notes:0, events:1, unread:false, people:['KZ'], extra:0,
+    settlement:null, nextAction:'Call new lead' },
+
   { name:'Cielo Escandor', amount:80000, ref:'#APP-2026-0876', product:'Asset finance', created:'14/01/26', activity:'22/01/26',
     urgency:'high', pinned:false, stage:'Docs requested', day:3, tone:'info', master:'discovery',
     lastAction:'Docs requested', assigned:['KZ','Kenn Z.'], associate:['CE','Cara E.'], lender:['WP','Westpac'], partner:null,
