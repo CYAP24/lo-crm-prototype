@@ -150,6 +150,11 @@ function kbCard(d, i, mode, v) {
      give way to when it comes back. */
   const snoozed = kbBucket(d) === 'snoozed';
 
+  /* In select mode the card grows a box in front of the name, which indents
+     the identity row rather than hanging off the card's corner. */
+  const sel = !!(v && v.select);
+  const picked = sel && v.selected.has(i);
+
   const banner = st ? `
     <div class="kb-c__banner">
       <span class="kb-c__banner-label">${icon(st.glyph, 15)}${st.label}</span>
@@ -158,6 +163,7 @@ function kbCard(d, i, mode, v) {
 
   const head = `
     <div class="kb-c__who">
+      ${sel ? `<span class="kb-cbox" data-kb-pick="${i}">${picked ? icon('check-sm', 12) : ''}</span>` : ''}
       <div class="kb-c__id">
         <span class="kb-c__name">${d.name}</span>
         <span class="kb-c__amount">${money(d.amount)}</span>
@@ -189,13 +195,8 @@ function kbCard(d, i, mode, v) {
       <span class="kb-ap kb-ap--icon">${icon('kebab', 16)}</span>
     </div>`;
 
-  /* In select mode the card grows a box and can be picked; otherwise the
-     markup is exactly what it was. */
-  const sel = !!(v && v.select);
-  const picked = sel && v.selected.has(i);
   const open = `<article class="kb-c kb-c--${mode} ${st ? 'is-' + st.id : ''}`
-    + `${sel ? ' is-selectable' : ''}${picked ? ' is-picked' : ''}" data-deal-row="${i}">`
-    + (sel ? `<span class="kb-cbox" data-kb-pick="${i}">${picked ? icon('check-sm', 12) : ''}</span>` : '');
+    + `${picked ? ' is-picked' : ''}" data-deal-row="${i}">`;
 
   /* v1 — one body, and the tasks are tinted blocks inside it. */
   if (mode === 'cues') {

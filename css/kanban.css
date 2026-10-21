@@ -659,16 +659,18 @@
   cursor: pointer;
 }
 
-.kb-c.is-selectable { position: relative; }
+/* Sits in the identity row ahead of the name, so turning select mode on
+   indents the row rather than hanging a control off the card's corner. The
+   negative margin trims the row's own 12px gap back to something that reads
+   as an indent rather than a column. */
 .kb-cbox {
-  position: absolute;
-  top: -7px; left: -7px;
-  z-index: 2;
-  width: 22px; height: 22px;
+  width: 18px; height: 18px;
+  flex: none;
+  margin: 1px -4px 0 0;
   display: grid;
   place-items: center;
   border: 1.5px solid var(--border-muted);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-4);
   background: var(--bg-base);
   color: var(--text-on-dark);
   cursor: pointer;
