@@ -186,7 +186,7 @@ function kbCard(d, i, mode) {
         ${head}
         ${!callNow && tasks.length ? `<div class="kb-c__blocks">${tasks.map(t => `
           <div class="kb-c__block ${t.overdue ? 'is-overdue' : ''}">
-            ${icon('clock', 16)}
+            ${icon('calendar-clock', 16)}
             <span class="kb-c__block-label">${t.label}</span>
             <span class="kb-c__block-due">${t.due}</span>
           </div>`).join('')}</div>` : ''}
