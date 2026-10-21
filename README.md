@@ -319,6 +319,16 @@ filter compose instead of fighting, and the column headings count what is
 actually on screen. The nine views give 10 / 22 / 12 / 1 / 14 / 19 / 4 / 2 /
 20 deals against today's data.
 
+**Amount and date lead the filter panel**, because they are the two a broker
+reaches for without first deciding whose deals they are looking at. Broker
+and partner follow, and they are searched rather than ticked: type a name,
+pick it from the suggestions, and it becomes a removable tag. That is the
+work list's own `.chip-person`, so a person keeps the colour they have on a
+row and in a panel. Typing narrows the suggestions without touching the
+board — nothing filters until a name is picked. The five closed lists
+(stage, consumer or commercial, loan type, lead source, partner group) stay
+as ticks, which are quicker for a short list.
+
 **Filters apply instantly**, so there is no Apply button and nothing to
 press. The panel says `Showing N of 27 deals` instead, which is the feedback
 the button would have carried, and the Filter control takes a badge counting

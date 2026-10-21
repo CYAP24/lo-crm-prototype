@@ -407,20 +407,43 @@ const KB_SORTS = {
 /* Every filter the brief lists. A group with nothing ticked does not
    constrain, so filters narrow only where the broker has said something. */
 const KB_FILTERS = {
-  broker:  { label: 'Broker',      of: (d) => d.assigned[1] },
+  /* People are searched for and held as tags, because there are more of them
+     than a tick list wants to show and a broker knows the name they are
+     after. Everything else is a short, closed list, so ticks are quicker. */
+  broker:  { label: 'Broker',  of: (d) => d.assigned[1], mark: (d) => d.assigned[0],
+             kind: 'search', placeholder: 'Search brokers by name…' },
+  partner: { label: 'Partner', of: (d) => (d.partner ? d.partner[1] : null),
+             mark: (d) => (d.partner ? d.partner[0] : null),
+             kind: 'search', placeholder: 'Search partners by name…' },
+
   stage:   { label: 'Stage',       of: (d) => (KB_STAGES.find(s => s.id === kbBucket(d)) || {}).label },
   segment: { label: 'Consumer or commercial', of: (d) => d.segment, cap: true },
   product: { label: 'Loan type',   of: (d) => d.product },
   source:  { label: 'Lead source', of: (d) => d.source },
-  partner: { label: 'Partner',     of: (d) => (d.partner ? d.partner[1] : null) },
   group:   { label: 'Partner group', of: (d) => partnerGroup(d) }
 };
+
+const KB_SEARCH_KEYS = Object.keys(KB_FILTERS).filter(k => KB_FILTERS[k].kind === 'search');
+const KB_TICK_KEYS   = Object.keys(KB_FILTERS).filter(k => KB_FILTERS[k].kind !== 'search');
+
+/* Name → initials, built from the deals so a person cannot appear here who
+   is not on the board. */
+function kbNameIndex(key) {
+  const f = KB_FILTERS[key];
+  const out = new Map();
+  DEALS.forEach(d => {
+    const label = f.of(d);
+    if (label && !out.has(label)) out.set(label, f.mark(d));
+  });
+  return out;
+}
 
 const kbDefaultView = () => ({
   view: 'all',
   saved: null,
   sort: 'newest',
   picked: Object.fromEntries(Object.keys(KB_FILTERS).map(k => [k, []])),
+  query: Object.fromEntries(KB_SEARCH_KEYS.map(k => [k, ''])),
   min: 0, max: 700000,
   from: '', to: '',
   select: false,
@@ -474,7 +497,7 @@ function kbBarV1(v) {
     </div>
 
     <div class="kb-views-pick">
-      <span class="kb-views-pick__label t-body-sm">Common views</span>
+      <span class="kb-pick__label t-body-sm">Common views</span>
       <span class="kb-select kb-select--wide" data-kb-menu="views">
         ${viewLabel} ${icon('chevron-down', 11)}
       </span>
@@ -518,6 +541,7 @@ function kbBarV1(v) {
     </span>
     <span class="kb-rule"></span>
     <div class="kb-sort-pick">
+      <span class="kb-pick__label t-body-sm">Sort by</span>
       <span class="kb-select" data-kb-menu="sort">
         ${KB_SORTS[v.sort].label} ${icon('chevron-down', 11)}
       </span>
@@ -659,7 +683,38 @@ function mountKanbanPanel(app) {
 function kbFilterPanel(v, shown) {
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-  const group = (key) => {
+  /* A person group: the people already chosen as removable tags, then a
+     field to find the next one. Suggestions appear only once something is
+     typed, and never offer someone already in the list. */
+  const searchGroup = (key) => {
+    const f = KB_FILTERS[key];
+    const index = kbNameIndex(key);
+    const picked = v.picked[key];
+    const typed = (v.query[key] || '').trim().toLowerCase();
+    const matches = [...index.keys()]
+      .filter(n => !picked.includes(n) && n.toLowerCase().includes(typed))
+      .sort();
+
+    return `
+      <div class="kbf__group" data-kb-group="${key}">
+        <div class="kbf__label t-overline">${f.label}</div>
+        ${picked.length ? `<div class="kbf__tags">
+          ${picked.map(n => `<span class="kbf__tag" data-val="${n}">${personChip([index.get(n), n])}</span>`).join('')}
+        </div>` : ''}
+        <input type="text" class="kbf__search" id="kbf-${key}" data-kb-search="${key}"
+               value="${v.query[key] || ''}" placeholder="${f.placeholder}" autocomplete="off">
+        ${typed ? `<div class="kbf__sugg">
+          ${matches.length
+            ? matches.map(n => `
+                <span class="kbf__sugg-item" data-kb-addtag="${key}" data-val="${n}">
+                  <span class="kbf__sugg-av">${index.get(n)}</span>${n}
+                </span>`).join('')
+            : `<span class="kbf__nomatch t-body-sm">No ${f.label.toLowerCase()} matching &ldquo;${v.query[key]}&rdquo;</span>`}
+        </div>` : ''}
+      </div>`;
+  };
+
+  const tickGroup = (key) => {
     const f = KB_FILTERS[key];
     const values = [...new Set(DEALS.map(f.of).filter(Boolean))].sort();
     return `
@@ -676,6 +731,8 @@ function kbFilterPanel(v, shown) {
       </div>`;
   };
 
+  /* Amount and date lead, because they are the two a broker reaches for
+     without first deciding whose deals they are looking at. */
   return `
     <div class="kbf__head">
       <div style="flex:1;min-width:0">
@@ -686,8 +743,6 @@ function kbFilterPanel(v, shown) {
       <span class="dp__close" title="Close" data-kb-closefilter>${icon('close', 15)}</span>
     </div>
     <div class="kbf__body">
-      ${Object.keys(KB_FILTERS).map(group).join('')}
-
       <div class="kbf__group">
         <div class="kbf__label t-overline">Amount</div>
         <div class="kbf__range t-body-sm">${money(v.min)} &ndash; ${money(v.max)}${v.max >= 700000 ? '+' : ''}</div>
@@ -703,6 +758,9 @@ function kbFilterPanel(v, shown) {
           <input type="date" id="kbf-to" value="${v.to}" data-kb-date="to">
         </div>
       </div>
+
+      ${KB_SEARCH_KEYS.map(searchGroup).join('')}
+      ${KB_TICK_KEYS.map(tickGroup).join('')}
     </div>`;
 }
 
@@ -865,9 +923,39 @@ function mountKanbanBar(app, mode) {
     fp.querySelector('[data-kb-clearfilters]').addEventListener('click', (e) => {
       e.stopPropagation();
       Object.keys(v.picked).forEach(k => { v.picked[k] = []; });
+      Object.keys(v.query).forEach(k => { v.query[k] = ''; });
       v.min = 0; v.max = 700000; v.from = ''; v.to = '';
       refilter();
     });
+
+    /* Typing narrows the suggestions but changes no filter, so only the
+       panel is redrawn — the board stays as it is until a name is picked. */
+    fp.querySelectorAll('[data-kb-search]').forEach(inp => inp.addEventListener('input', () => {
+      v.query[inp.dataset.kbSearch] = inp.value;
+      repaintPanel();
+    }));
+
+    fp.querySelectorAll('[data-kb-addtag]').forEach(opt => opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const k = opt.dataset.kbAddtag;
+      if (!v.picked[k].includes(opt.dataset.val)) v.picked[k].push(opt.dataset.val);
+      v.query[k] = '';
+      refilter();
+      const back = fp.querySelector(`#kbf-${k}`);
+      if (back) back.focus();
+    }));
+
+    /* The cross on a tag is what removes it, so the rest of the tag can stay
+       inert rather than being a button that deletes on any click. */
+    fp.querySelectorAll('[data-kb-group]').forEach(g => g.addEventListener('click', (e) => {
+      const x = e.target.closest('.chip-person__x');
+      if (!x) return;
+      e.stopPropagation();
+      const tag = x.closest('.kbf__tag');
+      const k = g.dataset.kbGroup;
+      v.picked[k] = v.picked[k].filter(n => n !== tag.dataset.val);
+      refilter();
+    }));
 
     fp.querySelectorAll('[data-kb-pickfilter]').forEach(opt => opt.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -891,14 +979,27 @@ function mountKanbanBar(app, mode) {
     }));
   }
 
-  /* A filter change repaints the panel too, so its counts and ticks follow —
-     but the focused control keeps the caret where the broker left it. */
-  function refilter() {
-    const active = document.activeElement && document.activeElement.id;
-    paintBar(); paintBoard(); paintBulk();
+  /* Redraws the panel alone, keeping focus and the caret where they were —
+     which is what makes typing into a person field feel like one field
+     rather than a field that keeps being replaced. */
+  function repaintPanel() {
+    const el = document.activeElement;
+    const id = el && el.id;
+    const at = el && el.selectionStart;
     fp.innerHTML = kbFilterPanel(v, kbDeals(v).length);
     wireFilters();
-    if (active) { const el = fp.querySelector('#' + active); if (el) el.focus(); }
+    if (!id) return;
+    const back = fp.querySelector('#' + id);
+    if (!back) return;
+    back.focus();
+    if (at != null && back.setSelectionRange) { try { back.setSelectionRange(at, at); } catch (e) {} }
+  }
+
+  /* A filter change repaints everything the filter touches: the board, the
+     bar's badge, the bulk count, and the panel's own counts and ticks. */
+  function refilter() {
+    paintBar(); paintBoard(); paintBulk();
+    repaintPanel();
   }
 
   app.addEventListener('click', () => { closeMenus(); });
