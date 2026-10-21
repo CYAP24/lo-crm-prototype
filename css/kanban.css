@@ -692,42 +692,6 @@
   color: var(--text-placeholder);
 }
 
-/* ---------- Bulk bar ------------------------------------------------------- */
-
-/* Anchored to the board rather than the viewport, so it rides the artboard
-   the way every other overlay on this screen does. */
-.kb-bulk {
-  position: absolute;
-  left: 50%;
-  bottom: var(--space-24);
-  transform: translate(-50%, 12px);
-  z-index: 35;
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  padding: var(--space-10, 10px) var(--space-16);
-  border-radius: var(--radius-pill);
-  background: var(--neutral-900);
-  box-shadow: var(--elevation-overlay);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .16s ease, transform .16s ease;
-}
-.kb-bulk.is-up { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-.kb-bulk__n { color: var(--text-on-dark); white-space: nowrap; }
-.kb-bulk__sep { width: 1px; height: 18px; background: rgba(255, 255, 255, .22); }
-.kb-bulk__act {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  font: var(--weight-medium) 12px/16px var(--font-family);
-  color: var(--neutral-300);
-  white-space: nowrap;
-  cursor: pointer;
-}
-.kb-bulk__act:hover { color: var(--text-on-dark); }
-.kb-bulk__act--quiet { color: var(--neutral-500); }
-
 /* ---------- Filter panel --------------------------------------------------- */
 
 .kbf {
@@ -863,3 +827,156 @@
   color: var(--text-secondary);
 }
 .kbf__nomatch { padding: var(--space-6); color: var(--text-placeholder); }
+
+/* ---------- Bulk actions banner --------------------------------------------
+   Selecting cards puts the whole screen in a mode, so the banner takes the
+   screen's top edge and covers the global nav rather than floating over the
+   board. The nav is not reachable while a selection is live, which is the
+   point: the cross is the way out.
+   -------------------------------------------------------------------------- */
+
+.kb-bb {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 45;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-10, 10px);
+  padding: 0 var(--space-20);
+  background: var(--bg-brand-subtle);
+  border-bottom: 1px solid var(--border-brand);
+}
+
+.kb-bb__x {
+  width: 28px; height: 28px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-bb__x:hover { background: var(--bg-base); color: var(--text-primary); }
+
+.kb-bb__n {
+  min-width: 26px;
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  text-align: center;
+  flex: none;
+}
+
+.kb-bb__act {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-brand);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kb-bb__act:hover { background: var(--bg-brand-subtle); }
+.kb-bb__act.is-on { background: var(--bg-brand); color: var(--text-on-dark); border-color: var(--bg-brand); }
+
+.kb-bb__note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-success);
+}
+
+/* ---------- The form under a chip ------------------------------------------ */
+
+.kb-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: var(--space-20);
+  z-index: 46;
+  width: 320px;
+  padding: var(--space-16);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+.kb-pop__title { color: var(--text-primary); }
+.kb-pop__label { color: var(--text-tertiary); margin-top: var(--space-4); }
+
+.kb-pop__list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 220px; overflow-y: auto; }
+.kb-pop__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-pop__opt:hover { background: var(--bg-surface); color: var(--text-primary); }
+
+.kb-pop__seg { display: flex; gap: var(--space-4); padding: 3px; border-radius: var(--radius-8); background: var(--bg-muted); }
+.kb-pop__segbtn {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-pop__segbtn.is-on { background: var(--bg-base); color: var(--text-brand); box-shadow: var(--elevation-card); }
+
+.kb-pop__text {
+  min-height: 84px;
+  resize: vertical;
+  padding: var(--space-8) var(--space-10, 10px);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  background: var(--bg-base);
+  font: var(--weight-medium) 13px/1.5 var(--font-family);
+  color: var(--text-primary);
+}
+.kb-pop__text:focus { outline: none; border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+
+.kb-pop input[type="date"] {
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+.kb-pop__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  margin-top: var(--space-4);
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+}
+.kb-pop__cancel { color: var(--text-tertiary); cursor: pointer; }
+.kb-pop__cancel:hover { color: var(--text-primary); }
+.kb-pop__save {
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 13px/1 var(--font-family);
+  cursor: pointer;
+}
+.kb-pop__save:hover { background: var(--bg-brand-hover); }
+/* Live only once the form has been told enough to act on. */
+.kb-pop__save.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }

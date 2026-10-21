@@ -447,8 +447,28 @@ const kbDefaultView = () => ({
   min: 0, max: 700000,
   from: '', to: '',
   select: false,
-  selected: new Set()
+  selected: new Set(),
+
+  /* The bulk banner: which form is open, what it has been told so far, and
+     the line it shows after a save. */
+  bulk: null,
+  note: '',
+  pending: {
+    broker: null, brokerQuery: '',
+    stage: null,
+    channel: 'SMS', text: '',
+    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: ''
+  }
 });
+
+const kbResetPending = (v) => {
+  v.pending = {
+    broker: null, brokerQuery: '',
+    stage: null,
+    channel: 'SMS', text: '',
+    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: ''
+  };
+};
 
 /* Turns the view state into the deals the board should show. */
 function kbDeals(v) {
@@ -764,22 +784,142 @@ function kbFilterPanel(v, shown) {
     </div>`;
 }
 
-/* ---------- Bulk bar -------------------------------------------------------
-   Raised only while something is picked. The four actions are the ones the
-   brief names; none of them does anything yet.
+/* ---------- Bulk actions ---------------------------------------------------
+   Picking a card raises a banner over the global nav rather than floating a
+   bar over the board: the selection is a mode the whole screen is in, so it
+   takes the screen's top edge, the way Zoho's does.
+
+   A cross on the left drops the selection, the count sits beside it, and
+   each action opens a small form under its own chip. Nothing is written —
+   Save closes the form and says what would have happened.
    -------------------------------------------------------------------------- */
 
-const kbBulkBar = (n) => `
-  <div class="kb-bulk ${n ? 'is-up' : ''}">
-    <span class="kb-bulk__n t-label-md">${n} selected</span>
-    <span class="kb-bulk__sep"></span>
-    <span class="kb-bulk__act">${icon('user-plus', 14)} Reassign</span>
-    <span class="kb-bulk__act">${icon('arrow-forward', 14)} Move stage</span>
-    <span class="kb-bulk__act">${icon('chat', 14)} Send message</span>
-    <span class="kb-bulk__act">${icon('check-circle', 14)} Add task</span>
-    <span class="kb-bulk__sep"></span>
-    <span class="kb-bulk__act kb-bulk__act--quiet" data-kb-clearsel>Clear</span>
-  </div>`;
+const KB_BULK = {
+  broker:  { label: 'Reassign broker', glyph: 'user-plus' },
+  stage:   { label: 'Move stage',      glyph: 'arrow-forward' },
+  message: { label: 'Message',         glyph: 'chat' },
+  task:    { label: 'Add a task',      glyph: 'check-circle' }
+};
+
+/* Each form says what it needs before Save means anything, so the button is
+   live only once it does. */
+function kbBulkReady(v) {
+  const p = v.pending;
+  if (v.bulk === 'broker')  return !!p.broker;
+  if (v.bulk === 'stage')   return !!p.stage;
+  if (v.bulk === 'message') return p.text.trim().length > 0;
+  if (v.bulk === 'task')    return p.taskTitle.trim().length > 0;
+  return false;
+}
+
+function kbBulkForm(v) {
+  const p = v.pending;
+  const n = v.selected.size;
+
+  if (v.bulk === 'broker') {
+    const index = kbNameIndex('broker');
+    const typed = p.brokerQuery.trim().toLowerCase();
+    const matches = [...index.keys()].filter(x => x.toLowerCase().includes(typed)).sort();
+    return `
+      <div class="kb-pop__title t-label-md">Reassign ${n} deal${n > 1 ? 's' : ''} to</div>
+      ${p.broker
+        ? `<div class="kbf__tags"><span class="kbf__tag" data-val="${p.broker}">${personChip([index.get(p.broker), p.broker])}</span></div>`
+        : `<input type="text" class="kbf__search" id="kb-bulk-broker" data-kb-bulkq="brokerQuery"
+                  value="${p.brokerQuery}" placeholder="Search brokers by name&hellip;" autocomplete="off">
+           ${typed ? `<div class="kbf__sugg">
+             ${matches.length
+               ? matches.map(x => `<span class="kbf__sugg-item" data-kb-bulkpick="broker" data-val="${x}">
+                   <span class="kbf__sugg-av">${index.get(x)}</span>${x}</span>`).join('')
+               : '<span class="kbf__nomatch t-body-sm">No broker by that name</span>'}
+           </div>` : ''}`}`;
+  }
+
+  if (v.bulk === 'stage') {
+    return `
+      <div class="kb-pop__title t-label-md">Move ${n} deal${n > 1 ? 's' : ''} to</div>
+      <div class="kb-pop__list">
+        ${KB_STAGES.map(s => `
+          <span class="kb-pop__opt ${p.stage === s.id ? 'is-on' : ''}" data-kb-bulkpick="stage" data-val="${s.id}">
+            <span class="kb-box">${p.stage === s.id ? icon('check-sm', 11) : ''}</span>${s.label}
+          </span>`).join('')}
+      </div>`;
+  }
+
+  if (v.bulk === 'message') {
+    return `
+      <div class="kb-pop__title t-label-md">Message ${n} client${n > 1 ? 's' : ''}</div>
+      <div class="kb-pop__seg">
+        ${['SMS', 'Email'].map(c => `
+          <span class="kb-pop__segbtn ${p.channel === c ? 'is-on' : ''}" data-kb-bulkpick="channel" data-val="${c}">${c}</span>`).join('')}
+      </div>
+      <textarea class="kb-pop__text" id="kb-bulk-text" data-kb-bulkq="text"
+                placeholder="Write your ${p.channel.toLowerCase()}&hellip;">${p.text}</textarea>`;
+  }
+
+  /* The task form is the quick-actions panel's own vocabulary: a title, who
+     it is for, and when it is due. */
+  const index = kbNameIndex('broker');
+  const typed = p.taskWhoQuery.trim().toLowerCase();
+  const matches = [...index.keys()].filter(x => x.toLowerCase().includes(typed)).sort();
+  return `
+    <div class="kb-pop__title t-label-md">Add a task to ${n} deal${n > 1 ? 's' : ''}</div>
+    <input type="text" class="kbf__search" id="kb-bulk-task" data-kb-bulkq="taskTitle"
+           value="${p.taskTitle}" placeholder="What needs doing?" autocomplete="off">
+    <div class="kb-pop__label t-overline">Assigned to</div>
+    ${p.taskWho
+      ? `<div class="kbf__tags"><span class="kbf__tag" data-val="${p.taskWho}">${personChip([index.get(p.taskWho), p.taskWho])}</span></div>`
+      : `<input type="text" class="kbf__search" id="kb-bulk-who" data-kb-bulkq="taskWhoQuery"
+                value="${p.taskWhoQuery}" placeholder="Search brokers by name&hellip;" autocomplete="off">
+         ${typed ? `<div class="kbf__sugg">
+           ${matches.length
+             ? matches.map(x => `<span class="kbf__sugg-item" data-kb-bulkpick="taskWho" data-val="${x}">
+                 <span class="kbf__sugg-av">${index.get(x)}</span>${x}</span>`).join('')
+             : '<span class="kbf__nomatch t-body-sm">No broker by that name</span>'}
+         </div>` : ''}`}
+    <div class="kb-pop__label t-overline">Due</div>
+    <input type="date" id="kb-bulk-due" data-kb-bulkq="taskDue" value="${p.taskDue}">`;
+}
+
+/* What a save would have done, said plainly. Nothing is written: these are
+   the words the confirmation uses, and the board is unchanged behind it. */
+function kbBulkNote(v) {
+  const n = v.selected.size;
+  const deals = `${n} deal${n > 1 ? 's' : ''}`;
+  const p = v.pending;
+  if (v.bulk === 'broker')  return `${deals} reassigned to ${p.broker}`;
+  if (v.bulk === 'stage')   return `${deals} moved to ${(KB_STAGES.find(s => s.id === p.stage) || {}).label}`;
+  if (v.bulk === 'message') return `${p.channel} queued to ${n} client${n > 1 ? 's' : ''}`;
+  return `Task added to ${deals}`;
+}
+
+function kbBulkBanner(v) {
+  const n = v.selected.size;
+  if (!n) return '';
+
+  return `
+    <div class="kb-bb">
+      <span class="kb-bb__x" data-kb-bulkexit title="Clear selection">${icon('close', 15)}</span>
+      <span class="kb-bb__n t-label-md">${n}</span>
+      ${Object.keys(KB_BULK).map(k => `
+        <span class="kb-bb__act ${v.bulk === k ? 'is-on' : ''}" data-kb-bulkopen="${k}">
+          ${icon(KB_BULK[k].glyph, 13)} ${KB_BULK[k].label}
+        </span>`).join('')}
+
+      ${/* The confirmation sits beside the actions rather than replacing
+            them: having just reassigned, the next thing a broker wants is
+            often to message the same deals. */ ''}
+      ${v.note ? `<span class="kb-bb__note t-body-md">${icon('check-circle', 15)} ${v.note}</span>` : ''}
+
+      ${v.bulk ? `
+        <div class="kb-pop" data-kb-pop>
+          ${kbBulkForm(v)}
+          <div class="kb-pop__foot">
+            <span class="kb-pop__cancel t-body-sm" data-kb-bulkclose>Cancel</span>
+            <span class="kb-pop__save ${kbBulkReady(v) ? '' : 'is-off'}" data-kb-bulksave>Save</span>
+          </div>
+        </div>` : ''}
+    </div>`;
+}
 
 /* ---------- Shell ---------------------------------------------------------- */
 
@@ -821,6 +961,7 @@ const KB_MODES = { v1: 'cues', v2: 'text' };
    there is one path rather than four. */
 function mountKanbanBar(app, mode) {
   const v = kbDefaultView();
+  let noteTimer = null;
   const board = app.querySelector('.kb-board');
   const bar = () => app.querySelector('.kb-bar');
   const fp = app.querySelector('#kbfilter');
@@ -838,7 +979,7 @@ function mountKanbanBar(app, mode) {
     wireBoard();
   };
   const paintFilters = () => { if (fp.classList.contains('is-open')) fp.innerHTML = kbFilterPanel(v, kbDeals(v).length); };
-  const paintBulk = () => { bulk.innerHTML = v.select ? kbBulkBar(v.selected.size) : ''; wireBulk(); };
+  const paintBulk = () => { bulk.innerHTML = kbBulkBanner(v); wireBulk(); };
   const paintAll = () => { paintBar(); paintBoard(); paintFilters(); paintBulk(); };
 
   /* --- board-level wiring, redone after every repaint --- */
@@ -860,13 +1001,88 @@ function mountKanbanBar(app, mode) {
     }));
   }
 
+  /* Redraws the banner alone, keeping focus and the caret — the same reason
+     the filter panel has its own repaint. */
+  function repaintBulk() {
+    const el = document.activeElement;
+    const id = el && el.id;
+    const at = el && el.selectionStart;
+    paintBulk();
+    if (!id) return;
+    const back = bulk.querySelector('#' + id);
+    if (!back) return;
+    back.focus();
+    if (at != null && back.setSelectionRange) { try { back.setSelectionRange(at, at); } catch (e) {} }
+  }
+
   function wireBulk() {
-    const clear = bulk.querySelector('[data-kb-clearsel]');
-    if (clear) clear.addEventListener('click', (e) => {
+    const x = bulk.querySelector('[data-kb-bulkexit]');
+    if (x) x.addEventListener('click', (e) => {
       e.stopPropagation();
-      v.selected.clear();
+      v.selected.clear(); v.bulk = null; v.note = ''; kbResetPending(v);
       paintBoard(); paintBulk();
     });
+
+    bulk.querySelectorAll('[data-kb-bulkopen]').forEach(b => b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const k = b.dataset.kbBulkopen;
+      v.bulk = v.bulk === k ? null : k;
+      kbResetPending(v);
+      paintBulk();
+    }));
+
+    const close = bulk.querySelector('[data-kb-bulkclose]');
+    if (close) close.addEventListener('click', (e) => {
+      e.stopPropagation();
+      v.bulk = null; kbResetPending(v); paintBulk();
+    });
+
+    /* Typing inside a form only redraws the form. */
+    bulk.querySelectorAll('[data-kb-bulkq]').forEach(inp => inp.addEventListener('input', () => {
+      v.pending[inp.dataset.kbBulkq] = inp.value;
+      repaintBulk();
+    }));
+
+    bulk.querySelectorAll('[data-kb-bulkpick]').forEach(opt => opt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      v.pending[opt.dataset.kbBulkpick] = opt.dataset.val;
+      paintBulk();
+    }));
+
+    /* Removing the chosen person puts the search field back. */
+    bulk.querySelectorAll('.kbf__tag').forEach(tag => tag.addEventListener('click', (e) => {
+      if (!e.target.closest('.chip-person__x')) return;
+      e.stopPropagation();
+      if (v.bulk === 'broker') { v.pending.broker = null; v.pending.brokerQuery = ''; }
+      else { v.pending.taskWho = null; v.pending.taskWhoQuery = ''; }
+      paintBulk();
+    }));
+
+    const save = bulk.querySelector('[data-kb-bulksave]');
+    if (save) save.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!kbBulkReady(v)) return;
+      v.note = kbBulkNote(v);
+      v.bulk = null; kbResetPending(v);
+      paintBulk();
+      /* The line clears itself, so the banner goes back to being the
+         actions rather than a receipt nobody dismissed. */
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => { v.note = ''; paintBulk(); }, 4000);
+    });
+
+    /* The form hangs under the chip that opened it, pulled back inside the
+       screen if that would push it off the right edge. */
+    const pop = bulk.querySelector('[data-kb-pop]');
+    const chip = bulk.querySelector('.kb-bb__act.is-on');
+    if (pop && chip) {
+      const edge = app.querySelector('.kb').getBoundingClientRect();
+      const at = chip.getBoundingClientRect();
+      const left = Math.min(at.left - edge.left, edge.width - pop.offsetWidth - 20);
+      pop.style.left = `${Math.max(20, left)}px`;
+    }
+
+    bulk.addEventListener('click', (e) => e.stopPropagation());
   }
 
   /* --- bar-level wiring, redone whenever the bar is repainted --- */
@@ -901,7 +1117,7 @@ function mountKanbanBar(app, mode) {
     if (sel) sel.addEventListener('click', (e) => {
       e.stopPropagation();
       v.select = !v.select;
-      if (!v.select) v.selected.clear();
+      if (!v.select) { v.selected.clear(); v.bulk = null; v.note = ''; kbResetPending(v); }
       paintAll();
     });
 

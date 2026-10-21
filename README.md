@@ -339,9 +339,26 @@ and the next follow-up — all of them dates and counts the *deal* records.
 Opening a card or its quick-actions panel changes none of them, so the board
 a broker comes back to is the board they left.
 
-**Select mode** puts a box on every card and a `Select all` on every column,
-and raises a dark bar with the four bulk actions the brief names. The actions
-are mock; the selection is real, and it survives filtering.
+**Select mode** puts a box on every card and a `Select all` on every column.
+Picking anything raises a banner **over the global nav** rather than floating
+a bar over the board: the selection is a mode the whole screen is in, so it
+takes the screen's top edge. A cross on the left drops the selection, the
+count sits beside it, and each action opens a small form under its own chip:
+
+| Action | The form |
+|---|---|
+| Reassign broker | Search by name, pick one, it becomes a removable chip |
+| Move stage | The seven stages, one of them chosen |
+| Message | SMS or Email, then free text |
+| Add a task | What needs doing, who it is for, when it is due — the quick-actions panel's own vocabulary |
+
+Save is live only once the form has been told enough to act on, and the
+confirmation sits **beside** the actions rather than replacing them, since
+having just reassigned, the next thing a broker wants is often to message the
+same deals. Nothing is written: the board behind the banner is unchanged, and
+the line says what would have happened.
+
+The selection itself is real, and it survives filtering.
 
 Three things the data gained for this: `segment` (consumer or commercial,
 which follows the product), `source` (where the lead came from, which nothing
