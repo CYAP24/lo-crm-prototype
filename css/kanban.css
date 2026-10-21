@@ -12,9 +12,11 @@
    the artboard, the app bar and the shared components.
    ========================================================================== */
 
-/* The board's ground, sampled from the frame — the same flat grey the
-   application view stands on, so the two screens share a floor. */
-.kb { --kb-ground: #F5F5F5; }
+/* The board's ground. The frame samples #F5F5F5 here, the same flat grey the
+   application view stands on, but a white card on it barely separates once
+   there are six columns of them. A step down the neutral ramp gives the
+   cards an edge without the column reading as a filled panel. */
+.kb { --kb-ground: var(--neutral-200); }
 
 .kb {
   flex: 1;
@@ -164,7 +166,7 @@
    column sits a step darker than the others and its cards hold back. The
    fade is on the card rather than the column so the heading and its count
    stay readable. */
-.kb-col[data-stage="snoozed"] { background: var(--neutral-300); }
+.kb-col[data-stage="snoozed"] { background: var(--neutral-400); }
 .kb-col[data-stage="snoozed"] .kb-c { opacity: .7; }
 
 /* The heading carries four things, in the order they are read: the stage,
@@ -189,7 +191,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.kb-col__n    { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-placeholder); }
+/* Two steps up from the placeholder grey it used to be: on the darker
+   ground that read as switched off rather than secondary. */
+.kb-col__n    { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-tertiary); }
 
 /* v1 — the totals as chips, the language of its tinted task blocks. Both
    carry a border so they hold up on the New lead and Snoozed grounds as
@@ -197,7 +201,7 @@
 .kb-col__stats { display: flex; align-items: center; gap: var(--space-6); }
 .kb-stat {
   padding: 3px var(--space-8);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-pill);
   background: var(--bg-base);
   font: var(--weight-demi) 14px/18px var(--font-family);
