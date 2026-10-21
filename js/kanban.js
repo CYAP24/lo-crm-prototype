@@ -165,19 +165,25 @@ function kbCard(d, i, mode) {
 
   const open = `<article class="kb-c kb-c--${mode} ${st ? 'is-' + st.id : ''}" data-deal-row="${i}">`;
 
-  /* v1 — one body, and the tasks are tinted blocks inside it. */
+  /* v1 — one body, and the tasks are tinted blocks inside it.
+
+     A card asking to be called right now drops its tasks and its documents:
+     the only thing being asked for is the call, and a progress bar under a
+     red banner argues with it. What is left is who, how much, and the three
+     ways to reach them. */
   if (mode === 'cues') {
+    const callNow = !!st && st.id === 'immediate';
     return `${open}
       ${banner}
       <div class="kb-c__body">
         ${head}
-        ${tasks.length ? `<div class="kb-c__blocks">${tasks.map(t => `
+        ${!callNow && tasks.length ? `<div class="kb-c__blocks">${tasks.map(t => `
           <div class="kb-c__block ${t.overdue ? 'is-overdue' : ''}">
             ${icon('clock', 16)}
             <span class="kb-c__block-label">${t.label}</span>
             <span class="kb-c__block-due">${t.due}</span>
           </div>`).join('')}</div>` : ''}
-        ${kbDocBar(d, c)}
+        ${callNow ? '' : kbDocBar(d, c)}
         ${owner}
       </div>
       ${actions}
