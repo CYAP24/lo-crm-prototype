@@ -6,11 +6,16 @@
 <meta name="viewport" content="width=1920">
 <link rel="stylesheet" href="css/tokens.css?v=bc20d396">
 <link rel="stylesheet" href="css/worklist.css?v=e4b809a5">
-<link rel="stylesheet" href="css/kanban.css?v=a9c3ac85">
+<!-- variants.css and variants.js come along for the quick actions panel
+     only: its .dp-* styles and its panelTasks / panelNotes renderers.
+     window.VARIANT is unset here, so the work-list renderer never runs. -->
+<link rel="stylesheet" href="css/variants.css?v=6dbde3bb">
+<link rel="stylesheet" href="css/kanban.css?v=34fd81db">
 <script>window.KB_VARIANT = 'v2';</script>
 <script src="js/icons.js?v=e5f50832" defer></script>
 <script src="js/data.js?v=94c0017b" defer></script>
-<script src="js/kanban.js?v=56ec82c5" defer></script>
+<script src="js/variants.js?v=849d918f" defer></script>
+<script src="js/kanban.js?v=f4451c02" defer></script>
 </head>
 <body>
 <!-- v2 of the kanban — tasks as a labelled list, documents as words. The board is the same in both

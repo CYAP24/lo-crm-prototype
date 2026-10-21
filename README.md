@@ -294,6 +294,31 @@ board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
 a card does not open the application view — both are the obvious next
 things.
 
+#### Quick actions panel
+
+The `Note` and `Task` pills on a card open the same full-height sidebar the
+work list opens, on the tab you pressed. It is the work list's panel, not a
+copy: `css/variants.css` supplies the `.dp-*` styles and `js/variants.js`
+supplies `panelTasks` and `panelNotes`, so the task and note lists are the
+ones the work list already tells. Both files come along on the kanban pages
+for that alone — `window.VARIANT` is unset there, so the work-list renderer
+loads and never runs.
+
+What the kanban changes is the head and the tabs:
+
+| | |
+|---|---|
+| Head | `Quick actions`, the client's name, then **amount · day in stage · stage**. The reference and the product are on the card already, so the panel names the three things the card does not repeat |
+| Tabs | **Add task**, **Add note**, **Docs & forms** |
+
+`Docs & forms` is a placeholder: it holds the shape of the panel but has no
+renderer, so it is drawn disabled and titled `Nothing here yet`. `Request
+docs` on the card stays inert for the same reason — there is nothing yet for
+it to open.
+
+The card the panel belongs to takes a brand ring, since the panel covers the
+right of the board and can hide it. `Esc` or a click anywhere outside closes.
+
 #### Removed
 
 - **The first board card** — the one from the `Draft #2 - 1440 px` frame, with

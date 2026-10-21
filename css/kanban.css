@@ -513,3 +513,22 @@
 .kb-ap svg { flex: none; }
 .kb-ap--grow { flex: 1; min-width: 0; }
 .kb-ap--icon { padding: 6px 9px; }
+
+/* ---------- Quick actions panel -------------------------------------------
+   The panel itself is the work list's, styled by the .dp-* block in
+   css/variants.css. Only two things are the kanban's own: a tab with nothing
+   behind it yet, and marking which card the panel is about.
+   -------------------------------------------------------------------------- */
+
+.dp__tab.is-disabled {
+  color: var(--text-placeholder);
+  cursor: default;
+}
+.dp__tab.is-disabled:hover { color: var(--text-placeholder); }
+
+/* The panel covers the right of the board, so the card it belongs to can be
+   off behind it — the ring is how you find your way back to it. */
+.kb-c.is-active {
+  outline: 2px solid var(--border-brand);
+  outline-offset: -2px;
+}

@@ -183,8 +183,8 @@ function kbCard(d, i, mode) {
 
   const actions = `
     <div class="kb-c__actions">
-      <span class="kb-ap kb-ap--grow">${icon('note', 14)} Note</span>
-      <span class="kb-ap kb-ap--grow">${icon('check-circle', 14)} Task</span>
+      <span class="kb-ap kb-ap--grow" data-kb-panel="note">${icon('note', 14)} Note</span>
+      <span class="kb-ap kb-ap--grow" data-kb-panel="task">${icon('check-circle', 14)} Task</span>
       <span class="kb-ap">${icon('article', 14)} Request docs</span>
       <span class="kb-ap kb-ap--icon">${icon('kebab', 16)}</span>
     </div>`;
@@ -360,6 +360,95 @@ const kbBar = () => `
     <span class="kb-select">-Sort by- ${icon('chevron-down', 11)}</span>
   </div>`;
 
+/* ---------- Quick actions panel -------------------------------------------
+   The same full-height sidebar the work list opens, reusing its `.dp-*`
+   styles from css/variants.css and its two body renderers, `panelTasks` and
+   `panelNotes`, from js/variants.js. Those files come along for the panel
+   only — `window.VARIANT` is unset on these pages, so the work-list renderer
+   never runs.
+
+   What differs is the head and the tab set. The board already shows the
+   reference and the product on the card, so the panel names the deal by the
+   three things the card does not repeat: what it is worth, how long it has
+   been in this stage, and which stage that is.
+   -------------------------------------------------------------------------- */
+
+const KB_PANEL_TABS = {
+  task: { label: 'Add task', render: panelTasks, count: (d) => d.tasks },
+  note: { label: 'Add note', render: panelNotes, count: (d) => d.notes },
+  /* No renderer yet — the tab holds the place so the shape of the panel is
+     right, and says plainly that there is nothing behind it. */
+  docs: { label: 'Docs & forms', render: null }
+};
+const KB_PANEL_ORDER = ['task', 'note', 'docs'];
+
+const kbPanelInner = (d, tab) => `
+  <div class="dp__head">
+    <div style="flex:1;min-width:0">
+      <div class="t-h4 dp__title">Quick actions</div>
+      <div class="t-label-lg dp__name">${d.name}</div>
+      <div class="t-body-sm dp__meta">
+        ${money(d.amount)} &nbsp;·&nbsp; Day ${d.day} &nbsp;·&nbsp; ${d.stage}
+      </div>
+    </div>
+    <span class="dp__close" title="Close">${icon('close', 15)}</span>
+  </div>
+  <div class="dp__tabs">
+    ${KB_PANEL_ORDER.map(k => {
+      const t = KB_PANEL_TABS[k];
+      const off = !t.render;
+      return `
+      <span class="dp__tab ${k === tab ? 'is-active' : ''} ${off ? 'is-disabled' : ''}"
+            ${off ? 'title="Nothing here yet"' : `data-tab="${k}"`}>
+        ${t.label}
+        ${t.count ? `<span class="dp__tabn">${String(t.count(d)).padStart(2, '0')}</span>` : ''}
+      </span>`;
+    }).join('')}
+  </div>
+  <div class="dp__body">${KB_PANEL_TABS[tab].render(d)}</div>`;
+
+/* Opens on the pill that was clicked: Note lands on Add note, Task on Add
+   task. Request docs stays inert until there is something to show. */
+function mountKanbanPanel(app) {
+  const dp = app.querySelector('#kbpanel');
+  if (!dp || typeof panelTasks !== 'function') return;
+  let openOn = null;
+
+  const close = () => {
+    dp.classList.remove('is-open');
+    openOn = null;
+    app.querySelectorAll('.kb-c.is-active').forEach(c => c.classList.remove('is-active'));
+  };
+
+  const render = (i, tab) => {
+    dp.innerHTML = kbPanelInner(DEALS[i], tab);
+    dp.classList.add('is-open');
+    openOn = `${i}:${tab}`;
+
+    app.querySelectorAll('.kb-c').forEach(c =>
+      c.classList.toggle('is-active', Number(c.dataset.dealRow) === i));
+
+    dp.querySelector('.dp__close').addEventListener('click', (e) => { e.stopPropagation(); close(); });
+    dp.querySelectorAll('.dp__tab[data-tab]').forEach(t =>
+      t.addEventListener('click', (e) => { e.stopPropagation(); render(i, t.dataset.tab); }));
+  };
+
+  app.querySelectorAll('[data-kb-panel]').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = trigger.closest('[data-deal-row]');
+      const i = Number(card.dataset.dealRow);
+      const tab = trigger.dataset.kbPanel;
+      if (openOn === `${i}:${tab}`) { close(); return; }
+      render(i, tab);
+    });
+  });
+
+  dp.addEventListener('click', (e) => e.stopPropagation());
+  app.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+}
+
 /* The board is the same in both versions — the mode decides the card and
    the column heading, which are the two things they disagree about. */
 function renderKanban(mode) {
@@ -376,6 +465,8 @@ function renderKanban(mode) {
     <div class="kb-board">
       ${KB_STAGES.map(s => kbColumn(s, card, mode)).join('')}
     </div>
+
+    <aside class="dp" id="kbpanel"></aside>
   </div>`;
 }
 
@@ -383,10 +474,8 @@ function renderKanban(mode) {
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
    the page. A third version goes here as another skin over the same card.
 
-   Nothing mounts any more: the column filter was the board's one piece of
-   wiring, and it went with the heading. Scrolling is CSS, and the card's
-   controls are presentational. A version that needs wiring can take a mount
-   back, the way the work list's do. */
+   Both versions mount the same thing — the quick actions panel is the
+   board's only wiring, and it behaves identically in each. */
 const KB_RENDERERS = {
   v1: () => renderKanban('cues'),
   v2: () => renderKanban('text')
@@ -395,5 +484,7 @@ const KB_RENDERERS = {
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
   const render = KB_RENDERERS[window.KB_VARIANT || 'v1'];
-  if (app && render) app.innerHTML = render();
+  if (!app || !render) return;
+  app.innerHTML = render();
+  mountKanbanPanel(app);
 });
