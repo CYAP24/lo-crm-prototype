@@ -382,13 +382,6 @@ const KB_VIEWS = {
   docs:      { label: 'Documents to review',     test: (d) => docCounts(d).review > 0 }
 };
 
-/* Saved views are the broker's own, so they live beside the standard ones
-   rather than inside them. One is marked as the board's default. */
-const KB_SAVED = [
-  { label: 'Asset Finance - AU', test: (d) => d.product === 'Asset finance', isDefault: true },
-  { label: 'Big-ticket equipment', test: (d) => d.product === 'Equipment finance' && d.amount >= 300000 }
-];
-
 /* The follow-up a sort orders by: the soonest thing with a date on it. */
 const kbFollowUp = (d) => (d.tasksOverdue > 0 ? -d.tasksOverdue : (d.tasksDue || 99));
 
@@ -438,6 +431,50 @@ function kbNameIndex(key) {
   return out;
 }
 
+/* A saved view is a set of filters with a name on it, not a rule of its own.
+   That is what lets it be adjusted: applying one loads its filters into the
+   panel, so the broker can see and change exactly what it stands for.
+
+   It is a `let` because the broker owns this list — they save, rename and
+   delete from it. Nothing persists past a reload; this is a prototype. */
+const kbEmptyFilters = () => ({
+  picked: Object.fromEntries(Object.keys(KB_FILTERS).map(k => [k, []])),
+  min: 0, max: 700000, from: '', to: ''
+});
+
+let KB_SAVED = [
+  {
+    label: 'Asset Finance - AU',
+    isDefault: true,
+    filters: Object.assign(kbEmptyFilters(), {
+      picked: Object.assign(kbEmptyFilters().picked, { product: ['Asset finance'] })
+    })
+  },
+  {
+    label: 'Big-ticket equipment',
+    filters: Object.assign(kbEmptyFilters(), {
+      picked: Object.assign(kbEmptyFilters().picked, { product: ['Equipment finance'] }),
+      min: 300000
+    })
+  }
+];
+
+/* Loading a saved view is loading its filters — the dropdown then just
+   remembers whose filters these are, so the name can be shown. */
+function kbApplySaved(v, i) {
+  const f = KB_SAVED[i].filters;
+  v.picked = JSON.parse(JSON.stringify(f.picked));
+  v.min = f.min; v.max = f.max; v.from = f.from; v.to = f.to;
+  v.view = 'all';
+  v.saved = i;
+}
+
+/* Snapshot of what the panel is currently filtering by. */
+const kbSnapshot = (v) => ({
+  picked: JSON.parse(JSON.stringify(v.picked)),
+  min: v.min, max: v.max, from: v.from, to: v.to
+});
+
 const kbDefaultView = () => ({
   view: 'all',
   saved: null,
@@ -446,6 +483,8 @@ const kbDefaultView = () => ({
   query: Object.fromEntries(KB_SEARCH_KEYS.map(k => [k, ''])),
   min: 0, max: 700000,
   from: '', to: '',
+  editSaved: false,
+  saveName: '',
   select: false,
   selected: new Set(),
 
@@ -476,11 +515,9 @@ function kbDeals(v) {
     const [y, m, d] = iso.split('-');
     return parseDMY(`${d}/${m}/${y.slice(2)}`);
   };
-  const saved = v.saved === null ? null : KB_SAVED[v.saved];
 
   return DEALS
     .filter(d => KB_VIEWS[v.view].test(d))
-    .filter(d => !saved || saved.test(d))
     .filter(d => Object.keys(KB_FILTERS).every(k => {
       const picked = v.picked[k];
       return !picked.length || picked.includes(KB_FILTERS[k].of(d));
@@ -517,20 +554,36 @@ function kbBarV1(v) {
     </div>
 
     <div class="kb-views-pick">
-      <span class="kb-pick__label t-body-sm">Common views</span>
+      <span class="kb-pick__label t-body-sm">Your views</span>
       <span class="kb-select kb-select--wide" data-kb-menu="views">
         ${viewLabel} ${icon('chevron-down', 11)}
       </span>
       <div class="kb-menu" data-kb-menufor="views">
         ${Object.keys(KB_VIEWS).map(k =>
           kbMenuItem(`data-kb-view="${k}"`, KB_VIEWS[k].label, v.saved === null && v.view === k)).join('')}
+
         <div class="kb-menu__sep t-overline">Saved views</div>
-        ${KB_SAVED.map((s, i) =>
-          kbMenuItem(`data-kb-saved="${i}"`, s.label, v.saved === i,
-            s.isDefault ? '<span class="kb-menu__default t-body-sm">Default</span>' : '')).join('')}
+        ${KB_SAVED.length === 0
+          ? '<div class="kb-menu__none t-body-sm">None yet — save one from the filter panel.</div>'
+          : v.editSaved
+            /* Editing: each row becomes its name, a way to change what it
+               stands for, and a way to be rid of it. */
+            ? KB_SAVED.map((s, i) => `
+                <div class="kb-menu__edit">
+                  <input type="text" class="kb-menu__rename" id="kb-rename-${i}"
+                         data-kb-rename="${i}" value="${s.label}" autocomplete="off">
+                  <span class="kb-menu__editact" data-kb-adjust="${i}" title="Adjust its filters">${icon('sliders', 13)}</span>
+                  <span class="kb-menu__editact kb-menu__editact--del" data-kb-delsaved="${i}" title="Delete">${icon('close', 13)}</span>
+                </div>`).join('')
+            : KB_SAVED.map((s, i) =>
+                kbMenuItem(`data-kb-saved="${i}"`, s.label, v.saved === i,
+                  s.isDefault ? '<span class="kb-menu__default t-body-sm">Default</span>' : '')).join('')}
+
         <div class="kb-menu__foot">
-          <span class="kb-menu__act">${icon('plus', 12)} Save this view</span>
-          <span class="kb-menu__act">${icon('star', 12)} Set as default</span>
+          ${v.editSaved
+            ? '<span class="kb-menu__act" data-kb-editsaved="off">Done</span>'
+            : `<span class="kb-menu__act">${icon('star', 12)} Set as default</span>
+               <span class="kb-menu__act kb-menu__act--danger" data-kb-editsaved="on">Edit saved views</span>`}
         </div>
       </div>
     </div>
@@ -781,6 +834,16 @@ function kbFilterPanel(v, shown) {
 
       ${KB_SEARCH_KEYS.map(searchGroup).join('')}
       ${KB_TICK_KEYS.map(tickGroup).join('')}
+    </div>
+
+    ${/* Saving belongs here rather than in the views menu: this is where the
+          thing being saved was made, and the broker can see it. */ ''}
+    <div class="kbf__save">
+      <input type="text" class="kbf__search" id="kbf-savename" data-kb-savename
+             value="${v.saveName}" placeholder="Name this view&hellip;" autocomplete="off">
+      <span class="kbf__savebtn ${v.saveName.trim() && kbFilterCount(v) ? '' : 'is-off'}" data-kb-saveview>
+        ${icon('plus', 12)} Save this view
+      </span>
     </div>`;
 }
 
@@ -1103,8 +1166,48 @@ function mountKanbanBar(app, mode) {
 
     app.querySelectorAll('[data-kb-saved]').forEach(el => el.addEventListener('click', (e) => {
       e.stopPropagation();
-      v.saved = Number(el.dataset.kbSaved); v.view = 'all'; v.selected.clear();
+      kbApplySaved(v, Number(el.dataset.kbSaved));
+      v.selected.clear();
       closeMenus(); paintAll();
+    }));
+
+    app.querySelectorAll('[data-kb-editsaved]').forEach(el => el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      v.editSaved = el.dataset.kbEditsaved === 'on';
+      paintBar();
+      /* The menu is rebuilt with the bar, so put it back on screen. */
+      const menu = app.querySelector('[data-kb-menufor="views"]');
+      if (menu) menu.classList.add('is-open');
+    }));
+
+    /* Renaming is live: there is no second step to forget to press. */
+    app.querySelectorAll('[data-kb-rename]').forEach(inp => inp.addEventListener('input', () => {
+      KB_SAVED[Number(inp.dataset.kbRename)].label = inp.value;
+    }));
+
+    app.querySelectorAll('[data-kb-adjust]').forEach(el => el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      /* Adjusting is applying it and then showing the broker what it is
+         made of, so the filter panel opens on its saved elements. */
+      kbApplySaved(v, Number(el.dataset.kbAdjust));
+      v.editSaved = false;
+      closeMenus();
+      paintAll();
+      fp.classList.add('is-open');
+      fp.innerHTML = kbFilterPanel(v, kbDeals(v).length);
+      wireFilters();
+    }));
+
+    app.querySelectorAll('[data-kb-delsaved]').forEach(el => el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const i = Number(el.dataset.kbDelsaved);
+      KB_SAVED.splice(i, 1);
+      if (v.saved === i) v.saved = null;
+      else if (v.saved !== null && v.saved > i) v.saved -= 1;
+      if (!KB_SAVED.length) v.editSaved = false;
+      paintBar();
+      const menu = app.querySelector('[data-kb-menufor="views"]');
+      if (menu) menu.classList.add('is-open');
     }));
 
     app.querySelectorAll('[data-kb-sort]').forEach(el => el.addEventListener('click', (e) => {
@@ -1193,6 +1296,19 @@ function mountKanbanBar(app, mode) {
       v[inp.dataset.kbDate] = inp.value;
       refilter();
     }));
+
+    const name = fp.querySelector('[data-kb-savename]');
+    if (name) name.addEventListener('input', () => { v.saveName = name.value; repaintPanel(); });
+
+    const save = fp.querySelector('[data-kb-saveview]');
+    if (save) save.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!v.saveName.trim() || !kbFilterCount(v)) return;
+      KB_SAVED.push({ label: v.saveName.trim(), filters: kbSnapshot(v) });
+      v.saved = KB_SAVED.length - 1;
+      v.saveName = '';
+      paintBar(); repaintPanel();
+    });
   }
 
   /* Redraws the panel alone, keeping focus and the caret where they were —
@@ -1214,6 +1330,9 @@ function mountKanbanBar(app, mode) {
   /* A filter change repaints everything the filter touches: the board, the
      bar's badge, the bulk count, and the panel's own counts and ticks. */
   function refilter() {
+    /* Changing a filter by hand means this is no longer the saved view it
+       was loaded from, so the dropdown stops claiming to be it. */
+    v.saved = null;
     paintBar(); paintBoard(); paintBulk();
     repaintPanel();
   }

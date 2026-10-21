@@ -980,3 +980,75 @@
 .kb-pop__save:hover { background: var(--bg-brand-hover); }
 /* Live only once the form has been told enough to act on. */
 .kb-pop__save.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }
+
+/* ---------- Saved views: editing ------------------------------------------
+   Editing is a state of the same menu rather than a dialog over it: the
+   rows stay where they were, and each one gains its name as a field plus
+   the two things that can be done to it.
+   -------------------------------------------------------------------------- */
+
+.kb-menu__none { padding: var(--space-8); color: var(--text-placeholder); }
+
+.kb-menu__edit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+}
+.kb-menu__rename {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-primary);
+}
+.kb-menu__rename:focus { outline: none; border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+
+.kb-menu__editact {
+  width: 26px; height: 26px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-menu__editact:hover { background: var(--bg-surface); color: var(--text-primary); }
+.kb-menu__editact--del:hover { background: var(--error-bg); color: var(--text-error); }
+
+/* The one destructive way out of this menu, so it is the one red thing in
+   it rather than another brand-coloured link among several. */
+.kb-menu__act--danger { color: var(--text-error); }
+.kb-menu__act--danger:hover { text-decoration: underline; }
+
+/* ---------- Saving a view from the filter panel ---------------------------- */
+
+.kbf__save {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-20);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+}
+.kbf__save .kbf__search { flex: 1; min-width: 0; }
+.kbf__savebtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kbf__savebtn:hover { background: var(--bg-brand-hover); }
+/* Needs both a name and something worth saving. */
+.kbf__savebtn.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }

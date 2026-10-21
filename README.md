@@ -305,7 +305,7 @@ had. Seven things the brief asks for, and where each one went:
 | | |
 |---|---|
 | Switch board / list / Easy View | Three tabs with a glyph, as before |
-| Jump to a common view | A `Common views` dropdown beside the board name, replacing the deal-type select |
+| Jump to a common view | A `Your views` dropdown beside the board name, replacing the deal-type select |
 | Search | The one field, saying what it actually searches |
 | Filter | A side panel that applies as you change it |
 | Sort | The `-Sort by-` dropdown |
@@ -318,6 +318,19 @@ group, then the amount and date ranges, then the sort — so a view and a
 filter compose instead of fighting, and the column headings count what is
 actually on screen. The nine views give 10 / 22 / 12 / 1 / 14 / 19 / 4 / 2 /
 20 deals against today's data.
+
+**A saved view is a set of filters with a name on it**, not a rule of its
+own. That is what lets it be adjusted: applying one loads its filters into
+the panel, so a broker can see and change exactly what it stands for, and
+changing anything by hand detaches the name — the dropdown stops claiming to
+be a view it no longer is.
+
+Saving happens in the **filter panel**, where the thing being saved was made
+and can be seen, rather than in the views menu. `Edit saved views` at the
+foot of the menu — the one red thing in it — turns the saved list into rows
+that can be renamed in place, adjusted (which loads the view and opens the
+panel on it) or deleted. Nothing persists past a reload; this is a
+prototype.
 
 **Amount and date lead the filter panel**, because they are the two a broker
 reaches for without first deciding whose deals they are looking at. Broker
