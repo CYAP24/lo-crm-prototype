@@ -73,22 +73,35 @@ function kbState(d) {
 
 /* Up to two task rows, derived from the deal. The due counts stand in for
    real dates, which the model does not carry yet — when it does, this is the
-   one place that has to change. */
+   one place that has to change.
+
+   Each row carries the due text twice. v1 gives a task its own block and can
+   spell it out; v2 puts the label, the task and the due on one line, so it
+   takes the short form and gives the room back to the task name — which is
+   what the frame does. */
 function kbTasks(d) {
   const c = docCounts(d);
   const out = [];
+  const days = (n) => `${n} day${n > 1 ? 's' : ''}`;
 
   if (d.tasksOverdue > 0) {
     out.push({
       label: d.nextAction || (c.rejected ? 'Re-request rejected document' : `Chase ${d.name.split(' ')[0]}`),
-      due: `${d.tasksOverdue} day${d.tasksOverdue > 1 ? 's' : ''} overdue`,
+      due: `${days(d.tasksOverdue)} overdue`,
+      dueShort: `${d.tasksOverdue}d overdue`,
       overdue: true
     });
   }
   if (d.tasksDue > 0) {
-    out.push({ label:`Reassign to ${d.assigned[1]}`, due:`due in ${d.tasksDue} day${d.tasksDue > 1 ? 's' : ''}` });
+    out.push({
+      label: `Reassign to ${d.assigned[1]}`,
+      due: `due in ${days(d.tasksDue)}`,
+      dueShort: `due in ${d.tasksDue}d`
+    });
   }
-  if (!out.length && d.nextAction) out.push({ label:d.nextAction, due:'due this week' });
+  if (!out.length && d.nextAction) {
+    out.push({ label: d.nextAction, due: 'due this week', dueShort: 'this week' });
+  }
 
   return out.slice(0, 2);
 }
@@ -205,7 +218,7 @@ function kbCard(d, i, mode) {
       <div class="kb-c__list-row ${t.overdue ? 'is-overdue' : ''}">
         <span class="kb-c__list-label ${n ? 'is-hidden' : ''}">Upcoming tasks</span>
         <span class="kb-c__list-task">${t.label}</span>
-        <span class="kb-c__list-due">${t.due}</span>
+        <span class="kb-c__list-due">${t.dueShort}</span>
       </div>`).join('')}</div>` : ''}
     <span class="kb-c__hr"></span>
     <div class="kb-c__docs-line">
