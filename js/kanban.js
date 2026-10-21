@@ -398,10 +398,12 @@ const kbBar = () => `
   </div>`;
 
 /* The board itself is the same in every version — only the card differs, so
-   each version passes its own card renderer rather than its own board. */
-function renderKanban(card = kbCard) {
+   each version passes its own card renderer rather than its own board. `mod`
+   carries the one thing a card can change about the board around it: how wide
+   a column has to be to hold it. */
+function renderKanban(card = kbCard, mod = '') {
   return `
-  <div class="kb">
+  <div class="kb ${mod}">
     <header class="appbar">
       <div class="logo"><svg width="22" height="13"><use href="#i-logo"/></svg></div>
       <div class="nav-placeholder t-body-sm">General CRM navigation elements here</div>
@@ -428,9 +430,9 @@ function mountKanban(app) {
    the page. A second version goes here as a skin over the same render. */
 const KB_RENDERERS = {
   v1: () => renderKanban(kbCard),
-  v2: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues1')),
-  v3: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues2')),
-  v4: () => renderKanban((d, i) => kbCardAlt(d, i, 'text'))
+  v2: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues1'), 'kb--wide'),
+  v3: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues2'), 'kb--wide'),
+  v4: () => renderKanban((d, i) => kbCardAlt(d, i, 'text'), 'kb--wide')
 };
 const KB_MOUNTERS = {
   v1: mountKanban,

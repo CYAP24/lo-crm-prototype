@@ -425,6 +425,13 @@
    the ramp, and matching the frame mattered more than inventing a token.
    -------------------------------------------------------------------------- */
 
+/* The alert-state card is 340 wide where v1's is 312, so its column has to
+   grow to hold it: the card, the gutter before the scrollbar, the 4px
+   scrollbar itself, and the column's own padding on both sides. Miss the
+   scrollbar out and the last few pixels of every card are clipped. Set here
+   rather than on .kb-col so v1 keeps the frame's 340 column. */
+.kb--wide .kb-col { width: calc(340px + var(--space-8) + 4px + 14px * 2); }
+
 .kb-c {
   --kb-c-call: #ECDEFE;
   --kb-c-task: #EFEFEF;
