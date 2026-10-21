@@ -45,7 +45,7 @@ screen's versions and lets you switch between them:
 | Page | Screen | Versions |
 |---|---|---|
 | `index.html` | The work list | v1, v2, v3 |
-| `kanban.html` | The kanban board | v1, v2, v3, v4 |
+| `kanban.html` | The kanban board | v1, v2 |
 | `screen2.html` | Screen 2 | v1 |
 
 Each numbers its versions **from v1 in its own right**: the kanban's v1 and
@@ -140,11 +140,9 @@ worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
 index.html            The work-list prototype view — v1, v2, v3.
-kanban.html           The kanban prototype view — v1–v4.
-kanban-v1.html        Kanban, v1 — the board.
-kanban-v2.html        v2 — alert states, tasks as bands.
-kanban-v3.html        v3 — alert states, tasks as blocks.
-kanban-v4.html        v4 — alert states, text and colour only.
+kanban.html           The kanban prototype view — v1, v2.
+kanban-v1.html        v1 — alert states, tasks as tinted blocks.
+kanban-v2.html        v2 — alert states, text and colour only.
 screen2.html          The screen-2 prototype view — v1.
 screen2-v1.html       Screen 2, v1 — the copy of the application view.
 ```
@@ -247,9 +245,9 @@ the same one.
 
 ## Kanban view
 
-`kanban-v1.html` is a rebuild of the Figma frame **`Draft #2 - 1440 px`**
-(node `4235:8867`) — the deals as cards on a board, grouped by the master
-pipeline stage.
+The board is a rebuild of the Figma frame **`Draft #2 - 1440 px`** (node
+`4235:8867`) — the deals as cards, grouped by the master pipeline stage. The
+card in it comes from a later frame; see **Alert states** below.
 
 **It runs on the same deals as the work list.** `js/data.js` already carried
 everything a card needs, so nothing is invented: the name, reference, amount,
@@ -269,19 +267,10 @@ the wider artboard shows more of the board rather than a wider board. Six
 columns still do not fit, so the board scrolls sideways — as it does in the
 frame, where four of the six are visible.
 
-**What is drawn rather than dropped in.** The documents ring follows the
-deal's own documents through `docPct`, the way the application view's score
-dials follow their values. At 0% the round cap leaves a single dot at twelve
-o'clock, which is what the frame shows for a deal with nothing collected.
-
 **Where it leaves the frame**, and why:
 
 - the icons are the sprite's, not the frame's exports — `js/icons.js` already
   carried every one of them
-- the three document counts take the semantic tokens (info / error / warning)
-  rather than the frame's raw hexes
-- the assignee hues come from this project's accents, keyed by initials in
-  `KB_PERSON`, rather than the frame's own identity colours
 - the per-column filter reads `View all` on every column; the frame shows a
   filter glyph on two of them, and there is no filter state to drive it yet
 
@@ -290,25 +279,35 @@ board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
 a card does not open the application view — both are the obvious next
 things.
 
-### Alert states — v2, v3 and v4
+#### Removed
 
-Three directions on the same card, rebuilt from the CRM-2026 `To upload` page
-(node `4622:10931`). The board is identical in all four versions — each one
-passes its own card renderer to `renderKanban`, so the columns, the toolbar
-and the chrome are shared rather than copied.
+- **The first board card** — the one from the `Draft #2 - 1440 px` frame, with
+  the documents ring and the assignee stack. The alert-state card replaced it.
+- **Visual cues 1** — the treatment that ran the tasks as full-bleed bands
+  across the card, separated by hairlines. Cut after review; `Visual cues 2`
+  survived and is now v1.
+
+Their renderers and styles are deleted, as with the work list's removed
+versions.
+
+### Alert states
+
+Both versions use the alert-state card from the CRM-2026 `To upload` page
+(node `4622:10931`). The board is identical in both — each one passes its own
+card renderer to `renderKanban`, so the columns, the toolbar and the chrome
+are shared rather than copied.
 
 | | What differs |
 |---|---|
-| **v2** Visual cues 1 | Tasks are full-bleed bands across the card, separated by hairlines; the overdue one is tinted |
-| **v3** Visual cues 2 | One body, and the tasks are rounded tinted blocks inside it |
-| **v4** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words |
+| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it |
+| **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words |
 
 **The four states are read off the deal**, not set by hand — `kbState()` in
 `js/kanban.js` is the whole rule:
 
 | State | When | How it shows |
 |---|---|---|
-| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, and a red outline on v2 and v3 |
+| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, and a red outline on v1 |
 | Urgent | The deal is slipping: more than one task past its due date, or documents that have sat unchecked for ten days | Amber banner naming the count |
 | Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
 | None | Nothing wants attention | No banner |
