@@ -260,7 +260,7 @@ the data does.
 |---|---|
 | New lead | Arrivals nobody has called yet. Sits in front of the pipeline, on a light red ground |
 | Qualifying, Discovery, In Progress, Approval, Settlement | `MASTER_STAGES`, in order |
-| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses. A step darker than the others, its cards at 70%, and the contact buttons replaced by `Snoozed until <date>` |
+| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses. Two steps darker than the others, its cards at 70%, and the contact buttons replaced by `Snoozed until <date>` |
 
 New lead and Snoozed are the two ends of the same idea — one is the arrivals
 tray, the other is what has been deliberately parked — so they are the two
@@ -318,12 +318,13 @@ are shared rather than copied.
 | **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words | The totals as a line of text, value spelled out, colour doing the work |
 
 **Each heading carries four things**, in the order a broker reads them: the
-stage, how many deals, what they are worth, and what is late. The first two
-share the control row with `View all`; the totals sit on a second line, so
-the row does not have to choose between them and the filter. Both are summed
-from the column's own deals, so a heading cannot drift from the cards under
-it — and both drop the overdue count when there is none, since an empty
-`0 overdue` on every column is what stops the real ones registering.
+stage, how many deals, what they are worth, and what is late — one row, with
+the totals where the `View all` control used to sit. The stage's description
+moved onto the name as a tooltip, since that is where it went with the
+control. Both totals are summed from the column's own deals, so a heading
+cannot drift from the cards under it, and both drop the overdue count when
+there is none, since an empty `0 overdue` on every column is what stops the
+real ones registering.
 
 **The four states are read off the deal**, not set by hand — `kbState()` in
 `js/kanban.js` is the whole rule:

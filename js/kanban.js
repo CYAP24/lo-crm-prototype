@@ -263,11 +263,15 @@ const kbColumnStats = (deals) => ({
   overdue: deals.reduce((t, d) => t + d.tasksOverdue, 0)
 });
 
-/* The heading differs between the versions the same way the cards do.
+/* One row: the stage and its count on the left, the two totals on the right
+   where the filter control used to sit. The stage's description moves onto
+   the name as a tooltip, since that is where it went with the control.
 
-   v1 states the two totals as chips, which is the language of its tinted
-   task blocks, and shortens the value to fit one — $1.2M rather than the
-   whole figure.
+   The heading differs between the versions the same way the cards do.
+
+   v1 states the totals as chips, which is the language of its tinted task
+   blocks, and shortens the value to fit one — $1.2M rather than the whole
+   figure.
 
    v2 keeps them as a line of text with colour doing the work, and spells the
    value out, since nothing else on that card is abbreviated either.
@@ -276,16 +280,6 @@ const kbColumnStats = (deals) => ({
    on every column is the thing that stops the real ones registering. */
 function kbColumnHead(stage, deals, mode) {
   const s = kbColumnStats(deals);
-
-  const top = `
-    <div class="kb-col__top">
-      <span class="kb-col__name">${stage.label}</span>
-      <span class="kb-col__n">(${String(s.n).padStart(2, '0')})</span>
-      <span class="kb-spacer"></span>
-      <span class="kb-col__filter" title="${stage.note}">
-        View all ${icon('chevron-down', 11)}
-      </span>
-    </div>`;
 
   const stats = mode === 'cues'
     ? `<div class="kb-col__stats">
@@ -298,7 +292,13 @@ function kbColumnHead(stage, deals, mode) {
          <span class="kb-col__over">${s.overdue} task${s.overdue > 1 ? 's' : ''} overdue</span>` : ''}
        </div>`;
 
-  return `<div class="kb-col__head">${top}${stats}</div>`;
+  return `
+    <div class="kb-col__head">
+      <span class="kb-col__name" title="${stage.note}">${stage.label}</span>
+      <span class="kb-col__n">(${String(s.n).padStart(2, '0')})</span>
+      <span class="kb-spacer"></span>
+      ${stats}
+    </div>`;
 }
 
 function kbColumn(stage, card, mode) {
@@ -366,32 +366,21 @@ function renderKanban(mode) {
   </div>`;
 }
 
-/* Wires what the board does. Scrolling is CSS; this is the rest of it. */
-function mountKanban(app) {
-  /* The column filter is a control, not a menu yet, so it shows what it
-     would filter rather than pretending to open. */
-  app.querySelectorAll('.kb-col__filter').forEach(f =>
-    f.addEventListener('click', () => f.classList.toggle('is-on')));
-}
-
 /* One entry per version of this screen, the way the work list and screen 2
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
-   the page. A third version goes here as another skin over the same card. */
+   the page. A third version goes here as another skin over the same card.
+
+   Nothing mounts any more: the column filter was the board's one piece of
+   wiring, and it went with the heading. Scrolling is CSS, and the card's
+   controls are presentational. A version that needs wiring can take a mount
+   back, the way the work list's do. */
 const KB_RENDERERS = {
   v1: () => renderKanban('cues'),
   v2: () => renderKanban('text')
 };
-const KB_MOUNTERS = {
-  v1: mountKanban,
-  v2: mountKanban
-};
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
-  const variant = window.KB_VARIANT || 'v1';
-  const render = KB_RENDERERS[variant];
-  if (!app || !render) return;
-  app.innerHTML = render();
-  const mount = KB_MOUNTERS[variant];
-  if (mount) mount(app);
+  const render = KB_RENDERERS[window.KB_VARIANT || 'v1'];
+  if (app && render) app.innerHTML = render();
 });
