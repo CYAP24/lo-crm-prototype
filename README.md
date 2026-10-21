@@ -294,6 +294,52 @@ board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
 a card does not open the application view — both are the obvious next
 things.
 
+#### The toolbar — v1
+
+The global CRM nav sits above the board in both versions now, the same
+`navBar()` the work list uses, in place of the placeholder band.
+
+The toolbar under it is **v1's only** for the moment; v2 keeps the one it
+had. Seven things the brief asks for, and where each one went:
+
+| | |
+|---|---|
+| Switch board / list / Easy View | Three tabs with a glyph, as before |
+| Jump to a common view | A `Common views` dropdown beside the board name, replacing the deal-type select |
+| Search | The one field, saying what it actually searches |
+| Filter | A side panel that applies as you change it |
+| Sort | The `-Sort by-` dropdown |
+| Add a lead | `+ New lead` |
+| Work on several deals | `Select`, which turns the board into checkboxes and raises a bulk bar |
+
+**The views, filters and sort are real**, not drawn. `kbDeals()` is the one
+path: it runs the view's predicate, then the saved view's, then each filter
+group, then the amount and date ranges, then the sort — so a view and a
+filter compose instead of fighting, and the column headings count what is
+actually on screen. The nine views give 10 / 22 / 12 / 1 / 14 / 19 / 4 / 2 /
+20 deals against today's data.
+
+**Filters apply instantly**, so there is no Apply button and nothing to
+press. The panel says `Showing N of 27 deals` instead, which is the feedback
+the button would have carried, and the Filter control takes a badge counting
+the groups that are actually constraining.
+
+**Sorting cannot jump around.** It orders on `created`, `activity`, `amount`
+and the next follow-up — all of them dates and counts the *deal* records.
+Opening a card or its quick-actions panel changes none of them, so the board
+a broker comes back to is the board they left.
+
+**Select mode** puts a box on every card and a `Select all` on every column,
+and raises a dark bar with the four bulk actions the brief names. The actions
+are mock; the selection is real, and it survives filtering.
+
+Three things the data gained for this: `segment` (consumer or commercial,
+which follows the product), `source` (where the lead came from, which nothing
+could previously express), and `PARTNER_GROUPS`, so a broker can filter by a
+whole partner group rather than naming each dealership. Two settlement dates
+were also pulled into the current week, so `Settling this week` is not an
+empty view in the mock data.
+
 #### Quick actions panel
 
 The `Note` and `Task` pills on a card open the same full-height sidebar the

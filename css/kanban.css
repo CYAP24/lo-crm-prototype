@@ -532,3 +532,258 @@
   outline: 2px solid var(--border-brand);
   outline-offset: -2px;
 }
+
+/* ==========================================================================
+   The v1 toolbar — common views, filter, sort, select.
+   --------------------------------------------------------------------------
+   The bar is one row and already full, so everything that would widen it
+   drops into a menu or a panel instead: the nine common views, the five
+   sorts, and the eight filter groups.
+   -------------------------------------------------------------------------- */
+
+.kb-views-pick,
+.kb-sort-pick { position: relative; display: flex; align-items: center; gap: var(--space-8); flex: none; }
+.kb-views-pick__label { color: var(--text-tertiary); white-space: nowrap; }
+
+/* ---------- Menus ---------------------------------------------------------- */
+
+.kb-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 232px;
+  padding: var(--space-6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: none;
+}
+.kb-menu--right { left: auto; right: 0; }
+.kb-menu.is-open { display: block; }
+
+.kb-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-8);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.kb-menu__item:hover { background: var(--bg-surface); color: var(--text-primary); }
+.kb-menu__item.is-on { color: var(--text-brand); font-weight: var(--weight-demi); }
+.kb-menu__tick { width: 12px; flex: none; display: grid; place-items: center; color: var(--text-brand); }
+
+.kb-menu__sep {
+  padding: var(--space-8) var(--space-8) var(--space-4);
+  color: var(--text-placeholder);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-6);
+}
+.kb-menu__default {
+  margin-left: auto;
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-4);
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+}
+
+.kb-menu__foot {
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-8);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+}
+.kb-menu__act {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-medium) 12px/1.4 var(--font-family);
+  color: var(--text-brand);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ---------- Select mode ---------------------------------------------------- */
+
+.kb-sel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-10, 10px);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  flex: none;
+  cursor: pointer;
+}
+.kb-sel:hover { background: var(--bg-surface); }
+.kb-sel.is-on { background: var(--bg-brand-subtle); color: var(--text-brand); }
+
+.kb-filter__n {
+  margin-left: var(--space-4);
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/1.4 var(--font-family);
+}
+
+/* The box is the one shape select mode adds, so it is the same object on a
+   card, on a column and in the filter panel. */
+.kb-box {
+  width: 16px; height: 16px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-4);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+}
+.is-on > .kb-box,
+.is-picked .kb-cbox { background: var(--bg-brand); border-color: var(--bg-brand); }
+
+.kb-colsel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0 0 var(--space-8) 11px;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.kb-c.is-selectable { position: relative; }
+.kb-cbox {
+  position: absolute;
+  top: -7px; left: -7px;
+  z-index: 2;
+  width: 22px; height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+  cursor: pointer;
+}
+.kb-c.is-picked { outline: 2px solid var(--border-brand); outline-offset: -2px; }
+
+.kb-col__empty {
+  padding: var(--space-16) 11px;
+  color: var(--text-placeholder);
+}
+
+/* ---------- Bulk bar ------------------------------------------------------- */
+
+/* Anchored to the board rather than the viewport, so it rides the artboard
+   the way every other overlay on this screen does. */
+.kb-bulk {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-24);
+  transform: translate(-50%, 12px);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-10, 10px) var(--space-16);
+  border-radius: var(--radius-pill);
+  background: var(--neutral-900);
+  box-shadow: var(--elevation-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease;
+}
+.kb-bulk.is-up { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.kb-bulk__n { color: var(--text-on-dark); white-space: nowrap; }
+.kb-bulk__sep { width: 1px; height: 18px; background: rgba(255, 255, 255, .22); }
+.kb-bulk__act {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--neutral-300);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kb-bulk__act:hover { color: var(--text-on-dark); }
+.kb-bulk__act--quiet { color: var(--neutral-500); }
+
+/* ---------- Filter panel --------------------------------------------------- */
+
+.kbf {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 380px;
+  z-index: 32;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .14);
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.kbf.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.kbf__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-24) var(--space-20) var(--space-16);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.kbf__count { color: var(--text-tertiary); margin-top: var(--space-2); }
+.kbf__clear { color: var(--text-brand); cursor: pointer; margin-top: var(--space-4); white-space: nowrap; }
+
+.kbf__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-16) var(--space-20) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  background: var(--bg-surface);
+}
+
+.kbf__label { color: var(--text-tertiary); margin-bottom: var(--space-8); }
+.kbf__opts { display: flex; flex-direction: column; gap: var(--space-2); }
+.kbf__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kbf__opt:hover { background: var(--bg-base); }
+.kbf__opt.is-on { color: var(--text-primary); }
+
+.kbf__range { color: var(--text-primary); margin-bottom: var(--space-6); }
+.kbf input[type="range"] { width: 100%; accent-color: var(--bg-brand); margin: 0 0 var(--space-6); }
+
+.kbf__dates { display: flex; align-items: center; gap: var(--space-8); }
+.kbf__to { color: var(--text-tertiary); flex: none; }
+.kbf input[type="date"] {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
