@@ -412,3 +412,285 @@
   border-radius: var(--radius-pill);
   background: var(--error-base);
 }
+
+/* ==========================================================================
+   The alert-state card — v2, v3 and v4.
+   --------------------------------------------------------------------------
+   One card, three treatments, following the three directions on the CRM-2026
+   "To upload" page (node 4622:10931). Everything outside the middle of the
+   card is shared, so the versions differ where they are meant to differ.
+
+   Two values are sampled from the frame rather than taken from a token: the
+   filled contact pill and the neutral task block. Both sit between steps on
+   the ramp, and matching the frame mattered more than inventing a token.
+   -------------------------------------------------------------------------- */
+
+.kb-c {
+  --kb-c-call: #ECDEFE;
+  --kb-c-task: #EFEFEF;
+
+  flex: none;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
+
+/* Only the state that wants an immediate call outlines the whole card. */
+.kb-c--cues1.is-immediate,
+.kb-c--cues2.is-immediate {
+  outline: 2px solid var(--error-base);
+  outline-offset: -2px;
+}
+
+/* ---------- Banner --------------------------------------------------------- */
+
+.kb-c__banner {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: 10px var(--space-16);
+}
+.kb-c__banner-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+}
+.kb-c__banner-label svg { flex: none; }
+.kb-c__banner-action { font: var(--weight-regular) 12px/16px var(--font-family); }
+
+.is-immediate .kb-c__banner { background: var(--error-base); color: var(--text-on-dark); }
+.is-urgent    .kb-c__banner { background: var(--warning-bg);  color: var(--warning-text); }
+.is-warning   .kb-c__banner { background: var(--bg-muted);    color: var(--text-primary); }
+
+/* ---------- Body ----------------------------------------------------------- */
+
+.kb-c__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-base);
+}
+
+.kb-c__who { display: flex; align-items: flex-start; gap: var(--space-12); }
+.kb-c__id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+.kb-c__name {
+  font: var(--weight-demi) 16px/20px var(--font-family);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__amount { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-secondary); }
+
+.kb-c__contact { display: flex; align-items: center; gap: var(--space-6); flex: none; }
+.kb-cp {
+  display: grid;
+  place-items: center;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-cp--on { background: var(--kb-c-call); border-color: transparent; color: var(--text-brand); }
+
+.kb-c__stage {
+  display: flex;
+  gap: 14px;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+/* ---------- Tasks: v2 bands ------------------------------------------------ */
+
+/* A band spans the whole card rather than sitting inside the body padding,
+   which is what separates this version from the next one. */
+.kb-c__band {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  background: var(--bg-base);
+  border-top: 1px solid var(--border-subtle);
+  font: var(--weight-regular) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__band-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+.kb-c__band-label svg { flex: none; }
+.kb-c__band.is-overdue {
+  background: var(--error-bg);
+  border-top-color: transparent;
+  color: var(--text-error);
+}
+.kb-c__band.is-overdue .kb-c__band-label { color: var(--text-error); font-weight: var(--weight-demi); }
+.kb-c__band + .kb-c__body { border-top: 1px solid var(--border-subtle); }
+
+/* ---------- Tasks: v3 blocks ----------------------------------------------- */
+
+.kb-c__blocks { display: flex; flex-direction: column; gap: var(--space-4); }
+.kb-c__block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-8);
+  background: var(--kb-c-task);
+  font: var(--weight-regular) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__block svg { flex: none; color: var(--text-secondary); }
+.kb-c__block-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__block-due { flex: none; }
+.kb-c__block.is-overdue { background: var(--error-bg); color: var(--text-error); }
+.kb-c__block.is-overdue svg { color: var(--text-error); }
+.kb-c__block.is-overdue .kb-c__block-label { color: var(--text-error); font-weight: var(--weight-demi); }
+
+/* ---------- Tasks: v4 list ------------------------------------------------- */
+
+.kb-c__list { display: flex; flex-direction: column; gap: var(--space-6); }
+.kb-c__list-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-16);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+.kb-c__list-label { flex: none; color: var(--text-secondary); }
+/* The second row keeps the label's width rather than dropping it, so the two
+   tasks line up under each other — the whole point of this treatment. */
+.kb-c__list-label.is-hidden { visibility: hidden; }
+.kb-c__list-task {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__list-due { flex: none; }
+.kb-c__list-row.is-overdue .kb-c__list-task,
+.kb-c__list-row.is-overdue .kb-c__list-due { color: var(--text-error); }
+
+.kb-c__hr { height: 1px; background: var(--border-subtle); }
+
+/* ---------- Documents ------------------------------------------------------ */
+
+.kb-c__docs { display: flex; flex-direction: column; gap: var(--space-6); }
+.kb-c__docs-head { display: flex; align-items: center; gap: var(--space-4); }
+.kb-c__docs-label {
+  flex: 1;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__docs-n {
+  flex: none;
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+.kb-c__bar {
+  display: flex;
+  height: 9px;
+  border-radius: 5px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+.kb-c__seg { background: transparent; }
+.kb-c__seg--ok       { background: var(--success-base); }
+.kb-c__seg--review   { background: var(--warning-border); }
+.kb-c__seg--rejected { background: var(--error-base); }
+
+.kb-c__docs-breakdown {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: flex-end;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.kb-c__docs-breakdown .is-review   { color: var(--warning-text); }
+.kb-c__docs-breakdown .is-rejected { color: var(--text-error); }
+.kb-c__dot { font-weight: var(--weight-regular); color: var(--text-primary); }
+
+.kb-c__docs-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+}
+.kb-c__docs-line .kb-c__docs-label { flex: none; }
+
+/* ---------- Owner and actions ---------------------------------------------- */
+
+.kb-c__owner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+.kb-c__ava {
+  width: 24px; height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-12);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__partner {
+  padding: 3px var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+
+.kb-c__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 10px var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+}
+.kb-ap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kb-ap svg { flex: none; }
+.kb-ap--grow { flex: 1; min-width: 0; }
+.kb-ap--icon { padding: 6px 9px; }

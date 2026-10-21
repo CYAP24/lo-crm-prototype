@@ -33,6 +33,10 @@ const MASTER_STAGES = [
     custom:true, glyph:'clock', collapsed:true }
 ];
 
+/* `duplicate` marks an application the system thinks it has seen before —
+   the same client and amount arriving twice. It is set on the deal rather
+   than worked out, because nothing else in the model implies it, and the
+   kanban's alert states need it. */
 const DEALS = [
   { name:'Maria Josephin', amount:250000, ref:'#APP-2026-0892', product:'Asset finance', created:'15/01/26', activity:'23/01/26',
     urgency:'high', pinned:true, stage:'First contact', day:1, tone:'brand', master:'qualifying',
@@ -79,7 +83,7 @@ const DEALS = [
     tasks:1, notes:3, events:7, unread:false, people:['KZ','CE'], extra:2,
     settlement:'02/03/26', nextAction:'Confirm settlement' },
 
-  { name:'Tom Blakely', amount:92500, ref:'#APP-2026-0849', product:'Vehicle finance', created:'08/01/26', activity:'16/01/26',
+  { name:'Tom Blakely', amount:92500, ref:'#APP-2026-0849', product:'Vehicle finance', created:'08/01/26', activity:'16/01/26', duplicate:true,
     urgency:'low', pinned:false, stage:'Awaiting payslips', day:4, tone:'warning', master:'discovery',
     lastAction:'SMS sent', assigned:['JF','Jess F.'], associate:['SM','Sam M.'], lender:null, partner:['TM','TruckMart'], snoozed:true,
     docs:['ok','rejected','rejected','pending','pending','pending'],
@@ -97,7 +101,7 @@ const DEALS = [
     tasks:0, notes:5, events:11, unread:false, people:['KZ','JF','CE','SM'], extra:4,
     settlement:'26/02/26', nextAction:'Submit to lender' },
 
-  { name:'Oliver Nguyen', amount:128000, ref:'#APP-2026-0837', product:'Vehicle finance', created:'05/01/26', activity:'17/01/26',
+  { name:'Oliver Nguyen', amount:128000, ref:'#APP-2026-0837', product:'Vehicle finance', created:'05/01/26', activity:'17/01/26', duplicate:true,
     urgency:'med', pinned:false, stage:'Docs requested', day:3, tone:'info', master:'discovery',
     lastAction:'Note added', assigned:['SM','Sam M.'], associate:null, lender:['WP','Westpac'], partner:null,
     docs:['ok','ok','pending','pending','ok','pending'],

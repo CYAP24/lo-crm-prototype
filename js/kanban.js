@@ -140,13 +140,211 @@ function kbCard(d, i) {
   </article>`;
 }
 
+/* ==========================================================================
+   The alert-state card — v2, v3 and v4.
+   --------------------------------------------------------------------------
+   A rebuild of the three card directions on the CRM-2026 "To upload" page
+   (node 4622:10931). The three share one card and differ only in how the
+   middle of it is treated:
+
+     v2  Visual cues 1   tasks as full-bleed bands, hairline-separated
+     v3  Visual cues 2   tasks as rounded tinted blocks inside one body
+     v4  Text & colour   tasks as a labelled two-column list, documents as
+                         text with no bar
+
+   The chrome around them — banner, who, stage, owner, actions — is the same
+   in all three, so a change there lands in all three.
+   ========================================================================== */
+
+/* The four states, in the order a broker should notice them. Each one is
+   read off the deal rather than set by hand:
+
+     immediate  a high-urgency deal still in Qualifying — nobody has worked it
+     urgent     documents the client has sent that nobody has checked, or a
+                task past its due date
+     warning    flagged by the system rather than by the pipeline
+     (none)     nothing wants attention
+
+   `duplicate` is the one thing the model could not express, so js/data.js
+   gained it. Everything else was already there. */
+function kbState(d) {
+  const c = docCounts(d);
+
+  if (d.urgency === 'high' && d.master === 'qualifying' && !d.snoozed)
+    return { id:'immediate', glyph:'alarm', label:'New lead - call now', action:'Call by today 4:07pm' };
+
+  if (c.review > 0)
+    return { id:'urgent', glyph:'alarm',
+             label:`${c.review} document${c.review > 1 ? 's' : ''} to review`, action:'Review now' };
+
+  if (d.tasksOverdue > 0)
+    return { id:'urgent', glyph:'alarm',
+             label:`${d.tasksOverdue} task${d.tasksOverdue > 1 ? 's' : ''} overdue`, action:'Action now' };
+
+  if (d.duplicate)
+    return { id:'warning', glyph:'alert', label:'Possible duplicate', action:'Review now' };
+
+  return null;
+}
+
+/* Up to two task rows, derived from the deal. The due counts stand in for
+   real dates, which the model does not carry yet — when it does, this is the
+   one place that has to change. */
+function kbTasks(d) {
+  const c = docCounts(d);
+  const out = [];
+
+  if (d.tasksOverdue > 0) {
+    out.push({
+      label: d.nextAction || (c.rejected ? 'Re-request rejected document' : `Chase ${d.name.split(' ')[0]}`),
+      due: `${d.tasksOverdue} day${d.tasksOverdue > 1 ? 's' : ''} overdue`,
+      overdue: true
+    });
+  }
+  if (d.tasksDue > 0) {
+    out.push({ label:`Reassign to ${d.assigned[1]}`, due:`due in ${d.tasksDue} day${d.tasksDue > 1 ? 's' : ''}` });
+  }
+  if (!out.length && d.nextAction) out.push({ label:d.nextAction, due:'due this week' });
+
+  return out.slice(0, 2);
+}
+
+/* Received out of requested, as the frame reads it: the filled part of the
+   bar is what is approved, and the breakdown names only what is not. */
+const kbDocBar = (d, c) => `
+  <div class="kb-c__docs">
+    <div class="kb-c__docs-head">
+      <span class="kb-c__docs-label">Documents</span>
+      <span class="kb-c__docs-n">${c.ok} of ${d.docs.length}</span>
+    </div>
+    <div class="kb-c__bar">
+      ${c.ok ? `<span class="kb-c__seg kb-c__seg--ok" style="flex:${c.ok}"></span>` : ''}
+      ${c.review ? `<span class="kb-c__seg kb-c__seg--review" style="flex:${c.review}"></span>` : ''}
+      ${c.rejected ? `<span class="kb-c__seg kb-c__seg--rejected" style="flex:${c.rejected}"></span>` : ''}
+      ${c.pending ? `<span class="kb-c__seg" style="flex:${c.pending}"></span>` : ''}
+    </div>
+    <div class="kb-c__docs-breakdown">${kbDocWords(c)}</div>
+  </div>`;
+
+/* The same three numbers as words, for the version that drops the bar. */
+function kbDocWords(c) {
+  const parts = [];
+  if (c.review)   parts.push(`<span class="is-review">${c.review} pending</span>`);
+  if (c.rejected) parts.push(`<span class="is-rejected">${c.rejected} rejected</span>`);
+  if (c.pending)  parts.push(`<span>${c.pending} to request</span>`);
+  return parts.join('<span class="kb-c__dot">·</span>') || '<span>all in</span>';
+}
+
+function kbCardAlt(d, i, mode) {
+  const st = kbState(d);
+  const tasks = kbTasks(d);
+  const c = docCounts(d);
+
+  const banner = st ? `
+    <div class="kb-c__banner">
+      <span class="kb-c__banner-label">${icon(st.glyph, 15)}${st.label}</span>
+      <span class="kb-c__banner-action">${st.action}</span>
+    </div>` : '';
+
+  const head = `
+    <div class="kb-c__who">
+      <div class="kb-c__id">
+        <span class="kb-c__name">${d.name}</span>
+        <span class="kb-c__amount">${money(d.amount)}</span>
+      </div>
+      <div class="kb-c__contact">
+        <span class="kb-cp kb-cp--on" title="Call">${icon('phone', 14)}</span>
+        <span class="kb-cp" title="SMS">${icon('chat', 14)}</span>
+        <span class="kb-cp" title="Email">${icon('mail', 14)}</span>
+      </div>
+    </div>
+    <div class="kb-c__stage">
+      <span>Day ${d.day}</span>
+      <span>${d.stage}</span>
+    </div>`;
+
+  const owner = `
+    <div class="kb-c__owner">
+      <span class="kb-c__ava">${d.assigned[0]}</span>
+      ${d.partner ? `<span class="kb-c__partner">${d.partner[1]}</span>` : ''}
+    </div>`;
+
+  const actions = `
+    <div class="kb-c__actions">
+      <span class="kb-ap kb-ap--grow">${icon('note', 14)} Note</span>
+      <span class="kb-ap kb-ap--grow">${icon('check-circle', 14)} Task</span>
+      <span class="kb-ap">${icon('article', 14)} Request docs</span>
+      <span class="kb-ap kb-ap--icon">${icon('kebab', 16)}</span>
+    </div>`;
+
+  const open = `<article class="kb-c kb-c--${mode} ${st ? 'is-' + st.id : ''}" data-deal-row="${i}">`;
+
+  /* v2 — the tasks are bands across the whole card, separated by hairlines. */
+  if (mode === 'cues1') {
+    return `${open}
+      ${banner}
+      <div class="kb-c__body">${head}</div>
+      ${tasks.map(t => `
+        <div class="kb-c__band ${t.overdue ? 'is-overdue' : ''}">
+          <span class="kb-c__band-label">${icon(t.overdue ? 'alarm' : 'clock', 16)}${t.label}</span>
+          <span class="kb-c__band-due">${t.due}</span>
+        </div>`).join('')}
+      <div class="kb-c__body">${kbDocBar(d, c)}${owner}</div>
+      ${actions}
+    </article>`;
+  }
+
+  /* v3 — one body, and the tasks are blocks inside it. */
+  if (mode === 'cues2') {
+    return `${open}
+      ${banner}
+      <div class="kb-c__body">
+        ${head}
+        ${tasks.length ? `<div class="kb-c__blocks">${tasks.map(t => `
+          <div class="kb-c__block ${t.overdue ? 'is-overdue' : ''}">
+            ${icon('clock', 16)}
+            <span class="kb-c__block-label">${t.label}</span>
+            <span class="kb-c__block-due">${t.due}</span>
+          </div>`).join('')}</div>` : ''}
+        ${kbDocBar(d, c)}
+        ${owner}
+      </div>
+      ${actions}
+    </article>`;
+  }
+
+  /* v4 — no tints and no bar: the state is carried by the words and their
+     colour alone. */
+  return `${open}
+    ${banner}
+    <div class="kb-c__body">
+      ${head}
+      ${tasks.length ? `<div class="kb-c__list">${tasks.map((t, n) => `
+        <div class="kb-c__list-row ${t.overdue ? 'is-overdue' : ''}">
+          <span class="kb-c__list-label ${n ? 'is-hidden' : ''}">Upcoming tasks</span>
+          <span class="kb-c__list-task">${t.label}</span>
+          <span class="kb-c__list-due">${t.due}</span>
+        </div>`).join('')}</div>` : ''}
+      <span class="kb-c__hr"></span>
+      <div class="kb-c__docs-line">
+        <span class="kb-c__docs-label">Documents</span>
+        <span class="kb-c__docs-n">${c.ok} of ${d.docs.length}</span>
+        <span class="kb-spacer"></span>
+        <span class="kb-c__docs-breakdown">${kbDocWords(c)}</span>
+      </div>
+      ${owner}
+    </div>
+    ${actions}
+  </article>`;
+}
+
 /* ---------- Columns -------------------------------------------------------- */
 
 /* Snoozed is broker-set, so it wins over whatever stage the application is
    technically in — the same rule the grouped work list uses. */
 const kbBucket = (d) => (d.snoozed ? 'snoozed' : d.master);
 
-function kbColumn(stage) {
+function kbColumn(stage, card) {
   const deals = DEALS.filter(d => kbBucket(d) === stage.id);
   return `
     <section class="kb-col" data-stage="${stage.id}">
@@ -159,7 +357,7 @@ function kbColumn(stage) {
         </span>
       </div>
       <div class="kb-col__scroll">
-        ${deals.map(d => kbCard(d, DEALS.indexOf(d))).join('')}
+        ${deals.map(d => card(d, DEALS.indexOf(d))).join('')}
       </div>
     </section>`;
 }
@@ -199,7 +397,9 @@ const kbBar = () => `
     <span class="kb-select">-Sort by- ${icon('chevron-down', 11)}</span>
   </div>`;
 
-function renderKanban() {
+/* The board itself is the same in every version — only the card differs, so
+   each version passes its own card renderer rather than its own board. */
+function renderKanban(card = kbCard) {
   return `
   <div class="kb">
     <header class="appbar">
@@ -210,7 +410,7 @@ function renderKanban() {
     ${kbBar()}
 
     <div class="kb-board">
-      ${MASTER_STAGES.map(kbColumn).join('')}
+      ${MASTER_STAGES.map(s => kbColumn(s, card)).join('')}
     </div>
   </div>`;
 }
@@ -227,10 +427,16 @@ function mountKanban(app) {
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
    the page. A second version goes here as a skin over the same render. */
 const KB_RENDERERS = {
-  v1: renderKanban
+  v1: () => renderKanban(kbCard),
+  v2: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues1')),
+  v3: () => renderKanban((d, i) => kbCardAlt(d, i, 'cues2')),
+  v4: () => renderKanban((d, i) => kbCardAlt(d, i, 'text'))
 };
 const KB_MOUNTERS = {
-  v1: mountKanban
+  v1: mountKanban,
+  v2: mountKanban,
+  v3: mountKanban,
+  v4: mountKanban
 };
 
 document.addEventListener('DOMContentLoaded', () => {

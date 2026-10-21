@@ -45,7 +45,7 @@ screen's versions and lets you switch between them:
 | Page | Screen | Versions |
 |---|---|---|
 | `index.html` | The work list | v1, v2, v3 |
-| `kanban.html` | The kanban board | v1 |
+| `kanban.html` | The kanban board | v1, v2, v3, v4 |
 | `screen2.html` | Screen 2 | v1 |
 
 Each numbers its versions **from v1 in its own right**: the kanban's v1 and
@@ -140,8 +140,11 @@ worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
 index.html            The work-list prototype view — v1, v2, v3.
-kanban.html           The kanban prototype view — v1.
+kanban.html           The kanban prototype view — v1–v4.
 kanban-v1.html        Kanban, v1 — the board.
+kanban-v2.html        v2 — alert states, tasks as bands.
+kanban-v3.html        v3 — alert states, tasks as blocks.
+kanban-v4.html        v4 — alert states, text and colour only.
 screen2.html          The screen-2 prototype view — v1.
 screen2-v1.html       Screen 2, v1 — the copy of the application view.
 ```
@@ -286,6 +289,44 @@ o'clock, which is what the frame shows for a deal with nothing collected.
 board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
 a card does not open the application view — both are the obvious next
 things.
+
+### Alert states — v2, v3 and v4
+
+Three directions on the same card, rebuilt from the CRM-2026 `To upload` page
+(node `4622:10931`). The board is identical in all four versions — each one
+passes its own card renderer to `renderKanban`, so the columns, the toolbar
+and the chrome are shared rather than copied.
+
+| | What differs |
+|---|---|
+| **v2** Visual cues 1 | Tasks are full-bleed bands across the card, separated by hairlines; the overdue one is tinted |
+| **v3** Visual cues 2 | One body, and the tasks are rounded tinted blocks inside it |
+| **v4** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words |
+
+**The four states are read off the deal**, not set by hand — `kbState()` in
+`js/kanban.js` is the whole rule:
+
+| State | When | How it shows |
+|---|---|---|
+| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, and a red outline on v2 and v3 |
+| Urgent | Documents the client has sent that nobody has checked, or a task past its due date | Amber banner naming the count |
+| Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
+| None | Nothing wants attention | No banner |
+
+Across the 26 deals that currently gives 2 immediate, 20 urgent, 2 warning and
+2 with no banner. The board leans amber because most of the mock deals have a
+document in review — that is the data talking, not the design.
+
+**`duplicate` is the one field the model gained for this.** Everything else a
+card shows was already in `js/data.js`. The task rows are derived from
+`nextAction`, `tasksOverdue` and `tasksDue`, so the due counts stand in for
+real dates — `kbTasks()` is the single place to change when the model
+carries them.
+
+Two values are sampled from the frame rather than taken from a token: the
+filled contact pill (`#ECDEFE`) and the neutral task block (`#EFEFEF`). Both
+sit between steps on the ramp, and matching the frame mattered more than
+inventing a token for them.
 
 ## Screen 2 — the copy of the application view
 
