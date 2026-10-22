@@ -203,23 +203,26 @@
    ground that read as switched off rather than secondary. */
 .kb-col__n    { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-tertiary); }
 
-/* v1 — the totals as chips, the language of its tinted task blocks. Both
-   carry a border so they hold up on the New lead and Snoozed grounds as
-   well as the grey ones. */
-.kb-col__stats { display: flex; align-items: center; gap: var(--space-6); }
-.kb-stat {
-  padding: 3px var(--space-8);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-pill);
-  background: var(--bg-base);
-  font: var(--weight-demi) 14px/18px var(--font-family);
+/* v1 — the overdue count as a chip, the language of its tinted task blocks.
+   The total runs as plain text at the stage name's size: it is on every
+   column, so chipping it would spend the shape on the thing that never
+   varies. The chip keeps a grey border so it holds up on the New lead and
+   Snoozed grounds as well as the grey ones, and leaves red to the fill and
+   the figure. */
+.kb-col__stats { display: flex; align-items: center; gap: var(--space-8); }
+.kb-col__sum {
+  font: var(--weight-demi) 16px/16px var(--font-family);
   color: var(--text-secondary);
   white-space: nowrap;
 }
 .kb-stat--over {
-  border-color: var(--error-border);
+  padding: 3px var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
   background: var(--error-bg);
+  font: var(--weight-demi) 14px/18px var(--font-family);
   color: var(--text-error);
+  white-space: nowrap;
 }
 
 /* v2 — the same totals as a line of text, with colour doing the work. */

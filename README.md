@@ -294,13 +294,15 @@ board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
 a card does not open the application view — both are the obvious next
 things.
 
-#### The toolbar — v1
+#### The toolbar
 
-The global CRM nav sits above the board in both versions now, the same
-`navBar()` the work list uses, in place of the placeholder band.
+The global CRM nav sits above the board in both versions, the same `navBar()`
+the work list uses, in place of the placeholder band.
 
-The toolbar under it is **v1's only** for the moment; v2 keeps the one it
-had. Seven things the brief asks for, and where each one went:
+The toolbar under it is shared: both versions get the same one, and with it
+the same views menu, filter panel, sort, select mode, bulk banner and
+`+ New lead`. They differ below the bar, not in it. Seven things the brief
+asks for, and where each one went:
 
 | | |
 |---|---|
@@ -466,7 +468,7 @@ are shared rather than copied.
 
 | | The card | The column heading |
 |---|---|---|
-| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it | The totals as chips, with the value shortened to `$1.2M` |
+| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it | The total as plain text at the stage name's size, and the overdue count as a chip, with the value shortened to `$1.2M` |
 | **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words | The totals as a line of text, value spelled out, colour doing the work |
 
 **Each heading carries four things**, in the order a broker reads them: the

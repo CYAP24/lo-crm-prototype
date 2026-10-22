@@ -298,7 +298,9 @@ const kbColumnStats = (deals) => ({
 
    v1 states the totals as chips, which is the language of its tinted task
    blocks, and shortens the value to fit one — $1.2M rather than the whole
-   figure.
+   figure. The total is not one of them: it is on every column, so it sits
+   as plain text at the stage name's size and leaves the chip to the thing
+   that is only sometimes there.
 
    v2 keeps them as a line of text with colour doing the work, and spells the
    value out, since nothing else on that card is abbreviated either.
@@ -310,7 +312,7 @@ function kbColumnHead(stage, deals, mode) {
 
   const stats = mode === 'cues'
     ? `<div class="kb-col__stats">
-         <span class="kb-stat">${moneyShort(s.value)}</span>
+         <span class="kb-col__sum">${moneyShort(s.value)}</span>
          ${s.overdue ? `<span class="kb-stat kb-stat--over">${s.overdue} overdue</span>` : ''}
        </div>`
     : `<div class="kb-col__line">
@@ -634,38 +636,6 @@ function kbBarV1(v) {
     </div>
   </div>`;
 }
-
-/* v2 keeps the bar it had: the brief is for v1 first. */
-const kbBarLegacy = () => `
-  <div class="kb-bar">
-    <div class="kb-board-name">
-      <span class="avatar avatar--solid kb-board-name__ava">KZ</span>
-      <span class="kb-board-name__label">Kenn&rsquo;s Board</span>
-    </div>
-
-    <span class="kb-select kb-select--wide">
-      Asset Finance - AU ${icon('chevron-down', 11)}
-    </span>
-
-    <div class="kb-views">
-      <span class="kb-view is-on">${icon('grid', 14)} Kanban</span>
-      <span class="kb-rule"></span>
-      <span class="kb-view">${icon('rows', 14)} Worklist</span>
-    </div>
-
-    <label class="kb-search">
-      ${icon('search', 16)}
-      <span class="kb-search__ph">Search applications&hellip;</span>
-    </label>
-
-    <span class="kb-spacer"></span>
-
-    <span class="kb-new">${icon('plus', 10)} New</span>
-    <span class="kb-rule"></span>
-    <span class="kb-filter">${icon('sliders', 14)} Filter</span>
-    <span class="kb-rule"></span>
-    <span class="kb-select">-Sort by- ${icon('chevron-down', 11)}</span>
-  </div>`;
 
 /* ---------- Quick actions panel -------------------------------------------
    The same full-height sidebar the work list opens, reusing its `.dp-*`
@@ -1020,20 +990,21 @@ const kbBoardInner = (mode, v) => {
   return KB_STAGES.map(s => kbColumn(s, card, mode, pool, v)).join('');
 };
 
-/* The board is the same in both versions — the mode decides the card, the
-   column heading and, for now, the toolbar: the new bar is v1's only. */
+/* The board is the same in both versions. The mode decides two things: the
+   card, and with it the column heading, and where a card's quick actions
+   open — the sidebar in v1, a floating card in v2. Everything in the
+   toolbar is shared. */
 function renderKanban(mode, v) {
   return `
   <div class="kb">
     ${navBar()}
 
-    ${mode === 'cues' ? kbBarV1(v) : kbBarLegacy()}
+    ${kbBarV1(v)}
 
     <div class="kb-board">${kbBoardInner(mode, v)}</div>
 
-    ${mode === 'cues' ? `
-      <aside class="kbf" id="kbfilter"></aside>
-      <div id="kbbulk"></div>` : ''}
+    <aside class="kbf" id="kbfilter"></aside>
+    <div id="kbbulk"></div>
 
     ${mode === 'text'
       ? '<div class="pop" id="rowpop"></div>'
@@ -1045,11 +1016,14 @@ function renderKanban(mode, v) {
 
 /* One entry per version of this screen, the way the work list and screen 2
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
-   the page. A third version goes here as another skin over the same card.
-
-   Both versions mount the same thing — the quick actions panel is the
-   board's only wiring, and it behaves identically in each. */
+   the page. A third version goes here as another skin over the same card. */
 const KB_MODES = { v1: 'cues', v2: 'text' };
+
+/* A card's Note and Task pills: the full-height sidebar in v1, the work
+   list's floating cards in v2. Both bind to the triggers they find, so both
+   are remounted whenever the board is repainted. */
+const mountCardActions = (app, mode) =>
+  mode === 'text' ? mountPopups(app) : mountKanbanPanel(app);
 
 /* Wires the bar to the board. The board is repainted rather than patched —
    a view, a filter, a sort and a selection all change which cards exist, so
@@ -1070,7 +1044,7 @@ function mountKanbanBar(app, mode) {
   };
   const paintBoard = () => {
     board.innerHTML = kbBoardInner(mode, v);
-    mountKanbanPanel(app);
+    mountCardActions(app, mode);
     wireBoard();
   };
   const paintFilters = () => { if (fp.classList.contains('is-open')) fp.innerHTML = kbFilterPanel(v, kbDeals(v).length); };
@@ -1538,7 +1512,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const v = kbDefaultView();
   app.innerHTML = renderKanban(mode, v);
-  if (mode === 'text') mountPopups(app);
-  else { mountKanbanPanel(app); mountKanbanBar(app, mode); }
+  mountCardActions(app, mode);
+  mountKanbanBar(app, mode);
   mountKbNewLead(app);
 });
