@@ -913,9 +913,11 @@
   padding: 0 var(--space-20);
   background: var(--bg-brand-subtle);
   /* Bordered on both edges, so the banner reads as a band laid over the
-     toolbar rather than as the toolbar having changed colour. */
-  border-top: 1px solid var(--border-brand);
-  border-bottom: 1px solid var(--border-brand);
+     toolbar rather than as the toolbar having changed colour. A grey line
+     rather than a brand one: the edges only have to say where the band
+     stops, and the brand is already doing the work inside it. */
+  border-top: 1px solid var(--border-muted);
+  border-bottom: 1px solid var(--border-muted);
 }
 
 .kb-bb__x {
