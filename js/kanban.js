@@ -1038,6 +1038,8 @@ function renderKanban(mode, v) {
     ${mode === 'text'
       ? '<div class="pop" id="rowpop"></div>'
       : '<aside class="dp" id="kbpanel"></aside>'}
+
+    <aside class="kbnl" id="kbnew"></aside>
   </div>`;
 }
 
@@ -1402,6 +1404,133 @@ function mountKanbanBar(app, mode) {
   wireBar(); wireBoard(); paintBulk();
 }
 
+/* ---------- + New lead -----------------------------------------------------
+   The panel behind the toolbar's "+ New lead", from the Figma frame of the
+   same name. It is the second full-height sidebar on this screen, so it
+   borrows the filter panel's geometry rather than inventing a third one:
+   anchored right, rounded on the leading edge, sliding in off the board.
+
+   Only "Main details" is drawn. The other two tabs are marked optional in
+   the design and have no fields behind them yet, so they say so rather than
+   showing an empty form.
+   -------------------------------------------------------------------------- */
+
+const KB_NL_TABS = [
+  ['main', 'Main details', ''],
+  ['enquiry', 'Enquiry details', '(optional)'],
+  ['lead', 'Lead details', '(optional)']
+];
+
+/* A labelled field. `small` is the 12px label the assignment fields carry —
+   those already name a person, so they sit quieter than the ones still
+   waiting to be typed into. */
+const kbNlField = (label, body, small) => `
+  <div class="kbnl__f">
+    <span class="kbnl__lab ${small ? 'kbnl__lab--sm' : ''}">${label}</span>
+    ${body}
+  </div>`;
+
+const kbNlText = (ph) => `<span class="kbnl__in"><input class="kbnl__input" placeholder="${ph}"></span>`;
+const kbNlPerson = (who) => `<div class="kbnl__in kbnl__in--chip">${personChip(who)}</div>`;
+
+const kbNlMain = () => `
+  ${kbNlField('Mobile no.', `
+    <span class="kbnl__in">
+      <span class="kbnl__cc">+61 ${icon('chevron-down', 10)}</span>
+      <span class="kbnl__rule"></span>
+      <input class="kbnl__input" placeholder="e.g. 04123 456 789">
+    </span>`)}
+  ${kbNlField('Email address', kbNlText('e.g. johnsmith@gmail.com'))}
+  <div class="kbnl__pair">
+    ${kbNlField('First name', kbNlText('e.g. John'))}
+    ${kbNlField('Last name', kbNlText('e.g. Smith'))}
+  </div>
+  ${kbNlField('Applicant type', `
+    <div class="kbnl__seg">
+      <span class="kbnl__segbtn is-on" data-kb-nlseg>Person</span>
+      <span class="kbnl__segbtn" data-kb-nlseg>Business</span>
+    </div>`)}
+  <div class="kbnl__pair">
+    ${kbNlField('Assign broker', kbNlPerson(['JK', 'Jesse K.']), true)}
+    ${kbNlField('Assign partner', kbNlPerson(['CE', 'Cielo E.']), true)}
+  </div>
+  <div class="kbnl__pair">
+    ${kbNlField('Referral source (optional)', kbNlPerson(['JK', 'Jesse K.']), true)}
+    ${kbNlField('Referring person (optional)', kbNlPerson(['CE', 'Cielo E.']), true)}
+  </div>`;
+
+const kbNlCheck = (label) => `
+  <span class="kbnl__check" data-kb-nlcheck>
+    <span class="kb-box">${icon('check-sm', 10)}</span>
+    <span class="t-body-sm">${label}</span>
+  </span>`;
+
+function kbNewLeadPanel(tab) {
+  const t = ([id, label, opt]) => `
+    <span class="kbnl__tab ${tab === id ? 'is-on' : ''}" data-kb-nltab="${id}">
+      <span class="kbnl__tab-l">${label}</span>
+      ${opt ? `<span class="kbnl__tab-o">${opt}</span>` : ''}
+    </span>`;
+  return `
+    <div class="kbnl__head">
+      <span class="kbnl__title">New lead</span>
+      <span class="kbnl__x" data-kb-nlclose>${icon('close', 12)}</span>
+    </div>
+    <div class="kbnl__tabs">${KB_NL_TABS.map(t).join('')}</div>
+    <div class="kbnl__body">
+      ${tab === 'main' ? kbNlMain() : `
+        <p class="kbnl__soon t-body-sm">
+          These details are optional, and the form behind this tab has not been drawn yet.
+        </p>`}
+    </div>
+    <div class="kbnl__foot">
+      <div class="kbnl__checks">
+        ${kbNlCheck('Don&rsquo;t send welcome SMS &amp; Email')}
+        ${kbNlCheck('Send broker notifications')}
+      </div>
+      <span class="kbnl__add">Add now</span>
+    </div>`;
+}
+
+/* Delegated from the screen rather than bound to the button: v1 repaints its
+   toolbar whenever a view, filter or sort changes, which would take any
+   handler on "+ New lead" with it. */
+function mountKbNewLead(app) {
+  const panel = app.querySelector('#kbnew');
+  if (!panel) return;
+  let tab = 'main';
+  const paint = () => { panel.innerHTML = kbNewLeadPanel(tab); };
+  const close = () => panel.classList.remove('is-open');
+
+  app.addEventListener('click', (e) => {
+    if (e.target.closest('.kb-new')) {
+      tab = 'main';
+      paint();
+      panel.classList.add('is-open');
+      return;
+    }
+    if (!e.target.closest('#kbnew')) { close(); return; }
+
+    const tb = e.target.closest('[data-kb-nltab]');
+    if (tb) { tab = tb.dataset.kbNltab; paint(); return; }
+    if (e.target.closest('[data-kb-nlclose]')) { close(); return; }
+
+    const seg = e.target.closest('[data-kb-nlseg]');
+    if (seg) {
+      seg.parentElement.querySelectorAll('[data-kb-nlseg]').forEach(s => s.classList.remove('is-on'));
+      seg.classList.add('is-on');
+      return;
+    }
+    const chk = e.target.closest('[data-kb-nlcheck]');
+    if (chk) { chk.classList.toggle('is-on'); return; }
+
+    const x = e.target.closest('.chip-person__x');
+    if (x) x.closest('.kbnl__in').innerHTML = personChip(null);
+  });
+
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
   const mode = KB_MODES[window.KB_VARIANT || 'v1'];
@@ -1411,4 +1540,5 @@ document.addEventListener('DOMContentLoaded', () => {
   app.innerHTML = renderKanban(mode, v);
   if (mode === 'text') mountPopups(app);
   else { mountKanbanPanel(app); mountKanbanBar(app, mode); }
+  mountKbNewLead(app);
 });

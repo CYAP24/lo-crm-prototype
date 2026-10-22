@@ -419,6 +419,33 @@ it to open.
 The card the panel belongs to takes a brand ring, since the panel covers the
 right of the board and can hide it. `Esc` or a click anywhere outside closes.
 
+#### + New lead
+
+Both versions open the same panel behind the toolbar's `+ New lead`, from the
+Figma frame of that name (`4633:26032`). It is the board's second full-height
+sidebar, so it keeps the filter panel's geometry and motion and differs only
+where the frame does: 460px rather than 380, a rounded leading edge, and a
+form rather than a list of controls.
+
+| | |
+|---|---|
+| Head | `New lead` and a close cross |
+| Tabs | **Main details**, **Enquiry details** *(optional)*, **Lead details** *(optional)* |
+| Main details | Mobile no. (`+61` and the number in one field), Email address, First / Last name, Applicant type as **Person · Business**, then Assign broker, Assign partner, Referral source and Referring person as person chips |
+| Foot | `Don't send welcome SMS & Email`, `Send broker notifications`, and **Add now** |
+
+The two optional tabs have no fields behind them in the frame, so they say so
+rather than showing an empty form — the same honesty `Docs & forms` keeps.
+
+The person chips are the work list's `personChip`, so a broker wears the same
+colour here as on a row; the cross on one clears it back to `+ Assign`. The
+checkboxes, the segmented control and the tabs all toggle. Nothing is
+submitted: `Add now` is inert.
+
+The button is wired by delegation from the screen rather than bound to
+itself, because v1 repaints its whole toolbar whenever a view, filter or sort
+changes. `Esc` or a click anywhere outside closes.
+
 #### Removed
 
 - **The first board card** — the one from the `Draft #2 - 1440 px` frame, with

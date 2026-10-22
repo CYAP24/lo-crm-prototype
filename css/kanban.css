@@ -1127,3 +1127,206 @@
 
 /* A line under a form that says where its content lands. */
 .kb-pop__hint { color: var(--text-tertiary); }
+
+/* ==========================================================================
+   The "+ New lead" panel
+   --------------------------------------------------------------------------
+   The second sidebar on this board, so it keeps the filter panel's geometry
+   and motion and differs only where the Figma frame does: 460px rather than
+   380, a rounded leading edge, and a form rather than a list of controls.
+
+   The frame is a 460px panel holding a 428px column, so every field here is
+   measured from that column and the panel pads to it.
+   -------------------------------------------------------------------------- */
+
+.kbnl {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 460px;
+  z-index: 34;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-right: 0;
+  border-radius: var(--radius-12) 0 0 var(--radius-12);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .14);
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.kbnl.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.kbnl__head {
+  flex: none;
+  position: relative;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.kbnl__title { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-secondary); }
+.kbnl__x {
+  position: absolute;
+  right: var(--space-16);
+  display: flex;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.kbnl__x:hover { color: var(--text-primary); }
+
+/* ---------- Tabs ----------------------------------------------------------
+   The three steps of the form, centred under the title. "(optional)" sits
+   on its own line so the three labels keep one baseline.
+   -------------------------------------------------------------------------- */
+
+.kbnl__tabs {
+  flex: none;
+  align-self: center;
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-20) 0 var(--space-24);
+  padding: var(--space-4);
+  border-radius: var(--radius-8);
+  background: var(--bg-muted);
+}
+.kbnl__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.kbnl__tab:hover { color: var(--text-primary); }
+.kbnl__tab.is-on { background: var(--bg-base); color: var(--text-brand); }
+.kbnl__tab-l { font: var(--weight-medium) 14px/18px var(--font-family); }
+.kbnl__tab-o { font: var(--weight-regular) 10px/10px var(--font-family); color: var(--text-tertiary); }
+.kbnl__tab.is-on .kbnl__tab-o { color: var(--text-brand); }
+
+/* ---------- Form ----------------------------------------------------------- */
+
+.kbnl__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--space-16) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+.kbnl__soon { color: var(--text-tertiary); padding: var(--space-24) var(--space-4); }
+
+.kbnl__f { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+.kbnl__pair { display: flex; gap: var(--space-16); }
+.kbnl__pair > .kbnl__f { flex: 1; }
+
+.kbnl__lab { font: var(--weight-medium) 14px/18px var(--font-family); color: var(--text-primary); }
+.kbnl__lab--sm { font-size: 12px; line-height: 16px; color: var(--text-tertiary); }
+
+.kbnl__in {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  height: 36px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.kbnl__in:focus-within { border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+.kbnl__in--chip { gap: var(--space-4); }
+
+.kbnl__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: var(--weight-regular) 14px/18px var(--font-family);
+  color: var(--text-primary);
+}
+.kbnl__input:focus { outline: none; }
+.kbnl__input::placeholder { color: var(--text-tertiary); }
+
+/* The country code reads as a chosen value rather than a placeholder, so it
+   carries the demibold the rest of the field does not. */
+.kbnl__cc {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font: var(--weight-demi) 14px/18px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex: none;
+}
+.kbnl__rule { width: 1px; height: 26px; background: var(--border-subtle); flex: none; }
+
+.kbnl__in--chip .chip-person { height: 24px; }
+.kbnl__in--chip .chip-person__x { cursor: pointer; }
+.kbnl__in--chip .chip-person__x:hover { color: var(--text-error); }
+
+/* ---------- Applicant type ------------------------------------------------- */
+
+.kbnl__seg { display: flex; }
+.kbnl__segbtn {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-16) var(--space-8);
+  border: 1px solid var(--border-subtle);
+  font: var(--weight-medium) 14px/24px var(--font-family);
+  color: var(--text-tertiary);
+  background: var(--bg-base);
+  cursor: pointer;
+}
+.kbnl__segbtn:first-child { border-radius: var(--radius-8) 0 0 var(--radius-8); }
+/* The two halves share one seam, so the second overlaps the first by its
+   border rather than dropping it — whichever half is chosen keeps a brand
+   edge all the way round. */
+.kbnl__segbtn:last-child { border-radius: 0 var(--radius-8) var(--radius-8) 0; margin-left: -1px; }
+.kbnl__segbtn.is-on {
+  position: relative;
+  background: var(--bg-brand-subtle);
+  border-color: var(--border-brand);
+  color: var(--text-brand);
+  font-weight: var(--weight-demi);
+}
+
+/* ---------- Footer --------------------------------------------------------- */
+
+.kbnl__foot {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-28);
+  padding: var(--space-16);
+  border-top: 1px solid var(--border-subtle);
+}
+.kbnl__checks { flex: 1; display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+.kbnl__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kbnl__check .kb-box { color: transparent; }
+.kbnl__check.is-on .kb-box { background: var(--bg-brand); border-color: var(--bg-brand); color: var(--text-on-dark); }
+
+.kbnl__add {
+  flex: none;
+  display: grid;
+  place-items: center;
+  height: 36px;
+  padding: 0 var(--space-16);
+  border-radius: 7px;
+  background: var(--bg-brand);
+  font: var(--weight-medium) 16px/16px var(--font-family);
+  color: var(--text-on-dark);
+  cursor: pointer;
+}
+.kbnl__add:hover { background: var(--bg-brand-hover); }
