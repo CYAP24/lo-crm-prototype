@@ -383,10 +383,21 @@ whole partner group rather than naming each dealership. Two settlement dates
 were also pulled into the current week, so `Settling this week` is not an
 empty view in the mock data.
 
-#### Quick actions panel
+#### Quick actions
 
-The `Note` and `Task` pills on a card open the same full-height sidebar the
-work list opens, on the tab you pressed. It is the work list's panel, not a
+The `Note` and `Task` pills on a card open the same two things the work list
+offers, and each version borrows the shape that suits it:
+
+| | |
+|---|---|
+| **v1** | The full-height sidebar, on the tab you pressed |
+| **v2** | A card floated beside the pill, the way the work list's own quick actions do — `js/popups.js`, unchanged |
+
+v2's are the work list's popups outright: `Next required actions` and
+`Internal notes`, seeded off the deal, so the same row tells the same story
+wherever it is opened from.
+
+The sidebar, in v1: It is the work list's panel, not a
 copy: `css/variants.css` supplies the `.dp-*` styles and `js/variants.js`
 supplies `panelTasks` and `panelNotes`, so the task and note lists are the
 ones the work list already tells. Both files come along on the kanban pages

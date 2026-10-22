@@ -187,10 +187,17 @@ function kbCard(d, i, mode, v) {
       ${d.partner ? `<span class="kb-c__partner">${d.partner[1]}</span>` : ''}
     </div>`;
 
+  /* v1 opens the full-height quick-actions panel; v2 floats a card beside
+     the pill, the way the work list's own quick actions do. Same two
+     actions either way — only where they land differs. */
+  const pop = (kind, tab) => mode === 'text'
+    ? `data-pop="${kind}" data-deal="${i}"`
+    : `data-kb-panel="${tab}"`;
+
   const actions = `
     <div class="kb-c__actions">
-      <span class="kb-ap kb-ap--grow" data-kb-panel="note">${icon('note', 14)} Note</span>
-      <span class="kb-ap kb-ap--grow" data-kb-panel="task">${icon('check-circle', 14)} Task</span>
+      <span class="kb-ap kb-ap--grow" ${pop('notes', 'note')}>${icon('note', 14)} Note</span>
+      <span class="kb-ap kb-ap--grow" ${pop('tasks', 'task')}>${icon('check-circle', 14)} Task</span>
       <span class="kb-ap">${icon('article', 14)} Request docs</span>
       <span class="kb-ap kb-ap--icon">${icon('kebab', 16)}</span>
     </div>`;
@@ -1028,7 +1035,9 @@ function renderKanban(mode, v) {
       <aside class="kbf" id="kbfilter"></aside>
       <div id="kbbulk"></div>` : ''}
 
-    <aside class="dp" id="kbpanel"></aside>
+    ${mode === 'text'
+      ? '<div class="pop" id="rowpop"></div>'
+      : '<aside class="dp" id="kbpanel"></aside>'}
   </div>`;
 }
 
@@ -1400,6 +1409,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const v = kbDefaultView();
   app.innerHTML = renderKanban(mode, v);
-  mountKanbanPanel(app);
-  if (mode === 'cues') mountKanbanBar(app, mode);
+  if (mode === 'text') mountPopups(app);
+  else { mountKanbanPanel(app); mountKanbanBar(app, mode); }
 });
