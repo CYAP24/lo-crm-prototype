@@ -748,8 +748,71 @@
 .kbf__opt:hover { background: var(--bg-base); }
 .kbf__opt.is-on { color: var(--text-primary); }
 
-.kbf__range { color: var(--text-primary); margin-bottom: var(--space-6); }
-.kbf input[type="range"] { width: 100%; accent-color: var(--bg-brand); margin: 0 0 var(--space-6); }
+.kbf__range { color: var(--text-primary); margin-bottom: var(--space-8); }
+
+/* ---------- Amount: one track, a handle at each end ------------------------
+   Two range inputs are stacked over a single drawn track. The inputs
+   themselves take no pointer events, only their thumbs, so each handle can
+   be grabbed independently and the band between them is a plain element
+   rather than anything the browser draws.
+   -------------------------------------------------------------------------- */
+
+.kbf__slider { position: relative; height: 22px; }
+
+.kbf__slider-track,
+.kbf__slider-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.kbf__slider-track { left: 0; right: 0; background: var(--border-default); }
+.kbf__slider-fill  { left: var(--lo); right: calc(100% - var(--hi)); background: var(--bg-brand); }
+
+.kbf__slider input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 22px;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.kbf__slider input[type="range"]:focus { outline: none; }
+.kbf__slider input[type="range"]::-webkit-slider-runnable-track { background: transparent; border: none; }
+.kbf__slider input[type="range"]::-moz-range-track { background: transparent; border: none; }
+
+.kbf__slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  cursor: grab;
+}
+.kbf__slider input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  cursor: grab;
+}
+.kbf__slider input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+.kbf__slider input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: var(--elevation-focus); }
+
+/* The upper handle sits above, so the two are still separable when they
+   meet at the same value. */
+.kbf__slider input[data-kb-amount="max"] { z-index: 2; }
 
 .kbf__dates { display: flex; align-items: center; gap: var(--space-8); }
 .kbf__to { color: var(--text-tertiary); flex: none; }
@@ -829,17 +892,21 @@
 .kbf__nomatch { padding: var(--space-6); color: var(--text-placeholder); }
 
 /* ---------- Bulk actions banner --------------------------------------------
-   Selecting cards puts the whole screen in a mode, so the banner takes the
-   screen's top edge and covers the global nav rather than floating over the
-   board. The nav is not reachable while a selection is live, which is the
-   point: the cross is the way out.
+   Selecting cards puts the board in a mode, so the banner takes the board's
+   own toolbar rather than floating over the cards — it covers the row that
+   chooses what you are looking at, which is the row that stops applying
+   while a selection is live. The CRM header above it stays put, because
+   leaving the board entirely is still allowed.
+
+   Sized to the toolbar it replaces: 64px down (the header's height, set in
+   css/worklist.css) and 65px tall (the toolbar's own).
    -------------------------------------------------------------------------- */
 
 .kb-bb {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 64px; left: 0; right: 0;
   z-index: 45;
-  height: 64px;
+  height: 65px;
   display: flex;
   align-items: center;
   gap: var(--space-10, 10px);

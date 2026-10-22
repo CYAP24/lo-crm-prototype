@@ -353,9 +353,11 @@ Opening a card or its quick-actions panel changes none of them, so the board
 a broker comes back to is the board they left.
 
 **Select mode** puts a box on every card and a `Select all` on every column.
-Picking anything raises a banner **over the global nav** rather than floating
-a bar over the board: the selection is a mode the whole screen is in, so it
-takes the screen's top edge. A cross on the left drops the selection, the
+Picking anything raises a banner **over the board's own toolbar** rather than
+floating a bar over the cards: the selection is a mode the board is in, so it
+takes the row that chooses what you are looking at — the row that stops
+applying while a selection is live. The CRM header above it stays put,
+because leaving the board entirely is still allowed. A cross on the left drops the selection, the
 count sits beside it, and each action opens a small form under its own chip:
 
 | Action | The form |

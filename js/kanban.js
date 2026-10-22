@@ -816,11 +816,19 @@ function kbFilterPanel(v, shown) {
       <span class="dp__close" title="Close" data-kb-closefilter>${icon('close', 15)}</span>
     </div>
     <div class="kbf__body">
+      ${/* One track with a handle at each end. Two range inputs stacked on
+            it do the work, because no single input carries two values —
+            only their thumbs take the pointer, so each is grabbable and the
+            band between them is a plain element. */ ''}
       <div class="kbf__group">
         <div class="kbf__label t-overline">Amount</div>
         <div class="kbf__range t-body-sm">${money(v.min)} &ndash; ${money(v.max)}${v.max >= 700000 ? '+' : ''}</div>
-        <input type="range" id="kbf-min" min="0" max="700000" step="5000" value="${v.min}" data-kb-amount="min">
-        <input type="range" id="kbf-max" min="0" max="700000" step="5000" value="${v.max}" data-kb-amount="max">
+        <div class="kbf__slider" style="--lo:${(v.min / 700000) * 100}%;--hi:${(v.max / 700000) * 100}%">
+          <span class="kbf__slider-track"></span>
+          <span class="kbf__slider-fill"></span>
+          <input type="range" id="kbf-min" min="0" max="700000" step="5000" value="${v.min}" data-kb-amount="min" aria-label="Lowest amount">
+          <input type="range" id="kbf-max" min="0" max="700000" step="5000" value="${v.max}" data-kb-amount="max" aria-label="Highest amount">
+        </div>
       </div>
 
       <div class="kbf__group">
@@ -1284,13 +1292,38 @@ function mountKanbanBar(app, mode) {
       refilter();
     }));
 
-    fp.querySelectorAll('[data-kb-amount]').forEach(r => r.addEventListener('input', () => {
-      const which = r.dataset.kbAmount;
-      v[which] = Number(r.value);
-      /* Keep the pair the right way round rather than letting them cross. */
-      if (v.min > v.max) { if (which === 'min') v.max = v.min; else v.min = v.max; }
-      refilter();
-    }));
+    /* Dragging must not redraw the panel: replacing the input mid-drag
+       drops the pointer and the handle stops following. So the slider and
+       its readout are updated in place, and only the board behind changes.
+       The panel catches up on release. */
+    const slider = fp.querySelector('.kbf__slider');
+    const retouch = () => {
+      if (slider) {
+        slider.style.setProperty('--lo', `${(v.min / 700000) * 100}%`);
+        slider.style.setProperty('--hi', `${(v.max / 700000) * 100}%`);
+      }
+      const read = fp.querySelector('.kbf__range');
+      if (read) read.innerHTML = `${money(v.min)} &ndash; ${money(v.max)}${v.max >= 700000 ? '+' : ''}`;
+      const count = fp.querySelector('.kbf__count');
+      if (count) count.textContent = `Showing ${kbDeals(v).length} of ${DEALS.length} deals`;
+    };
+
+    fp.querySelectorAll('[data-kb-amount]').forEach(r => {
+      r.addEventListener('input', () => {
+        const which = r.dataset.kbAmount;
+        v[which] = Number(r.value);
+        /* Keep the pair the right way round rather than letting them cross. */
+        if (v.min > v.max) {
+          if (which === 'min') v.max = v.min; else v.min = v.max;
+          const other = fp.querySelector(`[data-kb-amount="${which === 'min' ? 'max' : 'min'}"]`);
+          if (other) other.value = which === 'min' ? v.max : v.min;
+        }
+        v.saved = null;
+        retouch();
+        paintBar(); paintBoard(); paintBulk();
+      });
+      r.addEventListener('change', () => repaintPanel());
+    });
 
     fp.querySelectorAll('[data-kb-date]').forEach(inp => inp.addEventListener('change', () => {
       v[inp.dataset.kbDate] = inp.value;
