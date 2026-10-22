@@ -366,6 +366,7 @@ count sits beside it, and each action opens a small form under its own chip:
 | Move stage | The seven stages, one of them chosen |
 | Message | SMS or Email, then free text |
 | Add a task | What needs doing, who it is for, when it is due — the quick-actions panel's own vocabulary |
+| Add a note | Free text, landing on every selected deal as an internal note |
 
 Save is live only once the form has been told enough to act on, and the
 confirmation sits **beside** the actions rather than replacing them, since

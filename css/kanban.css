@@ -912,6 +912,9 @@
   gap: var(--space-10, 10px);
   padding: 0 var(--space-20);
   background: var(--bg-brand-subtle);
+  /* Bordered on both edges, so the banner reads as a band laid over the
+     toolbar rather than as the toolbar having changed colour. */
+  border-top: 1px solid var(--border-brand);
   border-bottom: 1px solid var(--border-brand);
 }
 
@@ -1119,3 +1122,6 @@
 .kbf__savebtn:hover { background: var(--bg-brand-hover); }
 /* Needs both a name and something worth saving. */
 .kbf__savebtn.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }
+
+/* A line under a form that says where its content lands. */
+.kb-pop__hint { color: var(--text-tertiary); }

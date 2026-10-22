@@ -496,7 +496,8 @@ const kbDefaultView = () => ({
     broker: null, brokerQuery: '',
     stage: null,
     channel: 'SMS', text: '',
-    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: ''
+    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: '',
+    noteText: ''
   }
 });
 
@@ -505,7 +506,8 @@ const kbResetPending = (v) => {
     broker: null, brokerQuery: '',
     stage: null,
     channel: 'SMS', text: '',
-    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: ''
+    taskTitle: '', taskWho: null, taskWhoQuery: '', taskDue: '',
+    noteText: ''
   };
 };
 
@@ -869,7 +871,8 @@ const KB_BULK = {
   broker:  { label: 'Reassign broker', glyph: 'user-plus' },
   stage:   { label: 'Move stage',      glyph: 'arrow-forward' },
   message: { label: 'Message',         glyph: 'chat' },
-  task:    { label: 'Add a task',      glyph: 'check-circle' }
+  task:    { label: 'Add a task',      glyph: 'check-circle' },
+  note:    { label: 'Add a note',      glyph: 'note' }
 };
 
 /* Each form says what it needs before Save means anything, so the button is
@@ -880,6 +883,7 @@ function kbBulkReady(v) {
   if (v.bulk === 'stage')   return !!p.stage;
   if (v.bulk === 'message') return p.text.trim().length > 0;
   if (v.bulk === 'task')    return p.taskTitle.trim().length > 0;
+  if (v.bulk === 'note')    return p.noteText.trim().length > 0;
   return false;
 }
 
@@ -927,6 +931,14 @@ function kbBulkForm(v) {
                 placeholder="Write your ${p.channel.toLowerCase()}&hellip;">${p.text}</textarea>`;
   }
 
+  if (v.bulk === 'note') {
+    return `
+      <div class="kb-pop__title t-label-md">Add a note to ${n} deal${n > 1 ? 's' : ''}</div>
+      <textarea class="kb-pop__text" id="kb-bulk-note" data-kb-bulkq="noteText"
+                placeholder="Write a note&hellip;">${p.noteText}</textarea>
+      <div class="kb-pop__hint t-body-sm">Goes on every selected deal as an internal note.</div>`;
+  }
+
   /* The task form is the quick-actions panel's own vocabulary: a title, who
      it is for, and when it is due. */
   const index = kbNameIndex('broker');
@@ -960,6 +972,7 @@ function kbBulkNote(v) {
   if (v.bulk === 'broker')  return `${deals} reassigned to ${p.broker}`;
   if (v.bulk === 'stage')   return `${deals} moved to ${(KB_STAGES.find(s => s.id === p.stage) || {}).label}`;
   if (v.bulk === 'message') return `${p.channel} queued to ${n} client${n > 1 ? 's' : ''}`;
+  if (v.bulk === 'note')    return `Note added to ${deals}`;
   return `Task added to ${deals}`;
 }
 
