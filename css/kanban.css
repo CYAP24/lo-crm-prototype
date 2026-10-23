@@ -206,9 +206,9 @@
 /* v1 — the overdue count as a chip, the language of its tinted task blocks.
    The total runs as plain text at the stage name's size: it is on every
    column, so chipping it would spend the shape on the thing that never
-   varies. The chip keeps a grey border so it holds up on the New lead and
-   Snoozed grounds as well as the grey ones, and leaves red to the fill and
-   the figure. */
+   varies. The chip is solid red rather than tinted, which is what lets it
+   drop its border: a filled shape holds its own edge on the New lead and
+   Snoozed grounds as well as the grey ones. White on #D92D20 clears 4.5:1. */
 .kb-col__stats { display: flex; align-items: center; gap: var(--space-8); }
 .kb-col__sum {
   font: var(--weight-demi) 16px/16px var(--font-family);
@@ -216,12 +216,11 @@
   white-space: nowrap;
 }
 .kb-stat--over {
-  padding: 3px var(--space-8);
-  border: 1px solid var(--border-muted);
+  padding: 4px var(--space-8);
   border-radius: var(--radius-pill);
-  background: var(--error-bg);
+  background: var(--error-base);
   font: var(--weight-demi) 14px/18px var(--font-family);
-  color: var(--text-error);
+  color: var(--text-on-dark);
   white-space: nowrap;
 }
 
