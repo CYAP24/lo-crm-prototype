@@ -487,24 +487,42 @@ already stands on.
 
 #### v1.2 — Ledger
 
-A broker's board drawn as the financial document it is. Every fill becomes a
-rule, every curve becomes a corner, and colour stops being decoration.
+A broker's board drawn as the financial document it is: ruled rather than
+filled, square rather than round, set in small caps and tabular figures.
+What it does **not** do is go quiet. A broker reading this board is time
+poor, so the skin spends its colour deliberately and ranks every signal.
 
 | | |
 |---|---|
 | Board | White end to end. No column grounds: a single hairline between columns, the way a ruled page separates its money columns |
-| Column identity | Moves into a **2px rule under the heading, in the stage's own colour** — the one place the hue appears |
+| Column heading | A **tinted band in the stage's own `tint`**, its name in that stage's `ink`, held by a **4px rule in its `colour`** — the stage palette `MASTER_STAGES` already carries, so a column is found by colour before a word of it is read |
+| What is late | A **solid red block** in that band. It is the loudest thing in the heading because it is the only thing in the heading to act on |
+| Card | A 1px box with a **5px spine** in the margin, square, no shadow. Every card has one, so the quiet ones are grey and the loud ones are a colour rather than a new shape |
 | Labels | Uppercase, letterspaced, 10–11px: the stage name, the card's day-and-stage line, the document and task labels |
-| Figures | Tabular numerals on everything countable — the column total, the amounts, the due dates, the document counts |
-| Card | A 1px box with a **3px spine**, square corners, no shadow. The spine is the alert state, so every card has one and the quiet ones are simply grey |
-| Alerts | Three steps rather than v1's three fills. Only `call now` keeps a solid band; `tasks overdue` and `possible duplicate` become label rows on the card's own white, carrying their colour in the type and the spine |
-| Tasks | v1's tinted blocks become ruled rows. An overdue row keeps its red type and drops its ground |
-| Documents | The bar is cut into ticks, so it is counted rather than estimated |
+| Figures | `font-variant-numeric: tabular-nums` on the whole board, so amounts, counts and dates line up down a column |
 
-Why the alert change: in v1 the common state — two tasks overdue — paints a
-filled band, and on a real board that is a stripe across half the columns.
-Ledger marks the one line you must act on and annotates the rest, which is
-what the document it is imitating does.
+**The alert band is ranked three ways at once** — fill, weight and height —
+rather than by hue alone:
+
+| State | Band | Height | Also |
+|---|---|---|---|
+| Call now | Solid red, white small caps | Tallest | The whole card's box turns red, and the call key with it |
+| Tasks overdue | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine |
+| Possible duplicate | Grey tint, near-black ink | Shortest | Near-black spine |
+
+Height is doing most of the work, and it costs nothing to read. v1 ranks the
+three by colour alone, which is why a board where half the cards carry
+something reads flat.
+
+**Solid red is rationed** to two places: the column's overdue block and the
+call-now band. Everything else that is late says so in red type — an overdue
+task row is highlighted and struck in the margin, a rejected document is set
+in red demibold — so the two things worth interrupting for stay the two
+loudest things on screen.
+
+The tint and ink pairs are the design system's own and clear 4.5:1 as drawn,
+so the count beside each stage name takes the lighter weight rather than a
+lower opacity, which would take it under.
 
 #### v1.3 — Midnight
 

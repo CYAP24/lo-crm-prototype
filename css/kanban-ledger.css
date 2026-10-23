@@ -17,6 +17,11 @@
    Scoped to `.skin-ledger`, set on the page's `.screen`.
    ========================================================================== */
 
+/* Every figure on the board is set in tabular numerals, so amounts, counts
+   and dates line up down a column whether or not anything is aligned to
+   them. It is the one typographic decision the whole skin rests on. */
+.skin-ledger .kb { font-variant-numeric: tabular-nums; }
+
 /* ---------- Toolbar -------------------------------------------------------
    The bar keeps every control and loses every curve, so the board below
    does not look like a different product from the bar above it. */
@@ -58,38 +63,53 @@
   border-left: 1px solid var(--border-subtle);
   background: none;
 }
-.skin-ledger .kb-col:first-child { border-left: 0; padding-left: 0; }
+.skin-ledger .kb-col:first-child { border-left: 0; }
 
 /* The two columns that were coloured grounds in v1 keep their identity in
-   the heading rule instead — see below. Snoozed still holds its cards back,
-   since that is what the column means rather than how it is drawn. */
+   the heading band instead — see below. Snoozed still holds its cards back,
+   since that is what the column means rather than how it is drawn, and it
+   holds back less than v1 does: a card at .55 is no longer readable at a
+   glance, which is the opposite of the point. */
 .skin-ledger .kb-col[data-stage="newlead"],
 .skin-ledger .kb-col[data-stage="snoozed"] { background: none; }
-.skin-ledger .kb-col[data-stage="snoozed"] .kb-c { opacity: .55; }
+.skin-ledger .kb-col[data-stage="snoozed"] .kb-c { opacity: .7; }
 
 /* ---------- Column heading ------------------------------------------------
-   One ruled row: the stage in small caps, the count beside it, the money
-   and what is late at the end. The rule under it is the stage's own colour,
-   which is the whole of the column's identity now. */
+   The first thing scanned, so it is the one place the skin spends colour
+   without being asked: a tinted band in the stage's own `tint`, its name in
+   that stage's `ink`, and a 4px rule in its `colour` holding the bottom.
+   Those three values come from `MASTER_STAGES`, so this is the system's
+   stage palette rather than a new one.
+
+   It reads as a ruled table's header row, which is the language this skin
+   is written in, and it means a broker finds a column by colour before
+   reading a word of it. */
 
 .skin-ledger .kb-col__head {
   height: auto;
   align-items: baseline;
   gap: var(--space-8);
-  padding: 0 0 10px;
-  margin-bottom: var(--space-16);
-  border-bottom: 2px solid var(--kb-stage, var(--border-default));
+  padding: var(--space-8) var(--space-20) 10px;
+  margin: 0 calc(var(--space-20) * -1) var(--space-16);
+  background: var(--kb-tint, var(--bg-surface));
+  border-bottom: 4px solid var(--kb-stage, var(--border-default));
 }
+/* Snoozed has no tint of its own — it is not a pipeline stage — so it takes
+   a plain grey band, which is the right answer for it anyway. */
+.skin-ledger .kb-col[data-stage="snoozed"] .kb-col__head { background: var(--bg-muted); }
+
 .skin-ledger .kb-col__name {
   font: var(--weight-demi) 11px/16px var(--font-family);
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: var(--text-primary);
+  color: var(--kb-ink, var(--text-primary));
 }
 .skin-ledger .kb-col__n {
   font: var(--weight-medium) 11px/16px var(--font-family);
   letter-spacing: .06em;
-  color: var(--text-placeholder);
+  /* The stage's own ink, at the lighter weight rather than a lower opacity:
+     the tint/ink pairs clear 4.5:1 as drawn, and fading one takes it under. */
+  color: var(--kb-ink, var(--text-tertiary));
 }
 .skin-ledger .kb-col__stats { align-items: baseline; gap: var(--space-12); }
 .skin-ledger .kb-col__sum {
@@ -97,61 +117,70 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
 }
-/* No chip. A square bullet and small caps say it instead — the one place a
-   card's red is allowed to be a shape rather than a word. */
+/* A solid block rather than a pill: the same red v1 uses, cut square so it
+   belongs here. It is the loudest thing in the heading because it is the
+   only thing in the heading a broker has to do something about. */
 .skin-ledger .kb-stat--over {
-  padding: 0;
+  padding: 3px var(--space-6);
   border-radius: 0;
-  background: none;
-  font: var(--weight-demi) 10px/16px var(--font-family);
-  letter-spacing: .09em;
-  text-transform: uppercase;
-  color: var(--text-error);
-}
-.skin-ledger .kb-stat--over::before {
-  content: '';
-  display: inline-block;
-  width: 6px; height: 6px;
-  margin-right: var(--space-6);
   background: var(--error-base);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
-
-.skin-ledger .kb-colsel { margin-left: 0; }
+.skin-ledger .kb-colsel { margin: var(--space-4) 0 var(--space-8); }
 .skin-ledger .kb-box { border-radius: var(--radius-4); }
 .skin-ledger .kb-col__empty { padding-left: 0; }
 
 /* ---------- Card ----------------------------------------------------------
-   A ruled box with a spine. The spine is where the alert state lives when
-   the card is scanned from the side rather than read, so every card has one
-   and the quiet ones are simply grey. */
+   A ruled box with a spine in the margin, the way a reader marks a page.
+   Every card has one, so the quiet ones are grey and the loud ones are not
+   a surprise shape — only a different colour, in the place the eye is
+   already running down. */
 
 .skin-ledger .kb-c {
   border-radius: var(--radius-4);
   border: 1px solid var(--border-default);
-  border-left: 3px solid var(--border-muted);
+  border-left: 5px solid var(--neutral-300);
   box-shadow: none;
 }
 .skin-ledger .kb-c:hover { border-color: var(--border-muted); }
-.skin-ledger .kb-c--cues.is-immediate { outline: 0; }
 .skin-ledger .kb-c.is-immediate { border-left-color: var(--error-base); }
 .skin-ledger .kb-c.is-urgent    { border-left-color: var(--warning-base); }
 .skin-ledger .kb-c.is-warning   { border-left-color: var(--neutral-900); }
+/* The one state that wants the phone picked up now takes the whole box as
+   well as the spine. It is the only card on the board drawn in red. */
+.skin-ledger .kb-c--cues.is-immediate {
+  outline: 0;
+  border-color: var(--error-base);
+}
 .skin-ledger .kb-cbox { border-radius: var(--radius-4); }
 
-/* Three steps rather than v1's three fills. Only the state that wants a
-   call right now keeps a solid band; the other two become label rows on the
-   card's own white, carrying their colour in the type and in the spine.
-   That is what a ledger does — it marks the one line you must act on and
-   annotates the rest — and it stops the common state, two tasks overdue,
-   painting a stripe across half the board. */
-.skin-ledger .kb-c__banner { padding: 7px var(--space-12); }
-.skin-ledger .is-urgent .kb-c__banner,
-.skin-ledger .is-warning .kb-c__banner {
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border-subtle);
+/* ---------- The alert band ------------------------------------------------
+   Three states, ranked by three things at once — fill, weight and height —
+   so a broker scanning a column reads the order without reading the words:
+
+     call now        solid red, white type, the tallest band
+     tasks overdue   amber tint, amber ink, and an amber rule under it
+     possible dup.   grey tint, near-black ink, the shortest band
+
+   v1 ranks them by hue alone, which is why its boards look flat when half
+   the cards carry something. Height is doing most of the work here, and it
+   costs nothing to read. */
+.skin-ledger .kb-c__banner { padding: 6px var(--space-12); }
+.skin-ledger .is-immediate .kb-c__banner { padding: 10px var(--space-12); }
+.skin-ledger .is-urgent .kb-c__banner {
+  padding: 8px var(--space-12);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-bottom: 2px solid var(--warning-base);
 }
-.skin-ledger .is-urgent  .kb-c__banner { color: var(--warning-text); }
-.skin-ledger .is-warning .kb-c__banner { color: var(--text-secondary); }
+.skin-ledger .is-warning .kb-c__banner {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-muted);
+}
 .skin-ledger .kb-c__banner-label {
   font: var(--weight-demi) 10px/14px var(--font-family);
   letter-spacing: .09em;
@@ -163,15 +192,18 @@
   text-transform: uppercase;
 }
 .skin-ledger .kb-c__body { gap: var(--space-12); padding: var(--space-16) var(--space-16) var(--space-12); }
-.skin-ledger .kb-c__name { font-size: 15px; letter-spacing: -.01em; }
+/* The name leads and the figure answers it, a step down — v1 separates the
+   two by colour alone, which is not a separation at a glance. */
+.skin-ledger .kb-c__name { letter-spacing: -.01em; }
 .skin-ledger .kb-c__amount {
-  font-variant-numeric: tabular-nums;
+  font-size: 15px;
   letter-spacing: -.01em;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 /* Square contact keys, and the one that is the next action filled rather
-   than tinted. */
+   than tinted. On a call-now card that key turns red, so the alert at the
+   top of the card and the control that answers it are the same colour. */
 .skin-ledger .kb-cp {
   padding: 5px var(--space-8);
   border-radius: var(--radius-4);
@@ -181,6 +213,10 @@
   background: var(--brand-600);
   border-color: var(--brand-600);
   color: var(--text-on-dark);
+}
+.skin-ledger .is-immediate .kb-cp--on {
+  background: var(--error-base);
+  border-color: var(--error-base);
 }
 .skin-ledger .kb-snooze { border-radius: var(--radius-4); border-color: var(--border-default); }
 
@@ -209,12 +245,24 @@
   background: none;
 }
 .skin-ledger .kb-c__block:last-child { border-bottom: 0; }
-.skin-ledger .kb-c__block.is-overdue { background: none; }
+/* The late one is struck through the margin and highlighted, square, and it
+   bleeds 8px either side so the mark sits outside the text rather than
+   indenting it. */
+.skin-ledger .kb-c__block.is-overdue {
+  margin: 0 calc(var(--space-8) * -1);
+  padding: var(--space-8);
+  background: var(--error-bg);
+  box-shadow: inset 4px 0 0 var(--error-base);
+  border-bottom-color: transparent;
+}
 .skin-ledger .kb-c__block-due {
   font-variant-numeric: tabular-nums;
   color: var(--text-tertiary);
 }
-.skin-ledger .kb-c__block.is-overdue .kb-c__block-due { color: var(--text-error); }
+.skin-ledger .kb-c__block.is-overdue .kb-c__block-due {
+  color: var(--text-error);
+  font-weight: var(--weight-demi);
+}
 
 /* ---------- Documents -----------------------------------------------------
    The bar is cut into ticks, so it is counted rather than estimated. */
@@ -227,12 +275,17 @@
 }
 .skin-ledger .kb-c__docs-n { font-variant-numeric: tabular-nums; }
 .skin-ledger .kb-c__bar {
-  height: 6px;
+  height: 8px;
   gap: 2px;
   border-radius: 0;
   background: none;
 }
-.skin-ledger .kb-c__seg { border-radius: 0; background: var(--neutral-200); }
+.skin-ledger .kb-c__seg { border-radius: 0; background: var(--neutral-300); }
+/* Solid red is rationed: the column's overdue block and the call-now band,
+   and nothing else on the board. Everything else that is late says so in
+   red type, so the two things worth interrupting for stay the two loudest
+   things on screen. */
+.skin-ledger .kb-c__docs-breakdown .is-rejected { font-weight: var(--weight-demi); }
 .skin-ledger .kb-c__docs-breakdown { font-variant-numeric: tabular-nums; }
 
 /* ---------- Owner and actions ---------------------------------------------- */
