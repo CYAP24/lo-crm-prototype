@@ -539,7 +539,8 @@ geometry.
 |---|---|---|
 | Column heading | A band bled to the column rules, squared, held by a 4px rule under it | A **rounded ribbon** sitting inside the column, with a **capsule** in the stage's colour at the head of the row |
 | Between columns | A hairline, like a ruled page | Nothing — the ribbons are what mark one column from the next |
-| Card | 4px radius, 5px spine cut square, no shadow | **12px radius**, so the spine curves into the corners, with the barest lift |
+| Card | 4px radius, 5px spine as the left border, no shadow | **12px radius**, hairline the same weight on all four sides, with the barest lift |
+| The spine | The card's left border, so the box has four different corners | Drawn **inside** the card, so the silhouette is even and the spine still curves with the corner |
 | What is late, in the heading | A solid red block, cut square | A solid red **pill** |
 | An overdue task | Highlighted and struck in the margin, square | The same mark as a **lozenge** — the radius clips the tick to a rounded end |
 | Documents | Square ticks | Rounded ticks |
