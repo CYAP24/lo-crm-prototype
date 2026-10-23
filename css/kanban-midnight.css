@@ -1,0 +1,200 @@
+/* ==========================================================================
+   Kanban v1.3 — Midnight
+   --------------------------------------------------------------------------
+   v1's board, restyled. Same markup, same hierarchy, same controls: this
+   file only changes how it looks, and it is loaded after css/kanban.css on
+   kanban-v1-3.html alone.
+
+   The idea: stop treating the brand as an accent. The board drops onto a
+   deep plum drawn from the top of the brand ramp, the columns become glass
+   wells cut into it, and every card is a lit white surface floating above.
+   Nothing on a card changes colour — the white ground keeps the contrast
+   the system already signed off — but everything gains depth, and the stage
+   each card belongs to is finally stated on the card itself, in that
+   stage's own hue from `MASTER_STAGES`.
+
+   The chrome above the board stays white on purpose. The CRM is still the
+   CRM; the board is the thing being looked at.
+
+   Scoped to `.skin-midnight`, set on the page's `.screen`.
+   ========================================================================== */
+
+/* ---------- Toolbar -------------------------------------------------------- */
+
+.skin-midnight .kb-bar { border-bottom: 1px solid var(--border-subtle); }
+/* Filled rather than outlined: against the board it is about to sit over,
+   an outlined button disappears. */
+.skin-midnight .kb-new {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-midnight .kb-new svg { color: var(--text-on-dark); }
+
+/* ---------- Board ---------------------------------------------------------
+   The plum is lit from the top left, so the first columns sit in light and
+   the far end of the pipeline falls away — the board has a direction. */
+
+.skin-midnight .kb-board {
+  gap: var(--space-16);
+  padding: var(--space-16);
+  background:
+    radial-gradient(120% 92% at 10% -12%, #4E1398 0%, #330480 42%, #210154 100%);
+}
+.skin-midnight .kb-board::-webkit-scrollbar { height: 8px; }
+.skin-midnight .kb-board::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .22);
+  border-radius: var(--radius-pill);
+}
+.skin-midnight .kb-board::-webkit-scrollbar-track { background: transparent; }
+
+/* Glass: a lift of white over the plum, edged with a brighter hairline so
+   the well has a rim rather than fading out. */
+.skin-midnight .kb-col {
+  padding: var(--space-16) 14px 0;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: var(--radius-16);
+  background: rgba(255, 255, 255, .07);
+  backdrop-filter: blur(8px);
+}
+
+/* The two columns that are not pipeline stages keep saying so, in the same
+   two colours v1 gave them — carried by the glass rather than a flat fill. */
+.skin-midnight .kb-col[data-stage="newlead"] {
+  background: rgba(217, 45, 32, .22);
+  border-color: rgba(240, 68, 56, .46);
+}
+.skin-midnight .kb-col[data-stage="snoozed"] {
+  background: rgba(0, 0, 0, .26);
+  border-color: rgba(255, 255, 255, .08);
+}
+/* Held back less than v1 holds it back: a white card fading into a dark
+   ground loses contrast much faster than one fading into light grey, and
+   the column's own darkness is already doing most of the work. */
+.skin-midnight .kb-col[data-stage="snoozed"] .kb-c { opacity: .72; }
+
+.skin-midnight .kb-col__scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .3); }
+
+/* ---------- Column heading ------------------------------------------------
+   Reversed out of the glass, with the stage's hue as a lit bar at the head
+   of the row — the one piece of colour on an otherwise white-on-plum line. */
+
+.skin-midnight .kb-col__head { padding-left: 0; gap: var(--space-8); }
+.skin-midnight .kb-col__head::before {
+  content: '';
+  flex: none;
+  width: 3px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--kb-stage, var(--error-base));
+  box-shadow: 0 0 10px var(--kb-stage, var(--error-base));
+}
+.skin-midnight .kb-col__name { color: var(--white); }
+.skin-midnight .kb-col__n    { color: rgba(255, 255, 255, .58); }
+.skin-midnight .kb-col__sum  { color: rgba(255, 255, 255, .92); }
+.skin-midnight .kb-col__empty { color: rgba(255, 255, 255, .5); padding-left: 0; }
+
+.skin-midnight .kb-colsel { margin-left: 3px; color: rgba(255, 255, 255, .82); }
+.skin-midnight .kb-colsel .kb-box { background: transparent; border-color: rgba(255, 255, 255, .5); }
+
+/* ---------- Card ----------------------------------------------------------
+   White, rounder than v1, and genuinely lifted: two shadows, a tight one
+   for the edge and a wide one for the drop. It rises a little under the
+   cursor, which is the only motion on the board. */
+
+.skin-midnight .kb-c {
+  border-radius: 18px;
+  box-shadow:
+    0 2px 6px rgba(12, 0, 46, .22),
+    0 16px 34px rgba(12, 0, 46, .34);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.skin-midnight .kb-c:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 8px rgba(12, 0, 46, .26),
+    0 22px 46px rgba(12, 0, 46, .42);
+}
+
+/* The system warning was neutral in v1 because it is not about the deal.
+   Here it goes to the darkest brand step for the same reason: it is still
+   the odd one out, but it is the product speaking, not an alarm. */
+.skin-midnight .is-warning .kb-c__banner { background: var(--brand-900); color: var(--brand-200); }
+
+.skin-midnight .kb-c__body { gap: var(--space-16); padding: var(--space-16); }
+/* The money is the brand's colour here — it is what the whole board counts. */
+.skin-midnight .kb-c__amount { color: var(--text-brand); }
+
+.skin-midnight .kb-cp { border-color: transparent; background: var(--bg-surface); }
+.skin-midnight .kb-cp--on { background: var(--brand-600); color: var(--text-on-dark); }
+.skin-midnight .kb-snooze { border-color: transparent; background: var(--bg-surface); }
+
+/* Day stays plain; the stage becomes a capsule in the hue its column is
+   headed with, so the colour at the top of the column is answered on every
+   card under it rather than stated once and dropped. */
+.skin-midnight .kb-c__stage { align-items: center; gap: var(--space-8); }
+.skin-midnight .kb-c__stage > span:first-child { color: var(--text-tertiary); }
+.skin-midnight .kb-c__stage > span:last-child {
+  padding: 3px var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--kb-tint, var(--bg-surface));
+  color: var(--kb-ink, var(--text-secondary));
+  font-weight: var(--weight-demi);
+}
+
+/* ---------- Tasks ---------------------------------------------------------
+   The same blocks, drawn as capsules with a hairline inside rather than a
+   flat tint — they read as objects you could pick up. */
+
+.skin-midnight .kb-c__blocks { gap: var(--space-6); }
+.skin-midnight .kb-c__block {
+  padding: 9px var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+}
+.skin-midnight .kb-c__block.is-overdue {
+  background: var(--error-bg);
+  box-shadow: inset 0 0 0 1px var(--error-border);
+}
+
+/* ---------- Documents -----------------------------------------------------
+   Thicker, fully rounded, and split into separate lozenges so the three
+   states are three objects rather than one bar changing colour. */
+
+.skin-midnight .kb-c__bar {
+  height: 10px;
+  gap: 3px;
+  border-radius: var(--radius-pill);
+  background: none;
+}
+.skin-midnight .kb-c__seg { border-radius: var(--radius-pill); background: var(--bg-muted); }
+
+/* ---------- Owner and actions ---------------------------------------------- */
+
+.skin-midnight .kb-c__ava { border-radius: var(--radius-pill); background: var(--bg-brand-subtle); color: var(--text-brand); }
+.skin-midnight .kb-c__partner { border-color: transparent; background: var(--bg-surface); border-radius: var(--radius-pill); }
+
+/* The footer is a second surface rather than the same white with a line
+   over it, so the card has a body and a base. */
+.skin-midnight .kb-c__actions {
+  padding: var(--space-12);
+  background: linear-gradient(180deg, var(--white), var(--bg-surface));
+}
+.skin-midnight .kb-ap {
+  border-color: transparent;
+  background: var(--bg-base);
+  box-shadow: 0 1px 2px rgba(16, 8, 40, .12);
+}
+.skin-midnight .kb-ap:hover { box-shadow: 0 2px 5px rgba(16, 8, 40, .18); }
+
+/* ---------- Panels --------------------------------------------------------
+   The sidebars keep their white, since that is where typing happens, and
+   take the card's radius and lift so they belong to the same board. */
+
+.skin-midnight .kbf {
+  border-radius: var(--radius-16) 0 0 var(--radius-16);
+  border-left: 1px solid rgba(255, 255, 255, .2);
+  box-shadow: -28px 0 70px rgba(12, 0, 46, .4);
+}
+.skin-midnight .kbnl { box-shadow: -28px 0 70px rgba(12, 0, 46, .4); }

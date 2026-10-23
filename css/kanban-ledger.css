@@ -1,0 +1,277 @@
+/* ==========================================================================
+   Kanban v1.2 — Ledger
+   --------------------------------------------------------------------------
+   v1's board, restyled. Same markup, same hierarchy, same controls: this
+   file only changes how it looks, and it is loaded after css/kanban.css on
+   kanban-v1-2.html alone.
+
+   The idea: a broker's board is a financial document, so draw it like one.
+   Everything that was a fill becomes a rule, everything that was round
+   becomes square, and colour stops being decoration — a card is tinted only
+   where the tint carries meaning. What is left to do the work is type, and
+   it is given a job: uppercase letterspaced small caps for labels, tabular
+   figures for anything countable, and a 2px rule in the stage's own colour
+   under each column heading, which is where the column's identity goes now
+   that the ground is white.
+
+   Scoped to `.skin-ledger`, set on the page's `.screen`.
+   ========================================================================== */
+
+/* ---------- Toolbar -------------------------------------------------------
+   The bar keeps every control and loses every curve, so the board below
+   does not look like a different product from the bar above it. */
+
+.skin-ledger .kb-bar { border-bottom: 1px solid var(--border-subtle); }
+.skin-ledger .kb-board-name__ava { border-radius: var(--radius-4); }
+.skin-ledger .kb-select {
+  border-radius: var(--radius-4);
+  border-color: var(--border-default);
+  box-shadow: none;
+}
+.skin-ledger .kb-search { border-radius: var(--radius-4); border-color: var(--border-default); }
+/* The one filled control on the bar: the only thing on it that creates. */
+.skin-ledger .kb-new {
+  border-radius: var(--radius-4);
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ledger .kb-new svg { color: var(--text-on-dark); }
+.skin-ledger .kb-sel { border-radius: var(--radius-4); }
+.skin-ledger .kb-menu { border-radius: var(--radius-4); }
+.skin-ledger .kb-menu__item { border-radius: var(--radius-4); }
+
+/* ---------- Board ---------------------------------------------------------
+   No column fills. The columns are separated by a single hairline, the way
+   a ruled page separates its money columns, and the white runs end to end. */
+
+.skin-ledger .kb-board {
+  gap: 0;
+  padding: 0 var(--space-24) var(--space-16);
+  background: var(--bg-base);
+}
+
+.skin-ledger .kb-col {
+  width: calc(340px + var(--space-8) + 4px + var(--space-20) * 2);
+  padding: var(--space-20) var(--space-20) 0;
+  border-radius: 0;
+  border-left: 1px solid var(--border-subtle);
+  background: none;
+}
+.skin-ledger .kb-col:first-child { border-left: 0; padding-left: 0; }
+
+/* The two columns that were coloured grounds in v1 keep their identity in
+   the heading rule instead — see below. Snoozed still holds its cards back,
+   since that is what the column means rather than how it is drawn. */
+.skin-ledger .kb-col[data-stage="newlead"],
+.skin-ledger .kb-col[data-stage="snoozed"] { background: none; }
+.skin-ledger .kb-col[data-stage="snoozed"] .kb-c { opacity: .55; }
+
+/* ---------- Column heading ------------------------------------------------
+   One ruled row: the stage in small caps, the count beside it, the money
+   and what is late at the end. The rule under it is the stage's own colour,
+   which is the whole of the column's identity now. */
+
+.skin-ledger .kb-col__head {
+  height: auto;
+  align-items: baseline;
+  gap: var(--space-8);
+  padding: 0 0 10px;
+  margin-bottom: var(--space-16);
+  border-bottom: 2px solid var(--kb-stage, var(--border-default));
+}
+.skin-ledger .kb-col__name {
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+.skin-ledger .kb-col__n {
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .06em;
+  color: var(--text-placeholder);
+}
+.skin-ledger .kb-col__stats { align-items: baseline; gap: var(--space-12); }
+.skin-ledger .kb-col__sum {
+  font: var(--weight-demi) 15px/16px var(--font-family);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+/* No chip. A square bullet and small caps say it instead — the one place a
+   card's red is allowed to be a shape rather than a word. */
+.skin-ledger .kb-stat--over {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-error);
+}
+.skin-ledger .kb-stat--over::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  margin-right: var(--space-6);
+  background: var(--error-base);
+}
+
+.skin-ledger .kb-colsel { margin-left: 0; }
+.skin-ledger .kb-box { border-radius: var(--radius-4); }
+.skin-ledger .kb-col__empty { padding-left: 0; }
+
+/* ---------- Card ----------------------------------------------------------
+   A ruled box with a spine. The spine is where the alert state lives when
+   the card is scanned from the side rather than read, so every card has one
+   and the quiet ones are simply grey. */
+
+.skin-ledger .kb-c {
+  border-radius: var(--radius-4);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--border-muted);
+  box-shadow: none;
+}
+.skin-ledger .kb-c:hover { border-color: var(--border-muted); }
+.skin-ledger .kb-c--cues.is-immediate { outline: 0; }
+.skin-ledger .kb-c.is-immediate { border-left-color: var(--error-base); }
+.skin-ledger .kb-c.is-urgent    { border-left-color: var(--warning-base); }
+.skin-ledger .kb-c.is-warning   { border-left-color: var(--neutral-900); }
+.skin-ledger .kb-cbox { border-radius: var(--radius-4); }
+
+/* Three steps rather than v1's three fills. Only the state that wants a
+   call right now keeps a solid band; the other two become label rows on the
+   card's own white, carrying their colour in the type and in the spine.
+   That is what a ledger does — it marks the one line you must act on and
+   annotates the rest — and it stops the common state, two tasks overdue,
+   painting a stripe across half the board. */
+.skin-ledger .kb-c__banner { padding: 7px var(--space-12); }
+.skin-ledger .is-urgent .kb-c__banner,
+.skin-ledger .is-warning .kb-c__banner {
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.skin-ledger .is-urgent  .kb-c__banner { color: var(--warning-text); }
+.skin-ledger .is-warning .kb-c__banner { color: var(--text-secondary); }
+.skin-ledger .kb-c__banner-label {
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.skin-ledger .kb-c__banner-action {
+  font: var(--weight-medium) 10px/14px var(--font-family);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.skin-ledger .kb-c__body { gap: var(--space-12); padding: var(--space-16) var(--space-16) var(--space-12); }
+.skin-ledger .kb-c__name { font-size: 15px; letter-spacing: -.01em; }
+.skin-ledger .kb-c__amount {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+  color: var(--text-primary);
+}
+
+/* Square contact keys, and the one that is the next action filled rather
+   than tinted. */
+.skin-ledger .kb-cp {
+  padding: 5px var(--space-8);
+  border-radius: var(--radius-4);
+  border-color: var(--border-default);
+}
+.skin-ledger .kb-cp--on {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ledger .kb-snooze { border-radius: var(--radius-4); border-color: var(--border-default); }
+
+/* Day and stage become the card's ruled meta line. */
+.skin-ledger .kb-c__stage {
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-subtle);
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ---------- Tasks ---------------------------------------------------------
+   v1's tinted blocks become ruled rows. An overdue row keeps its red type
+   and loses its ground: on a page this quiet, the colour is enough. */
+
+.skin-ledger .kb-c__blocks { gap: 0; border-top: 1px solid var(--border-subtle); }
+.skin-ledger .kb-c__block {
+  gap: var(--space-8);
+  padding: var(--space-8) 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  background: none;
+}
+.skin-ledger .kb-c__block:last-child { border-bottom: 0; }
+.skin-ledger .kb-c__block.is-overdue { background: none; }
+.skin-ledger .kb-c__block-due {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+.skin-ledger .kb-c__block.is-overdue .kb-c__block-due { color: var(--text-error); }
+
+/* ---------- Documents -----------------------------------------------------
+   The bar is cut into ticks, so it is counted rather than estimated. */
+
+.skin-ledger .kb-c__docs-label {
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.skin-ledger .kb-c__docs-n { font-variant-numeric: tabular-nums; }
+.skin-ledger .kb-c__bar {
+  height: 6px;
+  gap: 2px;
+  border-radius: 0;
+  background: none;
+}
+.skin-ledger .kb-c__seg { border-radius: 0; background: var(--neutral-200); }
+.skin-ledger .kb-c__docs-breakdown { font-variant-numeric: tabular-nums; }
+
+/* ---------- Owner and actions ---------------------------------------------- */
+
+.skin-ledger .kb-c__ava { border-radius: var(--radius-4); }
+.skin-ledger .kb-c__partner {
+  border-radius: var(--radius-4);
+  border-color: var(--border-default);
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.skin-ledger .kb-c__actions {
+  padding: var(--space-8) var(--space-12);
+  background: var(--bg-surface);
+}
+.skin-ledger .kb-ap {
+  border-radius: var(--radius-4);
+  border-color: var(--border-default);
+  background: var(--bg-base);
+}
+
+/* ---------- Panels --------------------------------------------------------
+   The two sidebars and the bulk banner follow the same rules, so opening
+   one does not land you back in v1. */
+
+.skin-ledger .kbf,
+.skin-ledger .kbnl { border-radius: 0; box-shadow: -18px 0 44px rgba(0, 0, 0, .10); }
+.skin-ledger .kbf__search,
+.skin-ledger .kbf input[type="date"],
+.skin-ledger .kbf__opt,
+.skin-ledger .kbnl__in,
+.skin-ledger .kbnl__segbtn,
+.skin-ledger .kbnl__add { border-radius: var(--radius-4); }
+.skin-ledger .kbnl__tabs { border-radius: var(--radius-4); }
+.skin-ledger .kbnl__tab { border-radius: var(--radius-4); }
+.skin-ledger .kbf__label,
+.skin-ledger .kbnl__lab--sm {
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}

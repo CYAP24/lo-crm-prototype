@@ -459,12 +459,82 @@ changes. `Esc` or a click anywhere outside closes.
 Their renderers and styles are deleted, as with the work list's removed
 versions.
 
+### Styling versions — v1.2 Ledger and v1.3 Midnight
+
+`v1.2` and `v1.3` are **v1 exactly**. Same markup, same renderers, same text
+hierarchy, same seven functions on the toolbar, the same quick-actions
+sidebar, filter panel, bulk banner and `+ New lead`. Each page loads one
+extra stylesheet after `css/kanban.css` and sets a skin class on its
+`.screen`:
+
+| | Page | Skin class | Stylesheet |
+|---|---|---|---|
+| **v1.2** Ledger | `kanban-v1-2.html` | `.skin-ledger` | `css/kanban-ledger.css` |
+| **v1.3** Midnight | `kanban-v1-3.html` | `.skin-midnight` | `css/kanban-midnight.css` |
+
+So there is **no second board** to keep in step: a change to `js/kanban.js`
+reaches all four versions, and a styling direction can be thrown away by
+deleting one file and one page. Nothing in `js/kanban.js` knows which skin
+is on.
+
+The one thing the JS gained for them is `kbTone()`, which hands each column
+its stage's `colour`, `tint` and `ink` from `MASTER_STAGES` as `--kb-stage`,
+`--kb-tint` and `--kb-ink`. Those three values already existed for the
+colour-coded work list; the skins reach for them rather than restating the
+palette, and v1 and v2 simply ignore them. New lead is not a pipeline stage
+and has no entry, so it borrows the system's error tint — the ground it
+already stands on.
+
+#### v1.2 — Ledger
+
+A broker's board drawn as the financial document it is. Every fill becomes a
+rule, every curve becomes a corner, and colour stops being decoration.
+
+| | |
+|---|---|
+| Board | White end to end. No column grounds: a single hairline between columns, the way a ruled page separates its money columns |
+| Column identity | Moves into a **2px rule under the heading, in the stage's own colour** — the one place the hue appears |
+| Labels | Uppercase, letterspaced, 10–11px: the stage name, the card's day-and-stage line, the document and task labels |
+| Figures | Tabular numerals on everything countable — the column total, the amounts, the due dates, the document counts |
+| Card | A 1px box with a **3px spine**, square corners, no shadow. The spine is the alert state, so every card has one and the quiet ones are simply grey |
+| Alerts | Three steps rather than v1's three fills. Only `call now` keeps a solid band; `tasks overdue` and `possible duplicate` become label rows on the card's own white, carrying their colour in the type and the spine |
+| Tasks | v1's tinted blocks become ruled rows. An overdue row keeps its red type and drops its ground |
+| Documents | The bar is cut into ticks, so it is counted rather than estimated |
+
+Why the alert change: in v1 the common state — two tasks overdue — paints a
+filled band, and on a real board that is a stripe across half the columns.
+Ledger marks the one line you must act on and annotates the rest, which is
+what the document it is imitating does.
+
+#### v1.3 — Midnight
+
+The opposite move: stop treating the brand as an accent and let the board
+stand on it.
+
+| | |
+|---|---|
+| Board | A deep plum from the top of the brand ramp, lit from the top left, so the board has a direction |
+| Columns | Glass — a lift of white over the plum with a brighter rim. New lead and Snoozed keep their two colours, carried by the glass rather than a flat fill |
+| Column heading | Reversed out white, with the stage's hue as a **lit bar** at the head of the row |
+| Card | White, 18px, and genuinely lifted: a tight shadow for the edge and a wide one for the drop. It rises 2px under the cursor — the only motion on the board |
+| The money | Set in the brand's own colour. It is what the board counts |
+| The stage | A capsule on every card in its column's hue, so the colour at the top of the column is answered on the cards under it |
+| Tasks | Capsules with a hairline inside rather than a flat tint — objects you could pick up |
+| Documents | Three separate lozenges rather than one bar changing colour |
+| `Possible duplicate` | Goes to the darkest brand step rather than neutral. It is still the odd one out, but it is the product speaking, not an alarm |
+
+Nothing on a card changes colour, so the contrast the system already signed
+off is untouched: every card is white, and the dark is only ever behind
+them. The chrome above the board stays white on purpose — the CRM is still
+the CRM, and the board is the thing being looked at.
+
 ### Alert states
 
-Both versions use the alert-state card from the CRM-2026 `To upload` page
-(node `4622:10931`). The board is identical in both — each one passes its own
-card renderer to `renderKanban`, so the columns, the toolbar and the chrome
-are shared rather than copied.
+All four versions use the alert-state card from the CRM-2026 `To upload` page
+(node `4622:10931`). The board is identical in all of them — each
+passes its own card renderer to `renderKanban`, so the columns, the toolbar
+and the chrome are shared rather than copied, and v1.2 and v1.3 use v1's
+renderer outright.
 
 | | The card | The column heading |
 |---|---|---|

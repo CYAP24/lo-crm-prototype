@@ -330,6 +330,17 @@ function kbColumnHead(stage, deals, mode) {
     </div>`;
 }
 
+/* Each stage already carries a hue, a tint and an ink in `MASTER_STAGES`,
+   for the colour-coded work list. The column hands them down as custom
+   properties so a skin can reach for the stage's own colour without
+   restating the palette. New lead is not in that list and borrows the
+   system's error tint, which is the ground it already stands on. */
+const kbTone = (stage) => [
+  `--kb-stage:${stage.colour || 'var(--error-base)'}`,
+  `--kb-tint:${stage.tint || (stage.colour ? 'var(--bg-surface)' : 'var(--error-bg)')}`,
+  `--kb-ink:${stage.ink || (stage.colour ? 'var(--text-secondary)' : 'var(--text-error)')}`
+].join(';');
+
 /* `pool` is what the view, the filters and the sort have left; the column
    takes its share of it rather than reaching for DEALS, so the heading's
    counts and totals describe what is actually on screen. */
@@ -337,7 +348,7 @@ function kbColumn(stage, card, mode, pool, v) {
   const deals = pool.filter(d => kbBucket(d) === stage.id);
   const all = deals.length > 0 && deals.every(d => v.selected.has(DEALS.indexOf(d)));
   return `
-    <section class="kb-col" data-stage="${stage.id}">
+    <section class="kb-col" data-stage="${stage.id}" style="${kbTone(stage)}">
       ${v.select ? `
         <span class="kb-colsel ${all ? 'is-on' : ''}" data-kb-colsel="${stage.id}">
           <span class="kb-box">${all ? icon('check-sm', 11) : ''}</span>
