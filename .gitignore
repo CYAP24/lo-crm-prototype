@@ -9,3 +9,11 @@ __pycache__/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# EDM: raw Figma downloads (45MB). Re-fetchable; build/img is the shipping set.
+edm/assets/
+edm/ref/
+
+# EDM: Vercel deploy staging (copies of build/) and CLI project link
+edm/deploy/
+.vercel/

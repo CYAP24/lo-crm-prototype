@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GemIQ — Black Friday 2026 EDMs</title>
+<style>
+  :root{
+    --ink:#0a0c0f; --paper:#ffffff; --muted:#6b7580; --line:#e4e7ea;
+    --turq:#1fa9b9; --orange:#f25700; --card:#ffffff;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#f2f4f6; --paper:#0a0c0f; --muted:#8e99a6; --line:#20262d; --card:#12161b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#f2f4f6; --paper:#0a0c0f; --muted:#8e99a6; --line:#20262d; --card:#12161b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:400 16px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:72px 16px 96px;}
+  header{border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:40px;}
+  .kicker{
+    font-size:12px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--turq); margin:0 0 10px;
+  }
+  h1{font-size:clamp(28px,5vw,40px); line-height:1.15; letter-spacing:-.025em; font-weight:800; margin:0 0 10px;}
+  .sub{color:var(--muted); margin:0; max-width:60ch;}
+  .dates{
+    display:inline-block; margin-top:18px; padding:7px 14px; border-radius:999px;
+    background:var(--orange); color:#fff; font-size:13px; font-weight:700; letter-spacing:.04em;
+  }
+  .grid{display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+  .card{
+    display:block; text-decoration:none; color:inherit; background:var(--card);
+    border:1px solid var(--line); border-radius:14px; padding:26px 24px;
+    transition:border-color .18s ease, transform .18s ease;
+  }
+  .card:hover{border-color:var(--turq); transform:translateY(-2px);}
+  .card h2{font-size:19px; font-weight:700; letter-spacing:-.01em; margin:0 0 6px;}
+  .card p{color:var(--muted); font-size:14.5px; margin:0 0 16px;}
+  .go{font-size:14px; font-weight:700; color:var(--turq);}
+  footer{margin-top:48px; padding-top:24px; border-top:1px solid var(--line); color:var(--muted); font-size:13.5px;}
+  footer p{margin:0 0 6px;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="kicker">GemIQ · Campaign review</p>
+      <h1>Black Friday 2026 — email designs</h1>
+      <p class="sub">Two emails for the November sale. Open each to view the full design at full width; they are
+        built at 600px and respond down to phone size.</p>
+      <span class="dates">27 November – 1 December 2026</span>
+    </header>
+
+    <div class="grid">
+      <a class="card" href="01-prehype.html">
+        <h2>1 · Pre-hype</h2>
+        <p>Sent ahead of the sale. Black Friday title, the date and the headline saving — no products, no prices.</p>
+        <span class="go">View design &rarr;</span>
+      </a>
+      <a class="card" href="02-launch.html">
+        <h2>2 · Launch</h2>
+        <p>Sent the morning the sale opens. Full pricing on all three products, features, proof and shipping.</p>
+        <span class="go">View design &rarr;</span>
+      </a>
+    </div>
+
+    <footer>
+      <p>Prices in USD. Offer valid 27 November – 1 December 2026.</p>
+      <p>Links in the emails point at placeholder gemiq.com URLs with campaign UTMs attached.</p>
+    </footer>
+  </div>
+</body>
+</html>
