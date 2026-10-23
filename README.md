@@ -459,51 +459,46 @@ changes. `Esc` or a click anywhere outside closes.
 Their renderers and styles are deleted, as with the work list's removed
 versions.
 
-### Styling versions — v1.2 Ledger and v1.3 Ribbon
+### Styling version — v1.2 Ribbon
 
-`v1.2` and `v1.3` are **v1 exactly**. Same markup, same renderers, same text
-hierarchy, same seven functions on the toolbar, the same quick-actions
-sidebar, filter panel, bulk banner and `+ New lead`. Each page loads one
-extra stylesheet after `css/kanban.css` and sets a skin class on its
-`.screen`:
+`v1.2` is **v1 exactly**. Same markup, same renderers, same text hierarchy,
+same seven functions on the toolbar, the same quick-actions sidebar, filter
+panel, bulk banner and `+ New lead`. The page loads one extra stylesheet
+after `css/kanban.css` and sets a skin class on its `.screen`:
 
 | | Page | Skin class | Stylesheet |
 |---|---|---|---|
-| **v1.2** Ledger | `kanban-v1-2.html` | `.skin-ledger` | `css/kanban-ledger.css` |
-| **v1.3** Ribbon | `kanban-v1-3.html` | `.skin-ribbon` | `css/kanban-ribbon.css` |
-
-`css/kanban-ribbon.css` began as a copy of the Ledger sheet and is kept as
-a copy: the two are being workshopped against each other, so neither should
-move when the other is edited.
+| **v1.2** Ribbon | `kanban-v1-2.html` | `.skin-ribbon` | `css/kanban-ribbon.css` |
 
 So there is **no second board** to keep in step: a change to `js/kanban.js`
-reaches all four versions, and a styling direction can be thrown away by
+reaches every version, and a styling direction can be thrown away by
 deleting one file and one page. Nothing in `js/kanban.js` knows which skin
-is on.
+is on. Another direction is another sheet and another page beside these.
 
-The one thing the JS gained for them is `kbTone()`, which hands each column
+The one thing the JS gained for it is `kbTone()`, which hands each column
 its stage's `colour`, `tint` and `ink` from `MASTER_STAGES` as `--kb-stage`,
 `--kb-tint` and `--kb-ink`. Those three values already existed for the
-colour-coded work list; the skins reach for them rather than restating the
+colour-coded work list; the skin reaches for them rather than restating the
 palette, and v1 and v2 simply ignore them. New lead is not a pipeline stage
 and has no entry, so it borrows the system's error tint — the ground it
 already stands on.
 
-#### v1.2 — Ledger
+#### What Ribbon does
 
-A broker's board drawn as the financial document it is: ruled rather than
-filled, square rather than round, set in small caps and tabular figures.
-What it does **not** do is go quiet. A broker reading this board is time
-poor, so the skin spends its colour deliberately and ranks every signal.
+A broker reading this board is time poor, so every signal on it is ranked
+rather than merely present, and the geometry is the brand's own roundness
+rather than v1's.
 
 | | |
 |---|---|
-| Board | White end to end. No column grounds: a single hairline between columns, the way a ruled page separates its money columns |
-| Column heading | A **tinted band in the stage's own `tint`**, its name in that stage's `ink`, held by a **4px rule in its `colour`** — the stage palette `MASTER_STAGES` already carries, so a column is found by colour before a word of it is read |
-| What is late | A **solid red block** in that band. It is the loudest thing in the heading because it is the only thing in the heading to act on |
-| Card | A 1px box with a **5px spine** in the margin, square, no shadow. Every card has one, so the quiet ones are grey and the loud ones are a colour rather than a new shape |
+| Board | White end to end. No column grounds and no rules between columns — the heading ribbons are what mark one column from the next |
+| Column heading | A **rounded ribbon in the stage's own `tint`**, its name in that stage's `ink`, with a **capsule in its `colour`** at the head of the row. A column is found by colour before a word of it is read |
+| What is late | A **solid red pill** in that ribbon. It is the loudest thing in the heading because it is the only thing in the heading to act on |
+| Card | 12px, with a hairline the same weight on all four sides and the barest lift. A **5px spine** runs inside it, full height, curving with the corner because the card clips it. Every card has one, so the quiet ones are grey and the loud ones are a colour rather than a new shape |
 | Labels | Uppercase, letterspaced, 10–11px: the stage name, the card's day-and-stage line, the document and task labels |
 | Figures | `font-variant-numeric: tabular-nums` on the whole board, so amounts, counts and dates line up down a column |
+| Documents | Rounded ticks rather than one bar changing colour |
+| The action row | 8px squircles — v1's footer is four pills in a row, and this one should not be mistaken for it |
 
 **The alert band is ranked three ways at once** — fill, weight and height —
 rather than by hue alone:
@@ -518,48 +513,33 @@ Height is doing most of the work, and it costs nothing to read. v1 ranks the
 three by colour alone, which is why a board where half the cards carry
 something reads flat.
 
-**Solid red is rationed** to two places: the column's overdue block and the
+**Solid red is rationed** to two places: the column's overdue pill and the
 call-now band. Everything else that is late says so in red type — an overdue
-task row is highlighted and struck in the margin, a rejected document is set
-in red demibold — so the two things worth interrupting for stay the two
-loudest things on screen.
+task row is highlighted and struck in the margin with a lozenge, a rejected
+document is set in red demibold — so the two things worth interrupting for
+stay the two loudest things on screen.
 
 The tint and ink pairs are the design system's own and clear 4.5:1 as drawn,
 so the count beside each stage name takes the lighter weight rather than a
 lower opacity, which would take it under.
 
-#### v1.3 — Ribbon
+#### Removed
 
-Ledger, softened. Same thinking — the stage's colour at the head of its
-column, alerts ranked by fill, weight and height, solid red rationed to two
-places, small caps and tabular figures throughout — and a different
-geometry.
-
-| | Ledger | Ribbon |
-|---|---|---|
-| Column heading | A band bled to the column rules, squared, held by a 4px rule under it | A **rounded ribbon** sitting inside the column, with a **capsule** in the stage's colour at the head of the row |
-| Between columns | A hairline, like a ruled page | Nothing — the ribbons are what mark one column from the next |
-| Card | 4px radius, 5px spine as the left border, no shadow | **12px radius**, hairline the same weight on all four sides, with the barest lift |
-| The spine | The card's left border, so the box has four different corners | Drawn **inside** the card, so the silhouette is even and the spine still curves with the corner |
-| What is late, in the heading | A solid red block, cut square | A solid red **pill** |
-| An overdue task | Highlighted and struck in the margin, square | The same mark as a **lozenge** — the radius clips the tick to a rounded end |
-| Documents | Square ticks | Rounded ticks |
-| Keys, chips, avatars | Squared | Capsules |
-| The action row | Squared | **8px squircles** — v1's footer is four pills in a row, and this one should not be mistaken for it |
-
-Ledger is a ruled document and reads as one: austere on purpose. Ribbon
-takes the brand's own roundness back without going back to v1, which carries
-its stages on grey grounds, ranks its alerts by hue alone, and says none of
-this in type. The card is 12px where v1 is 16px, and carries a hairline and
-a 1px lift where v1 carries a shadow: rounded, but not the same round.
+- **v1.3 Midnight** — v1 dropped onto a deep plum from the top of the brand
+  ramp, with glass columns and lifted white cards. Cut in favour of working
+  one direction properly.
+- **Ledger** — the first pass at this direction, and what Ribbon was
+  duplicated from: the same thinking drawn as a ruled document, square and
+  hairlined, with the stage band bled to the column's rules. Cut once the
+  rounded version had it.
 
 ### Alert states
 
-All four versions use the alert-state card from the CRM-2026 `To upload` page
+All three versions use the alert-state card from the CRM-2026 `To upload` page
 (node `4622:10931`). The board is identical in all of them — each
 passes its own card renderer to `renderKanban`, so the columns, the toolbar
-and the chrome are shared rather than copied, and v1.2 and v1.3 use v1's
-renderer outright.
+and the chrome are shared rather than copied, and v1.2 uses v1's renderer
+outright.
 
 | | The card | The column heading |
 |---|---|---|

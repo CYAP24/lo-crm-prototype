@@ -1,20 +1,20 @@
 /* ==========================================================================
-   Kanban v1.3 — Ribbon
+   Kanban v1.2 — Ribbon
    --------------------------------------------------------------------------
-   v1.2 Ledger, softened. It began as a copy of css/kanban-ledger.css and is
-   kept as a copy on purpose: the two are being workshopped against each
-   other, so neither should move when the other is edited.
+   v1's board, restyled. Same markup, same renderers, same hierarchy, same
+   controls: this file only changes how it looks, and it is loaded after
+   css/kanban.css on kanban-v1-2.html alone.
 
-   What it keeps from Ledger is the thinking — the stage's own colour at the
-   head of its column, alerts ranked by fill, weight and height, solid red
-   rationed to two places, small caps labels and tabular figures throughout.
+   The idea: a broker reading this board is time poor, so every signal on it
+   is ranked rather than merely present. The stage's own colour leads its
+   column, alerts separate by fill, weight and height rather than by hue
+   alone, solid red is rationed to the two things worth interrupting for,
+   and the labels go to small caps with tabular figures underneath so a
+   column of numbers can be read down rather than across.
 
-   What it changes is the geometry. Ledger is a ruled document and reads as
-   one: square, hairlined, deliberately austere. This takes the brand's own
-   roundness back — the heading becomes a ribbon with a capsule marker, the
-   spine curves with the card, the highlights become lozenges, the controls
-   get their radius back — without going back to v1, which carries its
-   stages on grey grounds and says none of this in type.
+   The geometry is the brand's own roundness — ribbons, capsules, lozenges —
+   rather than v1's, which carries its stages on grey grounds and says none
+   of this in type.
 
    Scoped to `.skin-ribbon`, set on the page's `.screen`.
    ========================================================================== */
@@ -25,9 +25,9 @@
 .skin-ribbon .kb { font-variant-numeric: tabular-nums; }
 
 /* ---------- Toolbar -------------------------------------------------------
-   The bar keeps the curves the base board gives it and takes one thing from
-   Ledger: the create button is filled rather than outlined, because it is
-   the only control on the bar that makes something. */
+   The bar keeps the curves the base board gives it and changes one thing:
+   the create button is filled rather than outlined, because it is the only
+   control on the bar that makes something. */
 
 .skin-ribbon .kb-bar { border-bottom: 1px solid var(--border-subtle); }
 .skin-ribbon .kb-new {
@@ -38,9 +38,8 @@
 .skin-ribbon .kb-new svg { color: var(--text-on-dark); }
 
 /* ---------- Board ---------------------------------------------------------
-   No column fills and, unlike Ledger, no hairlines either: the heading
-   ribbons are what mark one column from the next, so the white under them
-   is open rather than ruled. */
+   No column fills and no rules between them: the heading ribbons are what
+   mark one column from the next, so the white under them is open. */
 
 .skin-ribbon .kb-board {
   gap: 0;
@@ -73,9 +72,8 @@
    stage palette rather than a new one, and a broker finds a column by
    colour before reading a word of it.
 
-   Ledger bleeds this to the column's rules and squares it off, because a
-   table's header row is what it is imitating. Here it is a rounded ribbon
-   sitting inside the column, which is the shape the brand actually uses. */
+   It is a rounded ribbon sitting inside the column rather than a band bled
+   to its edges, which is the shape the brand actually uses. */
 
 .skin-ribbon .kb-col__head {
   height: auto;
@@ -117,9 +115,8 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
 }
-/* Solid red, and a pill rather than Ledger's cut block. It is the loudest
-   thing in the heading because it is the only thing in the heading a broker
-   has to do something about. */
+/* Solid red, and a pill. It is the loudest thing in the heading because it
+   is the only thing in the heading a broker has to do something about. */
 .skin-ribbon .kb-stat--over {
   padding: 3px var(--space-8);
   border-radius: var(--radius-pill);
@@ -267,7 +264,7 @@
 /* The late one is struck through the margin and highlighted, and it bleeds
    8px either side so the mark sits outside the text rather than indenting
    it. The radius clips the inset tick, so the mark reads as a lozenge with
-   a rounded end rather than Ledger's cut block. */
+   a rounded end. */
 .skin-ribbon .kb-c__block.is-overdue {
   margin: 0 calc(var(--space-8) * -1);
   padding: var(--space-8);
