@@ -459,7 +459,7 @@ changes. `Esc` or a click anywhere outside closes.
 Their renderers and styles are deleted, as with the work list's removed
 versions.
 
-### Styling versions — v1.2 Ledger and v1.3 Midnight
+### Styling versions — v1.2 Ledger and v1.3 Ribbon
 
 `v1.2` and `v1.3` are **v1 exactly**. Same markup, same renderers, same text
 hierarchy, same seven functions on the toolbar, the same quick-actions
@@ -470,7 +470,11 @@ extra stylesheet after `css/kanban.css` and sets a skin class on its
 | | Page | Skin class | Stylesheet |
 |---|---|---|---|
 | **v1.2** Ledger | `kanban-v1-2.html` | `.skin-ledger` | `css/kanban-ledger.css` |
-| **v1.3** Midnight | `kanban-v1-3.html` | `.skin-midnight` | `css/kanban-midnight.css` |
+| **v1.3** Ribbon | `kanban-v1-3.html` | `.skin-ribbon` | `css/kanban-ribbon.css` |
+
+`css/kanban-ribbon.css` began as a copy of the Ledger sheet and is kept as
+a copy: the two are being workshopped against each other, so neither should
+move when the other is edited.
 
 So there is **no second board** to keep in step: a change to `js/kanban.js`
 reaches all four versions, and a styling direction can be thrown away by
@@ -524,27 +528,29 @@ The tint and ink pairs are the design system's own and clear 4.5:1 as drawn,
 so the count beside each stage name takes the lighter weight rather than a
 lower opacity, which would take it under.
 
-#### v1.3 — Midnight
+#### v1.3 — Ribbon
 
-The opposite move: stop treating the brand as an accent and let the board
-stand on it.
+Ledger, softened. Same thinking — the stage's colour at the head of its
+column, alerts ranked by fill, weight and height, solid red rationed to two
+places, small caps and tabular figures throughout — and a different
+geometry.
 
-| | |
-|---|---|
-| Board | A deep plum from the top of the brand ramp, lit from the top left, so the board has a direction |
-| Columns | Glass — a lift of white over the plum with a brighter rim. New lead and Snoozed keep their two colours, carried by the glass rather than a flat fill |
-| Column heading | Reversed out white, with the stage's hue as a **lit bar** at the head of the row |
-| Card | White, 18px, and genuinely lifted: a tight shadow for the edge and a wide one for the drop. It rises 2px under the cursor — the only motion on the board |
-| The money | Set in the brand's own colour. It is what the board counts |
-| The stage | A capsule on every card in its column's hue, so the colour at the top of the column is answered on the cards under it |
-| Tasks | Capsules with a hairline inside rather than a flat tint — objects you could pick up |
-| Documents | Three separate lozenges rather than one bar changing colour |
-| `Possible duplicate` | Goes to the darkest brand step rather than neutral. It is still the odd one out, but it is the product speaking, not an alarm |
+| | Ledger | Ribbon |
+|---|---|---|
+| Column heading | A band bled to the column rules, squared, held by a 4px rule under it | A **rounded ribbon** sitting inside the column, with a **capsule** in the stage's colour at the head of the row |
+| Between columns | A hairline, like a ruled page | Nothing — the ribbons are what mark one column from the next |
+| Card | 4px radius, 5px spine cut square, no shadow | **12px radius**, so the spine curves into the corners, with the barest lift |
+| What is late, in the heading | A solid red block, cut square | A solid red **pill** |
+| An overdue task | Highlighted and struck in the margin, square | The same mark as a **lozenge** — the radius clips the tick to a rounded end |
+| Documents | Square ticks | Rounded ticks |
+| Keys, chips, avatars | Squared | Capsules |
+| The action row | Squared | **8px squircles** — v1's footer is four pills in a row, and this one should not be mistaken for it |
 
-Nothing on a card changes colour, so the contrast the system already signed
-off is untouched: every card is white, and the dark is only ever behind
-them. The chrome above the board stays white on purpose — the CRM is still
-the CRM, and the board is the thing being looked at.
+Ledger is a ruled document and reads as one: austere on purpose. Ribbon
+takes the brand's own roundness back without going back to v1, which carries
+its stages on grey grounds, ranks its alerts by hue alone, and says none of
+this in type. The card is 12px where v1 is 16px, and carries a hairline and
+a 1px lift where v1 carries a shadow: rounded, but not the same round.
 
 ### Alert states
 
