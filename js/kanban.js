@@ -297,23 +297,24 @@ const kbColumnStats = (deals) => ({
    where the filter control used to sit. The stage's description moves onto
    the name as a tooltip, since that is where it went with the control.
 
-   The heading differs between the versions the same way the cards do.
+   There are two of these, and `head` picks one — not `mode`, because a
+   version can want one version's card under the other's heading.
 
-   v1 states the totals as chips, which is the language of its tinted task
-   blocks, and shortens the value to fit one — $1.2M rather than the whole
-   figure. The total is not one of them: it is on every column, so it sits
-   as plain text at the stage name's size and leaves the chip to the thing
-   that is only sometimes there.
+   The `cues` heading states what is late as a chip, which is the language
+   of v1's tinted task blocks, and shortens the value to fit one — $1.2M
+   rather than the whole figure. The total is not a chip: it is on every
+   column, so it sits as plain text at the stage name's size and leaves the
+   chip to the thing that is only sometimes there.
 
-   v2 keeps them as a line of text with colour doing the work, and spells the
-   value out, since nothing else on that card is abbreviated either.
+   The `text` heading is a line of text with colour doing the work, and
+   spells the value out, since nothing on v2's card is abbreviated either.
 
    Both drop the overdue count when there is none: an empty "0 overdue"
    on every column is the thing that stops the real ones registering. */
-function kbColumnHead(stage, deals, mode) {
+function kbColumnHead(stage, deals, head) {
   const s = kbColumnStats(deals);
 
-  const stats = mode === 'cues'
+  const stats = head === 'cues'
     ? `<div class="kb-col__stats">
          <span class="kb-col__sum">${moneyShort(s.value)}</span>
          ${s.overdue ? `<span class="kb-stat kb-stat--over">${s.overdue} overdue</span>` : ''}
@@ -347,7 +348,7 @@ const kbTone = (stage) => [
 /* `pool` is what the view, the filters and the sort have left; the column
    takes its share of it rather than reaching for DEALS, so the heading's
    counts and totals describe what is actually on screen. */
-function kbColumn(stage, card, mode, pool, v) {
+function kbColumn(stage, card, head, pool, v) {
   const deals = pool.filter(d => kbBucket(d) === stage.id);
   const all = deals.length > 0 && deals.every(d => v.selected.has(DEALS.indexOf(d)));
   return `
@@ -357,7 +358,7 @@ function kbColumn(stage, card, mode, pool, v) {
           <span class="kb-box">${all ? icon('check-sm', 11) : ''}</span>
           ${all ? 'Deselect' : 'Select'} all
         </span>` : ''}
-      ${kbColumnHead(stage, deals, mode)}
+      ${kbColumnHead(stage, deals, head)}
       <div class="kb-col__scroll">
         ${deals.length
           ? deals.map(d => card(d, DEALS.indexOf(d))).join('')
@@ -1007,24 +1008,24 @@ function kbBulkBanner(v) {
 
 /* ---------- Shell ---------------------------------------------------------- */
 
-const kbBoardInner = (mode, v) => {
+const kbBoardInner = (mode, head, v) => {
   const pool = kbDeals(v);
   const card = (d, i) => kbCard(d, i, mode, v);
-  return KB_STAGES.map(s => kbColumn(s, card, mode, pool, v)).join('');
+  return KB_STAGES.map(s => kbColumn(s, card, head, pool, v)).join('');
 };
 
 /* The board is the same in both versions. The mode decides two things: the
    card, and with it the column heading, and where a card's quick actions
    open — the sidebar in v1, a floating card in v2. Everything in the
    toolbar is shared. */
-function renderKanban(mode, v) {
+function renderKanban(mode, head, v) {
   return `
   <div class="kb">
     ${navBar()}
 
     ${kbBarV1(v)}
 
-    <div class="kb-board">${kbBoardInner(mode, v)}</div>
+    <div class="kb-board">${kbBoardInner(mode, head, v)}</div>
 
     <aside class="kbf" id="kbfilter"></aside>
     <div id="kbbulk"></div>
@@ -1039,8 +1040,18 @@ function renderKanban(mode, v) {
 
 /* One entry per version of this screen, the way the work list and screen 2
    do it: the page sets `window.KB_VARIANT` and the prototype view points at
-   the page. A third version goes here as another skin over the same card. */
-const KB_MODES = { v1: 'cues', v2: 'text' };
+   the page. Another version goes here as another row.
+
+   `card` and `head` are separate because they turned out to be separate
+   decisions. v2's card is the text-and-colour one and its heading is a line
+   of text to match it — but v2.2 wants that card under v1.2's heading, and
+   there is no reason a version should have to take both or neither. */
+const KB_VARIANTS = {
+  'v1':   { card: 'cues', head: 'cues' },
+  'v1-2': { card: 'cues', head: 'cues' },
+  'v2':   { card: 'text', head: 'text' },
+  'v2-2': { card: 'text', head: 'cues' }
+};
 
 /* A card's Note and Task pills: the full-height sidebar in v1, the work
    list's floating cards in v2. Both bind to the triggers they find, so both
@@ -1051,7 +1062,7 @@ const mountCardActions = (app, mode) =>
 /* Wires the bar to the board. The board is repainted rather than patched —
    a view, a filter, a sort and a selection all change which cards exist, so
    there is one path rather than four. */
-function mountKanbanBar(app, mode) {
+function mountKanbanBar(app, mode, head) {
   const v = kbDefaultView();
   let noteTimer = null;
   const board = app.querySelector('.kb-board');
@@ -1066,7 +1077,7 @@ function mountKanbanBar(app, mode) {
     wireBar();
   };
   const paintBoard = () => {
-    board.innerHTML = kbBoardInner(mode, v);
+    board.innerHTML = kbBoardInner(mode, head, v);
     mountCardActions(app, mode);
     wireBoard();
   };
@@ -1530,12 +1541,12 @@ function mountKbNewLead(app) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
-  const mode = KB_MODES[window.KB_VARIANT || 'v1'];
-  if (!app || !mode) return;
+  const spec = KB_VARIANTS[window.KB_VARIANT || 'v1'];
+  if (!app || !spec) return;
 
   const v = kbDefaultView();
-  app.innerHTML = renderKanban(mode, v);
-  mountCardActions(app, mode);
-  mountKanbanBar(app, mode);
+  app.innerHTML = renderKanban(spec.card, spec.head, v);
+  mountCardActions(app, spec.card);
+  mountKanbanBar(app, spec.card, spec.head);
   mountKbNewLead(app);
 });

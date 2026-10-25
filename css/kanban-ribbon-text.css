@@ -9,8 +9,9 @@
    the same file v1.2 uses and moves when it moves.
 
    This file is only the places where v2's card is a different shape from
-   v1's, and the one place where carrying Ribbon over would have cost v2
-   what it is for.
+   v1's, and the places where carrying Ribbon over would have cost v2 what
+   it is for. The column heading is not one of them: v2.2 asks for v1.2's,
+   which it gets from `KB_VARIANTS` in js/kanban.js rather than from here.
 
    **v2 is the text-and-colour version**, and that is the point of it: no
    tinted task blocks, no documents bar, fewer objects, more words. So where
@@ -24,39 +25,9 @@
                     here there is no bar, so there is nothing for a dot to
                     key to — the counts carry their own colour, as words
 
-     what is late   v1.2 stamps a solid red pill in the column heading
-                    here it stays the line of text v2 already had, set in
-                    small caps
-
    Scoped to `.skin-ribbon-text`, set on the page's `.screen` alongside
    `.skin-ribbon`.
    ========================================================================== */
-
-/* ---------- Column heading ------------------------------------------------
-   The ribbon, its tint and its capsule marker all come from the shared
-   sheet. What sits inside it is v2's line of text rather than v1.2's figure
-   and pill, so only the type is set here. */
-
-/* The ribbon takes a second line here. v1.2 shortens its total to $1.2M and
-   fits everything on one; v2 spells the figure out, which is the whole
-   point of it, and seven figures beside a stage name does not fit 340px —
-   three of the seven names were being truncated. Wrapping costs each column
-   one line and keeps every word. */
-.skin-ribbon-text .kb-col__head { flex-wrap: wrap; row-gap: var(--space-2); }
-.skin-ribbon-text .kb-col__line { flex-basis: 100%; font-variant-numeric: tabular-nums; }
-.skin-ribbon-text .kb-col__value {
-  font: var(--weight-demi) 15px/16px var(--font-family);
-  color: var(--text-primary);
-}
-.skin-ribbon-text .kb-col__dot { color: var(--text-placeholder); }
-/* Small caps rather than v1.2's solid pill: the pill is a shape, and this
-   version answers with type. #B42318 clears 4.5:1 on every stage tint. */
-.skin-ribbon-text .kb-col__over {
-  font: var(--weight-demi) 11px/16px var(--font-family);
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-error);
-}
 
 /* ---------- Tasks ---------------------------------------------------------
    v2 lines the tasks up under one label so the second row reads as a

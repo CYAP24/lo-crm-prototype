@@ -471,10 +471,14 @@ and `+ New lead` as the version they are a skin over. Each page loads one or
 two extra stylesheets after `css/kanban.css` and sets a skin class on its
 `.screen`:
 
-| | Page | Skin class | Stylesheet |
-|---|---|---|---|
-| **v1.2** Ribbon | `kanban-v1-2.html` | `.skin-ribbon` | `css/kanban-ribbon.css` |
-| **v2.2** Ribbon | `kanban-v2-2.html` | `.skin-ribbon .skin-ribbon-text` | the same, plus `css/kanban-ribbon-text.css` |
+| | Page | `KB_VARIANT` | Skin class | Stylesheet |
+|---|---|---|---|---|
+| **v1.2** Ribbon | `kanban-v1-2.html` | `v1-2` | `.skin-ribbon` | `css/kanban-ribbon.css` |
+| **v2.2** Ribbon | `kanban-v2-2.html` | `v2-2` | `.skin-ribbon .skin-ribbon-text` | the same, plus `css/kanban-ribbon-text.css` |
+
+Each page names its own variant in `KB_VARIANTS`, which says which card
+renderer it uses and which column heading — two decisions that used to be
+one.
 
 `css/kanban-ribbon.css` is **shared**, so the stage ribbons and their capsule
 markers, the 12px card with the spine inside it, the small caps labels, the
@@ -506,15 +510,18 @@ v2.2 answers it with type:
 |---|---|---|
 | An overdue task | A solid red bar across the card | The task goes red and demibold and its due date goes with it, in the list it was already in |
 | Documents | A bar in four status colours, every colour keyed to a dot | No bar, so nothing for a dot to key to — the counts carry their colour as words, and the dots are turned off |
-| What is late, in the heading | A solid red pill | The line of text v2 already had, in small caps |
 
-Two things the ribbon had to give v2 that v1.2 does not need. **The heading
-takes a second line**: v1.2 shortens its total to `$1.2M` and fits on one,
-v2 spells the figure out — which is the whole point of it — and seven
-figures beside a stage name does not fit 340px, so three of the seven names
-were being truncated. **`Upcoming tasks` drops to 10px**: set in capitals it
-is wider than the sentence case it replaces, and it is the one label on the
-card that takes width from the task name, which is what a broker is reading.
+**The column heading is v1.2's**, not v2's. `kbColumnHead()` used to pick
+its treatment from the card mode, which meant the text-and-colour card came
+with the line-of-text heading whether or not that was wanted; `KB_VARIANTS`
+in `js/kanban.js` now names the card and the heading separately, so v2.2
+takes v2's card under v1.2's heading. That also settles a fit problem: v2's
+heading spells the total out, and seven figures beside a stage name does not
+fit 340px, so three of the seven names were being truncated.
+
+**`Upcoming tasks` drops to 10px**: set in capitals it is wider than the
+sentence case it replaces, and it is the one label on the card that takes
+width from the task name, which is what a broker is reading.
 
 #### What Ribbon does
 
