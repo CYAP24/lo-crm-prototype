@@ -265,13 +265,14 @@
   border-bottom: 0;
   background: none;
 }
-/* The late one is struck through the margin and highlighted, and it bleeds
-   8px either side so the mark sits outside the text rather than indenting
-   it. The radius clips the inset tick, so the mark reads as a lozenge with
-   a rounded end. */
+/* The late one is highlighted and struck in the margin. It used to bleed
+   8px either side, which put its left edge about three pixels off the
+   spine — two red shapes almost touching, with no air between them. It now
+   sits inside the body's own column, so the spine has the card's full
+   padding to itself. The radius clips the inset tick, so the mark reads as
+   a lozenge with a rounded end. */
 .skin-ribbon .kb-c__block.is-overdue {
-  margin: 0 calc(var(--space-8) * -1);
-  padding: var(--space-8);
+  padding: var(--space-8) 10px;
   border-radius: var(--radius-10);
   background: var(--error-bg);
   box-shadow: inset 4px 0 0 var(--error-base);
