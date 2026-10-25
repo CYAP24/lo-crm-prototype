@@ -509,7 +509,7 @@ rather than by hue alone:
 | State | Band | Height | Also |
 |---|---|---|---|
 | Call now | Solid red, white small caps | Tallest | The whole card's box turns red, and the call key with it |
-| Tasks overdue | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine, and a solid red bar on the task itself |
+| Documents to review | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine |
 | Possible duplicate | Grey tint, near-black ink | Shortest | Near-black spine |
 
 Height is doing most of the work, and it costs nothing to read. v1 ranks the
@@ -572,15 +572,21 @@ real ones registering.
 | State | When | How it shows |
 |---|---|---|
 | Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, a red outline on v1, and the card moves to the New lead column |
-| Urgent | The deal is slipping: more than one task past its due date, or documents that have sat unchecked for ten days | Amber banner naming the count |
+| Urgent | Documents the client sent that have sat unchecked for ten days | Amber banner naming the count |
 | Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
 | None | Nothing wants attention | No banner |
 
-**The thresholds are what keep the board honest.** An alert on every card is
-the same as no alerts at all, so a state has to mean something is actually
-wrong: one overdue task is ordinary slippage, two is a deal being neglected;
-a document in review for two days is the process working, one sitting for ten
-is not. Over the 27 deals that gives **3 immediate, 7 urgent, 2 warning and 15
+**The band is about documents, not tasks.** An overdue task already says so
+on the task itself, in a red bar across the card, so a band repeating the
+count above it spends the loudest thing on the card telling a broker
+something they can already see. The band is left to the one thing the body
+does not carry: work that has arrived and is waiting on them to look at it.
+
+**The threshold is what keeps the board honest.** An alert on every card is
+the same as no alerts at all, and 20 of the 27 deals have a document in
+review at any moment — so firing on arrival would put a band on three cards
+in four. A document in review for two days is the process working; one
+sitting for ten is not. That gives **3 immediate, 5 urgent, 2 warning and 17
 quiet** — a board a broker could triage rather than a wall of amber.
 
 **A call-now card drops its tasks and its documents** in both versions. The

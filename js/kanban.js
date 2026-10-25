@@ -35,19 +35,23 @@ const kbDaysSince = (date) => Math.round((parseDMY(TODAY) - parseDMY(date)) / 86
    read off the deal rather than set by hand:
 
      immediate  a high-urgency deal still in Qualifying — nobody has worked it
-     urgent     the deal is slipping: more than one task past its due date, or
-                documents the client sent that have sat unchecked for a week
-                and a half
+     urgent     documents the client sent that have sat unchecked
      warning    flagged by the system rather than by the pipeline
      (none)     nothing wants attention
 
-   **The thresholds are what keep the board honest.** An alert on every card
-   is the same as no alerts at all, so a state has to mean something is
-   actually wrong: one overdue task is ordinary slippage, two is a deal being
-   neglected; a document in review for two days is the process working, one
-   sitting for ten is not. Over the 27 mock deals that gives 3 immediate, 7
-   urgent, 2 warning and 15 quiet — a board a broker could triage rather than
-   a wall of amber. The three immediate ones are the New lead column.
+   **The band is about documents, not tasks.** An overdue task already says
+   so on the task itself, in a red bar across the card, so a band repeating
+   the count above it spends the loudest thing on the card telling a broker
+   something they can already see. The band is left to the one thing the
+   body does not carry: work that has arrived and is waiting on the broker
+   to look at it.
+
+   **The threshold is what keeps the board honest.** An alert on every card
+   is the same as no alerts at all, and 20 of the 27 mock deals have a
+   document in review at any moment — so firing on arrival would put a band
+   on three cards in four. A document in review for two days is the process
+   working; one sitting for ten is not. That leaves 3 immediate, 6 urgent,
+   2 warning and the rest quiet.
 
    `duplicate` is the one thing the model could not express, so js/data.js
    gained it. Everything else was already there. */
@@ -57,12 +61,11 @@ function kbState(d) {
   if (d.urgency === 'high' && d.master === 'qualifying' && !d.snoozed)
     return { id:'immediate', glyph:'alarm', label:'New lead - call now', action:'Call by today 4:07pm' };
 
-  if (d.tasksOverdue >= 2)
-    return { id:'urgent', glyph:'alarm',
-             label:`${d.tasksOverdue} tasks overdue`, action:'Action now' };
-
+  /* The glyph is the document one rather than the alarm: the band names a
+     thing that has arrived, and the alarm is spoken for by the state above
+     it, which is the only one that wants somebody to move right now. */
   if (c.review > 0 && kbDaysSince(d.activity) >= 10)
-    return { id:'urgent', glyph:'alarm',
+    return { id:'urgent', glyph:'article',
              label:`${c.review} document${c.review > 1 ? 's' : ''} to review`, action:'Review now' };
 
   if (d.duplicate)
