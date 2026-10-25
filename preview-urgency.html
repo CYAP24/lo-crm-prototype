@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>The overdue task &mdash; action row options</title>
+<title>The overdue task &mdash; compact options</title>
 <meta name="viewport" content="width=1600">
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/worklist.css">
@@ -17,6 +17,12 @@
    The same v1.2 Ribbon card five times, with only the overdue task drawn
    differently. Everything else is the real card off the real stylesheets,
    so the five can only differ where they are meant to.
+
+   This is for a kanban column, so height is the currency: each card is
+   measured against the one on the left and the difference is printed over
+   it. Four of the five keep the overdue task to a single line in the stack
+   it already lives in; the fifth moves it into the band and drops the line
+   altogether.
 
    Nothing here is wired into kanban.html. Delete this file and the board is
    unchanged.
@@ -58,7 +64,16 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
 }
 .cmp__tag--now { background: var(--neutral-900); color: var(--text-on-dark); }
 .cmp__col h2 { margin: 0 0 var(--space-4); font: var(--weight-demi) 15px/20px var(--font-family); color: var(--text-primary); }
-.cmp__col p  { margin: 0 0 var(--space-16); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); min-height: 95px; }
+.cmp__col p  { margin: 0 0 var(--space-12); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); min-height: 95px; }
+
+.cmp__cost {
+  display: block;
+  margin-bottom: var(--space-8);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  letter-spacing: .04em;
+  color: var(--text-tertiary);
+}
+.cmp__cost b { color: var(--success-text); font-weight: var(--weight-demi); }
 
 .cmp__hover { margin-top: var(--space-16); }
 .cmp__hoverlabel {
@@ -69,192 +84,139 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
   text-transform: uppercase;
   color: var(--text-placeholder);
 }
-
-/* The cards need a `.kb` ancestor for the skin's tabular figures, but not
-   the board's own sizing or its white ground. */
-
-.kb-c__upnext {
-  display: block;
-  margin-bottom: var(--space-6);
-  font: var(--weight-medium) 11px/16px var(--font-family);
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+/* The hover strips stand on the page rather than in a card, so they need a
+   white ground under them to be read the way they will be seen. */
+.cmp__hover .sact,
+.cmp__hover .kb-c__banner {
+  background: var(--bg-base);
+  border-radius: var(--radius-8);
+  padding-left: var(--space-12);
+  padding-right: var(--space-12);
 }
+.cmp__hover .sband { background: var(--warning-bg); }
 
-/* ---------- B — the pattern being replaced -------------------------------- */
+/* ==========================================================================
+   The compact action row
+   --------------------------------------------------------------------------
+   One line, in the slot the overdue task already had. No fill at rest, so
+   the row costs exactly what a task row costs; the surface and the border
+   arrive with the pointer, which is where an affordance is actually needed.
 
-.opt-ref .kb-c__late {
+   The 6px bleed is deliberate and small: it puts the hover surface 10px off
+   the card's edge, which keeps it clear of the 5px spine.
+   ========================================================================== */
+
+.sact {
+  width: calc(100% + 12px);
+  margin: 0 -6px;
+  padding: 0 var(--space-6);
   display: flex;
   align-items: center;
   gap: var(--space-8);
-  margin: 0 calc(var(--space-16) * -1);
-  padding: 10px var(--space-16);
-  background: var(--error-bg);
-  border-top: 1px solid var(--error-border);
-  border-bottom: 1px solid var(--error-border);
-}
-.opt-ref .kb-c__late svg { flex: none; color: var(--error-base); }
-.opt-ref .kb-c__late-task {
-  flex: 1; min-width: 0;
-  font: var(--weight-demi) 13px/18px var(--font-family);
-  color: var(--text-primary);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.opt-ref .kb-c__late-due {
-  flex: none;
-  font: var(--weight-demi) 11px/16px var(--font-family);
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-error);
-}
-
-/* ==========================================================================
-   The action row — four treatments
-   --------------------------------------------------------------------------
-   All four start from the same object: a row the width of the card's own
-   column, with a border, a surface and a lift. None of them tints the
-   surface, because a pale wash inside a saturated border of the same hue is
-   the one shape that reads as a passive notice rather than a control.
-   ========================================================================== */
-
-.act {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-10);
-  background: var(--bg-base);
-  box-shadow: 0 1px 2px rgba(16, 8, 40, .06);
+  border: 1px solid transparent;
+  border-radius: var(--radius-8);
+  background: none;
   font-family: var(--font-family);
   text-align: left;
   cursor: pointer;
-  transition: box-shadow .14s ease, border-color .14s ease, transform .14s ease;
+  transition: background .13s ease, border-color .13s ease;
 }
-.act:hover,
-.act.is-hover {
-  border-color: var(--border-muted);
-  box-shadow: 0 5px 12px rgba(16, 8, 40, .13);
-  transform: translateY(-1px);
-}
+.sact:hover,
+.sact.is-hover { background: var(--bg-surface); border-color: var(--border-subtle); }
 
-.act__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.act__task {
-  font: var(--weight-demi) 13px/18px var(--font-family);
+.sact__dot { width: 7px; height: 7px; flex: none; border-radius: var(--radius-pill); background: var(--error-base); }
+.sact__task {
+  flex: 1;
+  min-width: 0;
+  font: var(--weight-demi) 12px/20px var(--font-family);
   color: var(--text-primary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.act__meta {
+.sact__late {
+  flex: none;
   font: var(--weight-demi) 10px/14px var(--font-family);
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--text-error);
 }
-.act__dot { width: 8px; height: 8px; flex: none; border-radius: var(--radius-pill); background: var(--error-base); }
-
-/* B1 — the red is one glyph tile, and a chevron says where it goes. */
-.act--tile .act__tile {
-  width: 30px; height: 30px;
+.sact__btn {
   flex: none;
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-8);
-  background: var(--error-base);
-  color: var(--text-on-dark);
-}
-.act--tile .act__go { flex: none; display: flex; color: var(--text-tertiary); transition: color .14s ease, transform .14s ease; }
-.act--tile:hover .act__go,
-.act--tile.is-hover .act__go { color: var(--text-brand); transform: translateX(2px); }
-
-/* B2 — red is the status, purple is the action. The system already splits
-   them; a tinted box collapses both into one colour. */
-.act--btn .act__btn {
-  flex: none;
-  padding: 6px var(--space-12);
+  padding: 1px var(--space-8);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--bg-brand);
   color: var(--text-on-dark);
-  font: var(--weight-demi) 11px/16px var(--font-family);
-  cursor: pointer;
-  transition: background .14s ease;
-}
-.act--btn:hover .act__btn,
-.act--btn.is-hover .act__btn { background: var(--bg-brand-hover); }
-
-/* B3 — inverted, so it is an object on the card rather than a region of it.
-   The lateness is set in light grey and the red is left to the dot: at 10px
-   on near-black, the system's red does not clear 4.5:1. */
-.act--dark {
-  background: var(--neutral-900);
-  border-color: var(--neutral-800);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
-}
-.act--dark:hover,
-.act--dark.is-hover { border-color: var(--neutral-700); box-shadow: 0 6px 16px rgba(0, 0, 0, .34); }
-.act--dark .act__task { color: var(--text-on-dark); }
-.act--dark .act__meta { color: var(--neutral-400); }
-.act--dark .act__dot { background: var(--error-border); }
-.act__ghost {
-  flex: none;
-  padding: 5px var(--space-10, 10px);
-  border: 1px solid rgba(255, 255, 255, .38);
-  border-radius: var(--radius-pill);
-  color: var(--text-on-dark);
-  font: var(--weight-demi) 11px/14px var(--font-family);
-  transition: background .14s ease, color .14s ease;
-}
-.act--dark:hover .act__ghost,
-.act--dark.is-hover .act__ghost { background: var(--white); color: var(--neutral-900); }
-
-/* B4 — the fastest close there is: the thing that is late is the thing you
-   tick off. No fill anywhere. */
-.act--tick .act__box {
-  width: 20px; height: 20px;
-  flex: none;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 2px solid var(--border-muted);
-  border-radius: var(--radius-pill);
-  background: var(--bg-base);
-  color: transparent;
-  cursor: pointer;
-  transition: border-color .14s ease, background .14s ease, color .14s ease;
-}
-.act--tick:hover .act__box,
-.act--tick.is-hover .act__box { border-color: var(--bg-brand); color: var(--border-muted); }
-.act--tick .act__box:hover { background: var(--bg-brand); border-color: var(--bg-brand); color: var(--text-on-dark); }
-.act--tick .act__late {
-  flex: none;
   font: var(--weight-demi) 10px/14px var(--font-family);
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--text-error);
+  letter-spacing: .04em;
 }
+.sact:hover .sact__btn,
+.sact.is-hover .sact__btn { background: var(--bg-brand-hover); }
+
+/* S2 — the two states share one slot, so swapping them moves nothing. */
+.sact--swap .sact__slot { flex: none; position: relative; display: grid; place-items: center end; }
+.sact--swap .sact__slot > * { grid-area: 1 / 1; transition: opacity .13s ease; }
+.sact--swap .sact__btn { opacity: 0; }
+.sact--swap:hover .sact__late,
+.sact--swap.is-hover .sact__late { opacity: 0; }
+.sact--swap:hover .sact__btn,
+.sact--swap.is-hover .sact__btn { opacity: 1; }
+
+/* S3 — a bar in the gutter, in the spine's own language, and a chevron that
+   arrives rather than sits there. */
+.sact--mark .sact__bar { width: 3px; height: 14px; flex: none; border-radius: var(--radius-pill); background: var(--error-base); }
+.sact--mark .sact__chev {
+  flex: none;
+  display: flex;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity .13s ease, transform .13s ease;
+}
+.sact--mark:hover .sact__chev,
+.sact--mark.is-hover .sact__chev { opacity: 1; transform: none; color: var(--text-brand); }
+
+/* S4 — the band names the task and carries the button, so the body loses a
+   row. The band was already on the card, so this costs nothing at all. */
+.sband .kb-c__banner-label { flex: 1; min-width: 0; }
+.sband__task { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sband__btn {
+  flex: none;
+  padding: 1px var(--space-8);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: inherit;
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background .13s ease, color .13s ease;
+}
+.sband:hover .sband__btn,
+.sband.is-hover .sband__btn { background: var(--warning-text); color: var(--warning-bg); border-color: var(--warning-text); }
+
+.kb-c__upnext { display: none; }
 </style>
 </head>
 <body>
 
 <div class="cmp__head">
-  <h1>The overdue task, as something you press</h1>
+  <h1>The overdue task, without the real estate</h1>
   <p>
-    The same v1.2 Ribbon card each time &mdash; same band, same identity, same documents, same
-    footer. Only the overdue task is drawn differently, and every option after the first keeps a
-    container with a border of its own. The deal is Freya Lindqvist: one task two days late, one
-    due in three days.
+    Same card, same band, same documents. Four of these keep the overdue task to a single line in
+    the stack it already occupies, and the fifth moves it into the band and drops the line. Each
+    card is measured against the one on the left; nothing here is taller than what is on the board
+    today.
   </p>
 </div>
 
 <div class="cmp__row skin-ribbon">
   <div class="kb cmp__kb">
     <section class="cmp__col opt-ref">
-      <span class="cmp__tag cmp__tag--now">B</span>
-      <h2>As shown before</h2>
-      <p>A tinted ground inside a border of the same hue. It is the alert-box pattern every framework ships, it says &ldquo;something is wrong&rdquo; rather than &ldquo;do this&rdquo;, and nothing about it invites a click. The four beside it are the same idea drawn as something you would press.</p>
-      <article class="kb-c kb-c--cues is-urgent">
+      <span class="cmp__tag cmp__tag--now">Now</span>
+      <h2>Highlighted in place</h2>
+      <p>The lozenge is two lines&rsquo; worth of padding and a ground of its own for one task. On a column you scroll, that is the most expensive thing on the card and it is spent on repeating what the band already said.</p>
+      <span class="cmp__cost" data-cost="ref">&nbsp;</span>
+      <article class="kb-c kb-c--cues is-urgent" data-opt="ref">
         <div class="kb-c__banner">
           <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
           <span class="kb-c__banner-action">Action now</span>
@@ -273,20 +235,16 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
-          <div class="kb-c__late">
-            <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-            <span class="kb-c__late-task">Chase Freya</span>
-            <span class="kb-c__late-due">2 days late</span>
-          </div>
-
-          <div>
-            <span class="kb-c__upnext">Next up</span>
-            <div class="kb-c__blocks">
-              <div class="kb-c__block">
-                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-                <span class="kb-c__block-due">due in 3 days</span>
-              </div>
+          <div class="kb-c__blocks">
+            <div class="kb-c__block is-overdue">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Chase Freya</span>
+              <span class="kb-c__block-due">2 days overdue</span>
+            </div>
+            <div class="kb-c__block">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+              <span class="kb-c__block-due">due in 3 days</span>
             </div>
           </div>
 
@@ -312,11 +270,12 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
         </div>
       </article>
     </section>
-    <section class="cmp__col opt-tile">
-      <span class="cmp__tag">B1</span>
-      <h2>Icon tile and chevron</h2>
-      <p>A white row inside a neutral border, with the red held to a single glyph tile and the chevron saying where it goes. The shape is a list item in a task app, so it reads as tappable before it reads as a warning.</p>
-      <article class="kb-c kb-c--cues is-urgent">
+    <section class="cmp__col opt-press">
+      <span class="cmp__tag">S1</span>
+      <h2>The row is the button</h2>
+      <p>One line, no taller than any other task. A dot for status, the task, and a small filled button carrying the verb. The container appears only under the pointer, so it costs nothing while you are reading past it.</p>
+      <span class="cmp__cost" data-cost="press">&nbsp;</span>
+      <article class="kb-c kb-c--cues is-urgent" data-opt="press">
         <div class="kb-c__banner">
           <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
           <span class="kb-c__banner-action">Action now</span>
@@ -335,23 +294,16 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
-          <button class="act act--tile" type="button">
-            <span class="act__tile"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <span class="act__go"><svg width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
-          </button>
-
-          <div>
-            <span class="kb-c__upnext">Next up</span>
-            <div class="kb-c__blocks">
-              <div class="kb-c__block">
-                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-                <span class="kb-c__block-due">due in 3 days</span>
-              </div>
+          <div class="kb-c__blocks">
+            <button class="sact sact--press" type="button">
+              <span class="sact__dot"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__btn">Chase</span>
+            </button>
+            <div class="kb-c__block">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+              <span class="kb-c__block-due">due in 3 days</span>
             </div>
           </div>
 
@@ -378,21 +330,19 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
       </article>
       <div class="cmp__hover">
         <span class="cmp__hoverlabel">On hover</span>
-        <button class="act is-hover act--tile" type="button">
-            <span class="act__tile"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <span class="act__go"><svg width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
-          </button>
+        <button class="sact is-hover sact--press" type="button">
+              <span class="sact__dot"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__btn">Chase</span>
+            </button>
       </div>
     </section>
-    <section class="cmp__col opt-btn">
-      <span class="cmp__tag">B2</span>
-      <h2>Row with a real button</h2>
-      <p>The container stays neutral and the action is an actual button carrying the verb. Red says how late it is; purple says what to do about it &mdash; the system&rsquo;s own split between status and action, which the tinted box collapses into one colour.</p>
-      <article class="kb-c kb-c--cues is-urgent">
+    <section class="cmp__col opt-swap">
+      <span class="cmp__tag">S2</span>
+      <h2>Lateness becomes the action</h2>
+      <p>At rest it reads as a row: dot, task, how late. Point at it and the lateness gives way to the button in the same slot &mdash; nothing moves, nothing reflows, and the card is never taller than it looks here.</p>
+      <span class="cmp__cost" data-cost="swap">&nbsp;</span>
+      <article class="kb-c kb-c--cues is-urgent" data-opt="swap">
         <div class="kb-c__banner">
           <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
           <span class="kb-c__banner-action">Action now</span>
@@ -411,23 +361,19 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
-          <div class="act act--btn">
-            <span class="act__dot"></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <button class="act__btn" type="button">Chase now</button>
-          </div>
-
-          <div>
-            <span class="kb-c__upnext">Next up</span>
-            <div class="kb-c__blocks">
-              <div class="kb-c__block">
-                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-                <span class="kb-c__block-due">due in 3 days</span>
-              </div>
+          <div class="kb-c__blocks">
+            <button class="sact sact--swap" type="button">
+              <span class="sact__dot"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__slot">
+                <span class="sact__late">2 days late</span>
+                <span class="sact__btn">Chase now</span>
+              </span>
+            </button>
+            <div class="kb-c__block">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+              <span class="kb-c__block-due">due in 3 days</span>
             </div>
           </div>
 
@@ -454,21 +400,22 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
       </article>
       <div class="cmp__hover">
         <span class="cmp__hoverlabel">On hover</span>
-        <div class="act is-hover act--btn">
-            <span class="act__dot"></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <button class="act__btn" type="button">Chase now</button>
-          </div>
+        <button class="sact is-hover sact--swap" type="button">
+              <span class="sact__dot"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__slot">
+                <span class="sact__late">2 days late</span>
+                <span class="sact__btn">Chase now</span>
+              </span>
+            </button>
       </div>
     </section>
-    <section class="cmp__col opt-dark">
-      <span class="cmp__tag">B3</span>
-      <h2>Inverted strip</h2>
-      <p>Near-black with white type, a red dot for status and an outlined button at the end. Inverting it makes it an object sitting on the card rather than a region of it, and it is the one treatment that cannot be mistaken for a passive notice.</p>
-      <article class="kb-c kb-c--cues is-urgent">
+    <section class="cmp__col opt-mark">
+      <span class="cmp__tag">S3</span>
+      <h2>Marked in the gutter</h2>
+      <p>The least ink of the four: a red bar where the spine language already puts meaning, the task, two characters of lateness, and a chevron that slides in on hover. Reads as a link, not a notice.</p>
+      <span class="cmp__cost" data-cost="mark">&nbsp;</span>
+      <article class="kb-c kb-c--cues is-urgent" data-opt="mark">
         <div class="kb-c__banner">
           <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
           <span class="kb-c__banner-action">Action now</span>
@@ -487,23 +434,17 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
-          <button class="act act--dark" type="button">
-            <span class="act__dot"></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <span class="act__ghost">Open</span>
-          </button>
-
-          <div>
-            <span class="kb-c__upnext">Next up</span>
-            <div class="kb-c__blocks">
-              <div class="kb-c__block">
-                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-                <span class="kb-c__block-due">due in 3 days</span>
-              </div>
+          <div class="kb-c__blocks">
+            <button class="sact sact--mark" type="button">
+              <span class="sact__bar"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__late">2d</span>
+              <span class="sact__chev"><svg width="13" height="13" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
+            </button>
+            <div class="kb-c__block">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+              <span class="kb-c__block-due">due in 3 days</span>
             </div>
           </div>
 
@@ -530,24 +471,23 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
       </article>
       <div class="cmp__hover">
         <span class="cmp__hoverlabel">On hover</span>
-        <button class="act is-hover act--dark" type="button">
-            <span class="act__dot"></span>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-              <span class="act__meta">2 days late</span>
-            </span>
-            <span class="act__ghost">Open</span>
-          </button>
+        <button class="sact is-hover sact--mark" type="button">
+              <span class="sact__bar"></span>
+              <span class="sact__task">Chase Freya</span>
+              <span class="sact__late">2d</span>
+              <span class="sact__chev"><svg width="13" height="13" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
+            </button>
       </div>
     </section>
-    <section class="cmp__col opt-tick">
-      <span class="cmp__tag">B4</span>
-      <h2>Tick it off</h2>
-      <p>The affordance is a checkbox, so the row offers the fastest possible close: the thing that is late is also the thing you complete. Lateness stays as small caps at the end, with no fill at all.</p>
-      <article class="kb-c kb-c--cues is-urgent">
-        <div class="kb-c__banner">
-          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
-          <span class="kb-c__banner-action">Action now</span>
+    <section class="cmp__col opt-band">
+      <span class="cmp__tag">S4</span>
+      <h2>Folded into the band</h2>
+      <p>The band is already on the card, so the task moves into it and the stack drops a row. This is the only option that makes the card <em>shorter</em> than it is today, and the only one where the alarm and the instruction are the same sentence.</p>
+      <span class="cmp__cost" data-cost="band">&nbsp;</span>
+      <article class="kb-c kb-c--cues is-urgent" data-opt="band">
+        <div class="kb-c__banner sband">
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg><span class="sband__task">Chase Freya &middot; 2 days late</span></span>
+          <button class="sband__btn" type="button">Chase &middot; +1</button>
         </div>
         <div class="kb-c__body">
           <div class="kb-c__who">
@@ -563,22 +503,11 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
-          <div class="act act--tick">
-            <button class="act__box" type="button" aria-label="Mark done"><svg width="11" height="11" aria-hidden="true"><use href="#i-check-sm"></use></svg></button>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-            </span>
-            <span class="act__late">2 days late</span>
-          </div>
-
-          <div>
-            <span class="kb-c__upnext">Next up</span>
-            <div class="kb-c__blocks">
-              <div class="kb-c__block">
-                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-                <span class="kb-c__block-due">due in 3 days</span>
-              </div>
+          <div class="kb-c__blocks">
+            <div class="kb-c__block">
+              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+              <span class="kb-c__block-due">due in 3 days</span>
             </div>
           </div>
 
@@ -605,17 +534,31 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
       </article>
       <div class="cmp__hover">
         <span class="cmp__hoverlabel">On hover</span>
-        <div class="act is-hover act--tick">
-            <button class="act__box" type="button" aria-label="Mark done"><svg width="11" height="11" aria-hidden="true"><use href="#i-check-sm"></use></svg></button>
-            <span class="act__text">
-              <span class="act__task">Chase Freya</span>
-            </span>
-            <span class="act__late">2 days late</span>
-          </div>
+        <div class="kb-c__banner sband is-hover">
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg><span class="sband__task">Chase Freya &middot; 2 days late</span></span>
+          <button class="sband__btn" type="button">Chase &middot; +1</button>
+        </div>
       </div>
     </section>
   </div>
 </div>
+
+<script>
+/* Measured rather than asserted: whatever the stylesheets do, the number
+   over each card is what that card actually is. */
+window.addEventListener('load', () => {
+  const cards = [...document.querySelectorAll('.kb-c[data-opt]')];
+  const base = cards[0].getBoundingClientRect().height;
+  cards.forEach((c, i) => {
+    const h = Math.round(c.getBoundingClientRect().height);
+    const d = h - Math.round(base);
+    const slot = document.querySelector(`.cmp__cost[data-cost="${c.dataset.opt}"]`);
+    slot.innerHTML = i === 0
+      ? `${h}px tall &mdash; the one to beat`
+      : `${h}px tall &middot; <b>${d === 0 ? 'same height' : (d < 0 ? d + 'px' : '+' + d + 'px')}</b>`;
+  });
+});
+</script>
 
 </body>
 </html>
