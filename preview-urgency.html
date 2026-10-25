@@ -2,22 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Overdue task — three treatments</title>
+<title>The overdue task &mdash; action row options</title>
 <meta name="viewport" content="width=1600">
-<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
-<link rel="stylesheet" href="css/worklist.css?v=e4b809a5">
-<link rel="stylesheet" href="css/variants.css?v=6dbde3bb">
-<link rel="stylesheet" href="css/kanban.css?v=43b7e2b8">
-<link rel="stylesheet" href="css/kanban-ribbon.css?v=b9d7b613">
-<script src="js/icons.js?v=e5f50832" defer></script>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/worklist.css">
+<link rel="stylesheet" href="css/variants.css">
+<link rel="stylesheet" href="css/kanban.css">
+<link rel="stylesheet" href="css/kanban-ribbon.css">
+<script src="js/icons.js" defer></script>
 <style>
 /* ==========================================================================
    A scratch comparison sheet, not a prototype version.
    --------------------------------------------------------------------------
-   The same v1.2 Ribbon card four times, with only the overdue task drawn
-   differently. Everything else — the band, the identity, the documents, the
-   footer — is the real card off the real stylesheets, so the four can only
-   differ where they are meant to.
+   The same v1.2 Ribbon card five times, with only the overdue task drawn
+   differently. Everything else is the real card off the real stylesheets,
+   so the five can only differ where they are meant to.
 
    Nothing here is wired into kanban.html. Delete this file and the board is
    unchanged.
@@ -31,10 +30,20 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
   border-bottom: 1px solid var(--border-subtle);
 }
 .cmp__head h1 { margin: 0; font: var(--weight-demi) 20px/26px var(--font-family); color: var(--text-primary); }
-.cmp__head p  { margin: var(--space-6) 0 0; font: var(--weight-regular) 14px/20px var(--font-family); color: var(--text-tertiary); max-width: 760px; }
+.cmp__head p  { margin: var(--space-6) 0 0; font: var(--weight-regular) 14px/20px var(--font-family); color: var(--text-tertiary); max-width: 820px; }
 
 .cmp__row { padding: var(--space-32); }
 .cmp__col { width: 340px; flex: none; }
+
+.cmp__kb {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-32) var(--space-24);
+  align-items: flex-start;
+  flex: none;
+  background: none;
+}
 
 .cmp__tag {
   display: inline-block;
@@ -47,253 +56,204 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.cmp__col--now .cmp__tag { background: var(--neutral-900); color: var(--text-on-dark); }
+.cmp__tag--now { background: var(--neutral-900); color: var(--text-on-dark); }
 .cmp__col h2 { margin: 0 0 var(--space-4); font: var(--weight-demi) 15px/20px var(--font-family); color: var(--text-primary); }
-.cmp__col p  { margin: 0 0 var(--space-16); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); min-height: 76px; }
+.cmp__col p  { margin: 0 0 var(--space-16); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); min-height: 95px; }
+
+.cmp__hover { margin-top: var(--space-16); }
+.cmp__hoverlabel {
+  display: block;
+  margin-bottom: var(--space-6);
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-placeholder);
+}
 
 /* The cards need a `.kb` ancestor for the skin's tabular figures, but not
    the board's own sizing or its white ground. */
-.cmp__kb {
-  display: flex;
-  flex-direction: row;
-  gap: var(--space-24);
-  align-items: flex-start;
-  flex: none;
-  background: none;
+
+.kb-c__upnext {
+  display: block;
+  margin-bottom: var(--space-6);
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-/* ---------- A — the row stays put, the lateness becomes a stamp ----------- */
+/* ---------- B — the pattern being replaced -------------------------------- */
 
-.opt-a .kb-c__block.is-overdue {
-  padding: var(--space-2) 0;
-  background: none;
-  box-shadow: none;
-}
-.opt-a .kb-c__block.is-overdue svg { color: var(--error-base); }
-.opt-a .kb-c__block.is-overdue .kb-c__block-label {
-  color: var(--text-error);
-  font-weight: var(--weight-demi);
-}
-.opt-a .kb-c__block.is-overdue .kb-c__block-due {
-  padding: 2px var(--space-8);
-  border-radius: var(--radius-pill);
-  background: var(--error-base);
-  color: var(--text-on-dark);
-  font: var(--weight-demi) 11px/15px var(--font-family);
-}
-
-/* ---------- B — the late task is lifted out of the list ------------------- */
-
-.opt-b .kb-c__late {
+.opt-ref .kb-c__late {
   display: flex;
   align-items: center;
   gap: var(--space-8);
   margin: 0 calc(var(--space-16) * -1);
-  padding: var(--space-10, 10px) var(--space-16);
+  padding: 10px var(--space-16);
   background: var(--error-bg);
   border-top: 1px solid var(--error-border);
   border-bottom: 1px solid var(--error-border);
 }
-.opt-b .kb-c__late svg { flex: none; color: var(--error-base); }
-.opt-b .kb-c__late-task {
-  flex: 1;
-  min-width: 0;
+.opt-ref .kb-c__late svg { flex: none; color: var(--error-base); }
+.opt-ref .kb-c__late-task {
+  flex: 1; min-width: 0;
   font: var(--weight-demi) 13px/18px var(--font-family);
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.opt-b .kb-c__late-due {
+.opt-ref .kb-c__late-due {
   flex: none;
   font: var(--weight-demi) 11px/16px var(--font-family);
   letter-spacing: .07em;
   text-transform: uppercase;
   color: var(--text-error);
 }
-.opt-b .kb-c__upnext {
-  display: block;
-  margin-bottom: var(--space-6);
-  font: var(--weight-medium) 11px/16px var(--font-family);
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
+
+/* ==========================================================================
+   The action row — four treatments
+   --------------------------------------------------------------------------
+   All four start from the same object: a row the width of the card's own
+   column, with a border, a surface and a lift. None of them tints the
+   surface, because a pale wash inside a saturated border of the same hue is
+   the one shape that reads as a passive notice rather than a control.
+   ========================================================================== */
+
+.act {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-10);
+  background: var(--bg-base);
+  box-shadow: 0 1px 2px rgba(16, 8, 40, .06);
+  font-family: var(--font-family);
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow .14s ease, border-color .14s ease, transform .14s ease;
+}
+.act:hover,
+.act.is-hover {
+  border-color: var(--border-muted);
+  box-shadow: 0 5px 12px rgba(16, 8, 40, .13);
+  transform: translateY(-1px);
 }
 
-/* ---------- C — the band names the task ----------------------------------- */
-
-.opt-c .kb-c__banner-action {
-  flex: none;
-  padding: 2px var(--space-6);
-  border-radius: var(--radius-pill);
-  background: rgba(181, 71, 8, .14);
+.act__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.act__task {
+  font: var(--weight-demi) 13px/18px var(--font-family);
+  color: var(--text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.act__meta {
   font: var(--weight-demi) 10px/14px var(--font-family);
-  letter-spacing: .06em;
-}
-.opt-c .kb-c__banner-label { flex: 1; min-width: 0; }
-.opt-c .kb-c__banner-task {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.opt-c .kb-c__upnext {
-  display: block;
-  margin-bottom: var(--space-6);
-  font: var(--weight-medium) 11px/16px var(--font-family);
-  letter-spacing: .07em;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--text-error);
+}
+.act__dot { width: 8px; height: 8px; flex: none; border-radius: var(--radius-pill); background: var(--error-base); }
+
+/* B1 — the red is one glyph tile, and a chevron says where it goes. */
+.act--tile .act__tile {
+  width: 30px; height: 30px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-8);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+}
+.act--tile .act__go { flex: none; display: flex; color: var(--text-tertiary); transition: color .14s ease, transform .14s ease; }
+.act--tile:hover .act__go,
+.act--tile.is-hover .act__go { color: var(--text-brand); transform: translateX(2px); }
+
+/* B2 — red is the status, purple is the action. The system already splits
+   them; a tinted box collapses both into one colour. */
+.act--btn .act__btn {
+  flex: none;
+  padding: 6px var(--space-12);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  cursor: pointer;
+  transition: background .14s ease;
+}
+.act--btn:hover .act__btn,
+.act--btn.is-hover .act__btn { background: var(--bg-brand-hover); }
+
+/* B3 — inverted, so it is an object on the card rather than a region of it.
+   The lateness is set in light grey and the red is left to the dot: at 10px
+   on near-black, the system's red does not clear 4.5:1. */
+.act--dark {
+  background: var(--neutral-900);
+  border-color: var(--neutral-800);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+}
+.act--dark:hover,
+.act--dark.is-hover { border-color: var(--neutral-700); box-shadow: 0 6px 16px rgba(0, 0, 0, .34); }
+.act--dark .act__task { color: var(--text-on-dark); }
+.act--dark .act__meta { color: var(--neutral-400); }
+.act--dark .act__dot { background: var(--error-border); }
+.act__ghost {
+  flex: none;
+  padding: 5px var(--space-10, 10px);
+  border: 1px solid rgba(255, 255, 255, .38);
+  border-radius: var(--radius-pill);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/14px var(--font-family);
+  transition: background .14s ease, color .14s ease;
+}
+.act--dark:hover .act__ghost,
+.act--dark.is-hover .act__ghost { background: var(--white); color: var(--neutral-900); }
+
+/* B4 — the fastest close there is: the thing that is late is the thing you
+   tick off. No fill anywhere. */
+.act--tick .act__box {
+  width: 20px; height: 20px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  background: var(--bg-base);
+  color: transparent;
+  cursor: pointer;
+  transition: border-color .14s ease, background .14s ease, color .14s ease;
+}
+.act--tick:hover .act__box,
+.act--tick.is-hover .act__box { border-color: var(--bg-brand); color: var(--border-muted); }
+.act--tick .act__box:hover { background: var(--bg-brand); border-color: var(--bg-brand); color: var(--text-on-dark); }
+.act--tick .act__late {
+  flex: none;
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-error);
 }
 </style>
 </head>
 <body>
 
 <div class="cmp__head">
-  <h1>The overdue task, four ways</h1>
+  <h1>The overdue task, as something you press</h1>
   <p>
     The same v1.2 Ribbon card each time &mdash; same band, same identity, same documents, same
-    footer. Only the overdue task is drawn differently. The deal is Freya Lindqvist: one task two
-    days late, one due in three days.
+    footer. Only the overdue task is drawn differently, and every option after the first keeps a
+    container with a border of its own. The deal is Freya Lindqvist: one task two days late, one
+    due in three days.
   </p>
 </div>
 
 <div class="cmp__row skin-ribbon">
   <div class="kb cmp__kb">
-
-    <!-- ============================ NOW ============================ -->
-    <section class="cmp__col cmp__col--now">
-      <span class="cmp__tag">On the board now</span>
-      <h2>Highlighted in place</h2>
-      <p>The late task sits in the stack with a red lozenge and a tick in its margin. It is clear,
-        but the band above has already said &ldquo;2 tasks overdue&rdquo;, so the card raises the
-        alarm twice without naming what to do about it any sooner.</p>
-
-      <article class="kb-c kb-c--cues is-urgent">
-        <div class="kb-c__banner">
-          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
-          <span class="kb-c__banner-action">Action now</span>
-        </div>
-        <div class="kb-c__body">
-          <div class="kb-c__who">
-            <div class="kb-c__id">
-              <span class="kb-c__name">Freya Lindqvist</span>
-              <span class="kb-c__amount">$340,000</span>
-            </div>
-            <div class="kb-c__contact">
-              <span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span>
-              <span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span>
-              <span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span>
-            </div>
-          </div>
-          <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
-
-          <div class="kb-c__blocks">
-            <div class="kb-c__block is-overdue">
-              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-              <span class="kb-c__block-label">Chase Freya</span>
-              <span class="kb-c__block-due">2 days overdue</span>
-            </div>
-            <div class="kb-c__block">
-              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-              <span class="kb-c__block-due">due in 3 days</span>
-            </div>
-          </div>
-
-          <div class="kb-c__docs">
-            <div class="kb-c__docs-head">
-              <span class="kb-c__docs-label">Documents</span>
-              <span class="kb-c__docs-n">5 of 6</span>
-            </div>
-            <div class="kb-c__bar">
-              <span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span>
-              <span class="kb-c__seg kb-c__seg--review" style="flex:1"></span>
-            </div>
-            <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
-          </div>
-
-          <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
-        </div>
-        <div class="kb-c__actions">
-          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span>
-          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span>
-          <span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span>
-          <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
-        </div>
-      </article>
-    </section>
-
-    <!-- ============================= A ============================== -->
-    <section class="cmp__col opt-a">
-      <span class="cmp__tag">Option A</span>
-      <h2>Stamped, not highlighted</h2>
-      <p>The stack stays even and the lateness becomes a solid red stamp at the end of the row, with
-        the task named in red. Quietest of the three: the band is left to do the alarming, and the
-        row only says which one. Best if the board is busy and every card has something.</p>
-
-      <article class="kb-c kb-c--cues is-urgent">
-        <div class="kb-c__banner">
-          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
-          <span class="kb-c__banner-action">Action now</span>
-        </div>
-        <div class="kb-c__body">
-          <div class="kb-c__who">
-            <div class="kb-c__id">
-              <span class="kb-c__name">Freya Lindqvist</span>
-              <span class="kb-c__amount">$340,000</span>
-            </div>
-            <div class="kb-c__contact">
-              <span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span>
-              <span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span>
-              <span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span>
-            </div>
-          </div>
-          <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
-
-          <div class="kb-c__blocks">
-            <div class="kb-c__block is-overdue">
-              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-              <span class="kb-c__block-label">Chase Freya</span>
-              <span class="kb-c__block-due">2d late</span>
-            </div>
-            <div class="kb-c__block">
-              <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
-              <span class="kb-c__block-label">Reassign to Kenn Z.</span>
-              <span class="kb-c__block-due">due in 3 days</span>
-            </div>
-          </div>
-
-          <div class="kb-c__docs">
-            <div class="kb-c__docs-head">
-              <span class="kb-c__docs-label">Documents</span>
-              <span class="kb-c__docs-n">5 of 6</span>
-            </div>
-            <div class="kb-c__bar">
-              <span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span>
-              <span class="kb-c__seg kb-c__seg--review" style="flex:1"></span>
-            </div>
-            <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
-          </div>
-
-          <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
-        </div>
-        <div class="kb-c__actions">
-          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span>
-          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span>
-          <span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span>
-          <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
-        </div>
-      </article>
-    </section>
-
-    <!-- ============================= B ============================== -->
-    <section class="cmp__col opt-b">
-      <span class="cmp__tag">Option B</span>
-      <h2>Lifted out of the list</h2>
-      <p>What is late leaves the stack and becomes a band across the card, so the spine runs through
-        it. Upcoming work stays below under its own label. The card then answers two questions
-        separately: what is late, and what is coming.</p>
-
+    <section class="cmp__col opt-ref">
+      <span class="cmp__tag cmp__tag--now">B</span>
+      <h2>As shown before</h2>
+      <p>A tinted ground inside a border of the same hue. It is the alert-box pattern every framework ships, it says &ldquo;something is wrong&rdquo; rather than &ldquo;do this&rdquo;, and nothing about it invites a click. The four beside it are the same idea drawn as something you would press.</p>
       <article class="kb-c kb-c--cues is-urgent">
         <div class="kb-c__banner">
           <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
@@ -352,22 +312,14 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
         </div>
       </article>
     </section>
-
-    <!-- ============================= C ============================== -->
-    <section class="cmp__col opt-c">
-      <span class="cmp__tag">Option C</span>
-      <h2>Named in the band</h2>
-      <p>The band stops counting and starts naming: the oldest overdue task and how late it is, with
-        the rest as a chip. The card raises the alarm once, and the alarm is the instruction. The
-        stack is left to upcoming work only.</p>
-
+    <section class="cmp__col opt-tile">
+      <span class="cmp__tag">B1</span>
+      <h2>Icon tile and chevron</h2>
+      <p>A white row inside a neutral border, with the red held to a single glyph tile and the chevron saying where it goes. The shape is a list item in a task app, so it reads as tappable before it reads as a warning.</p>
       <article class="kb-c kb-c--cues is-urgent">
         <div class="kb-c__banner">
-          <span class="kb-c__banner-label">
-            <svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>
-            <span class="kb-c__banner-task">Chase Freya &middot; 2 days late</span>
-          </span>
-          <span class="kb-c__banner-action">+1 more</span>
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+          <span class="kb-c__banner-action">Action now</span>
         </div>
         <div class="kb-c__body">
           <div class="kb-c__who">
@@ -382,6 +334,15 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
             </div>
           </div>
           <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+
+          <button class="act act--tile" type="button">
+            <span class="act__tile"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <span class="act__go"><svg width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
+          </button>
 
           <div>
             <span class="kb-c__upnext">Next up</span>
@@ -415,8 +376,244 @@ body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family);
           <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
         </div>
       </article>
+      <div class="cmp__hover">
+        <span class="cmp__hoverlabel">On hover</span>
+        <button class="act is-hover act--tile" type="button">
+            <span class="act__tile"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <span class="act__go"><svg width="14" height="14" aria-hidden="true"><use href="#i-chevron-right"></use></svg></span>
+          </button>
+      </div>
     </section>
+    <section class="cmp__col opt-btn">
+      <span class="cmp__tag">B2</span>
+      <h2>Row with a real button</h2>
+      <p>The container stays neutral and the action is an actual button carrying the verb. Red says how late it is; purple says what to do about it &mdash; the system&rsquo;s own split between status and action, which the tinted box collapses into one colour.</p>
+      <article class="kb-c kb-c--cues is-urgent">
+        <div class="kb-c__banner">
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+          <span class="kb-c__banner-action">Action now</span>
+        </div>
+        <div class="kb-c__body">
+          <div class="kb-c__who">
+            <div class="kb-c__id">
+              <span class="kb-c__name">Freya Lindqvist</span>
+              <span class="kb-c__amount">$340,000</span>
+            </div>
+            <div class="kb-c__contact">
+              <span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+              <span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span>
+              <span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span>
+            </div>
+          </div>
+          <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
 
+          <div class="act act--btn">
+            <span class="act__dot"></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <button class="act__btn" type="button">Chase now</button>
+          </div>
+
+          <div>
+            <span class="kb-c__upnext">Next up</span>
+            <div class="kb-c__blocks">
+              <div class="kb-c__block">
+                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+                <span class="kb-c__block-due">due in 3 days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kb-c__docs">
+            <div class="kb-c__docs-head">
+              <span class="kb-c__docs-label">Documents</span>
+              <span class="kb-c__docs-n">5 of 6</span>
+            </div>
+            <div class="kb-c__bar">
+              <span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span>
+              <span class="kb-c__seg kb-c__seg--review" style="flex:1"></span>
+            </div>
+            <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+          </div>
+
+          <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+        </div>
+        <div class="kb-c__actions">
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span>
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span>
+          <span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span>
+          <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
+        </div>
+      </article>
+      <div class="cmp__hover">
+        <span class="cmp__hoverlabel">On hover</span>
+        <div class="act is-hover act--btn">
+            <span class="act__dot"></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <button class="act__btn" type="button">Chase now</button>
+          </div>
+      </div>
+    </section>
+    <section class="cmp__col opt-dark">
+      <span class="cmp__tag">B3</span>
+      <h2>Inverted strip</h2>
+      <p>Near-black with white type, a red dot for status and an outlined button at the end. Inverting it makes it an object sitting on the card rather than a region of it, and it is the one treatment that cannot be mistaken for a passive notice.</p>
+      <article class="kb-c kb-c--cues is-urgent">
+        <div class="kb-c__banner">
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+          <span class="kb-c__banner-action">Action now</span>
+        </div>
+        <div class="kb-c__body">
+          <div class="kb-c__who">
+            <div class="kb-c__id">
+              <span class="kb-c__name">Freya Lindqvist</span>
+              <span class="kb-c__amount">$340,000</span>
+            </div>
+            <div class="kb-c__contact">
+              <span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+              <span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span>
+              <span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span>
+            </div>
+          </div>
+          <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+
+          <button class="act act--dark" type="button">
+            <span class="act__dot"></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <span class="act__ghost">Open</span>
+          </button>
+
+          <div>
+            <span class="kb-c__upnext">Next up</span>
+            <div class="kb-c__blocks">
+              <div class="kb-c__block">
+                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+                <span class="kb-c__block-due">due in 3 days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kb-c__docs">
+            <div class="kb-c__docs-head">
+              <span class="kb-c__docs-label">Documents</span>
+              <span class="kb-c__docs-n">5 of 6</span>
+            </div>
+            <div class="kb-c__bar">
+              <span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span>
+              <span class="kb-c__seg kb-c__seg--review" style="flex:1"></span>
+            </div>
+            <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+          </div>
+
+          <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+        </div>
+        <div class="kb-c__actions">
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span>
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span>
+          <span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span>
+          <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
+        </div>
+      </article>
+      <div class="cmp__hover">
+        <span class="cmp__hoverlabel">On hover</span>
+        <button class="act is-hover act--dark" type="button">
+            <span class="act__dot"></span>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+              <span class="act__meta">2 days late</span>
+            </span>
+            <span class="act__ghost">Open</span>
+          </button>
+      </div>
+    </section>
+    <section class="cmp__col opt-tick">
+      <span class="cmp__tag">B4</span>
+      <h2>Tick it off</h2>
+      <p>The affordance is a checkbox, so the row offers the fastest possible close: the thing that is late is also the thing you complete. Lateness stays as small caps at the end, with no fill at all.</p>
+      <article class="kb-c kb-c--cues is-urgent">
+        <div class="kb-c__banner">
+          <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+          <span class="kb-c__banner-action">Action now</span>
+        </div>
+        <div class="kb-c__body">
+          <div class="kb-c__who">
+            <div class="kb-c__id">
+              <span class="kb-c__name">Freya Lindqvist</span>
+              <span class="kb-c__amount">$340,000</span>
+            </div>
+            <div class="kb-c__contact">
+              <span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span>
+              <span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span>
+              <span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span>
+            </div>
+          </div>
+          <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+
+          <div class="act act--tick">
+            <button class="act__box" type="button" aria-label="Mark done"><svg width="11" height="11" aria-hidden="true"><use href="#i-check-sm"></use></svg></button>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+            </span>
+            <span class="act__late">2 days late</span>
+          </div>
+
+          <div>
+            <span class="kb-c__upnext">Next up</span>
+            <div class="kb-c__blocks">
+              <div class="kb-c__block">
+                <svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+                <span class="kb-c__block-label">Reassign to Kenn Z.</span>
+                <span class="kb-c__block-due">due in 3 days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kb-c__docs">
+            <div class="kb-c__docs-head">
+              <span class="kb-c__docs-label">Documents</span>
+              <span class="kb-c__docs-n">5 of 6</span>
+            </div>
+            <div class="kb-c__bar">
+              <span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span>
+              <span class="kb-c__seg kb-c__seg--review" style="flex:1"></span>
+            </div>
+            <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+          </div>
+
+          <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+        </div>
+        <div class="kb-c__actions">
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span>
+          <span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span>
+          <span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span>
+          <span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span>
+        </div>
+      </article>
+      <div class="cmp__hover">
+        <span class="cmp__hoverlabel">On hover</span>
+        <div class="act is-hover act--tick">
+            <button class="act__box" type="button" aria-label="Mark done"><svg width="11" height="11" aria-hidden="true"><use href="#i-check-sm"></use></svg></button>
+            <span class="act__text">
+              <span class="act__task">Chase Freya</span>
+            </span>
+            <span class="act__late">2 days late</span>
+          </div>
+      </div>
+    </section>
   </div>
 </div>
 
