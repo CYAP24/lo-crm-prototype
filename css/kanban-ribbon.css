@@ -207,7 +207,7 @@
   letter-spacing: .05em;
   text-transform: uppercase;
 }
-.skin-ribbon .kb-c__body { gap: var(--space-12); padding: var(--space-16) var(--space-16) var(--space-12); }
+.skin-ribbon .kb-c__body { gap: 14px; padding: var(--space-16); }
 /* The name leads and the figure answers it, a step down — v1 separates the
    two by colour alone, which is not a separation at a glance. */
 .skin-ribbon .kb-c__name { letter-spacing: -.01em; }
@@ -252,15 +252,19 @@
    v1's tinted blocks become ruled rows. An overdue row keeps its red type
    and loses its ground: on a page this quiet, the colour is enough. */
 
-.skin-ribbon .kb-c__blocks { gap: 0; border-top: 1px solid var(--border-subtle); }
+/* Spaced rather than ruled. A hairline above the stack and one under every
+   row puts a line hard against the top and bottom of the highlighted row,
+   which is what made the card feel crowded: the lozenge had nothing to sit
+   in. The rows carry their own gap instead, and the stack is held apart
+   from the lines above and below it by the body's own spacing. */
+.skin-ribbon .kb-c__blocks { gap: var(--space-6); border-top: 0; }
 .skin-ribbon .kb-c__block {
   gap: var(--space-8);
-  padding: var(--space-8) 0;
+  padding: var(--space-2) 0;
   border-radius: 0;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 0;
   background: none;
 }
-.skin-ribbon .kb-c__block:last-child { border-bottom: 0; }
 /* The late one is struck through the margin and highlighted, and it bleeds
    8px either side so the mark sits outside the text rather than indenting
    it. The radius clips the inset tick, so the mark reads as a lozenge with
@@ -271,7 +275,6 @@
   border-radius: var(--radius-10);
   background: var(--error-bg);
   box-shadow: inset 4px 0 0 var(--error-base);
-  border-bottom-color: transparent;
 }
 .skin-ribbon .kb-c__block-due {
   font-variant-numeric: tabular-nums;
@@ -283,7 +286,18 @@
 }
 
 /* ---------- Documents -----------------------------------------------------
-   The bar is cut into ticks, so it is counted rather than estimated. */
+   The bar is four states in one line, so it only works if a broker can tell
+   which is which without being told twice. Two things make that true: the
+   bar carries the system's own status colours, and every colour in it is
+   repeated as a dot against the word for it underneath. The bar is the
+   picture, the line under it is the key, and `3 of 6` takes the green dot
+   because that is the count the green stands for.
+
+      green   received
+      amber   with us, not yet checked  ("pending")
+      red     rejected
+      grey    not requested yet         ("to request")
+*/
 
 .skin-ribbon .kb-c__docs-label {
   font: var(--weight-medium) 11px/16px var(--font-family);
@@ -291,20 +305,63 @@
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.skin-ribbon .kb-c__docs-n { font-variant-numeric: tabular-nums; }
+.skin-ribbon .kb-c__docs-n {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-variant-numeric: tabular-nums;
+}
+
 .skin-ribbon .kb-c__bar {
-  height: 8px;
-  gap: 3px;
+  height: 10px;
+  gap: 2px;
   border-radius: 0;
   background: none;
 }
-.skin-ribbon .kb-c__seg { border-radius: var(--radius-pill); background: var(--neutral-300); }
-/* Solid red is rationed: the column's overdue block and the call-now band,
+/* The unclassed segment is the one with no status yet — a document nobody
+   has asked for. Stating it here rather than on `.kb-c__seg` is the whole
+   point: a rule on the base class outruns the three state classes and
+   paints the entire bar one grey, which is what it was doing. */
+.skin-ribbon .kb-c__seg {
+  border-radius: var(--radius-pill);
+  min-width: 5px;
+  background: var(--neutral-300);
+}
+.skin-ribbon .kb-c__seg--ok       { background: var(--success-base); }
+.skin-ribbon .kb-c__seg--review   { background: var(--warning-base); }
+.skin-ribbon .kb-c__seg--rejected { background: var(--error-base); }
+
+/* The key. Every count gets the dot of the segment it is counting, so the
+   bar is read once and understood from then on. */
+.skin-ribbon .kb-c__docs-breakdown { font-variant-numeric: tabular-nums; }
+.skin-ribbon .kb-c__docs-breakdown > span:not(.kb-c__dot) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.skin-ribbon .kb-c__docs-n::before,
+.skin-ribbon .kb-c__docs-breakdown > span:not(.kb-c__dot)::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--neutral-300);
+}
+.skin-ribbon .kb-c__docs-n::before { background: var(--success-base); }
+/* Written as `> span.is-review` rather than `.is-review`: the grey default
+   above is `> span:not(.kb-c__dot)`, and the `:not()` carries a class of
+   its own, so a plain `.is-review` loses to it on specificity. */
+.skin-ribbon .kb-c__docs-breakdown > span.is-review::before   { background: var(--warning-base); }
+.skin-ribbon .kb-c__docs-breakdown > span.is-rejected::before { background: var(--error-base); }
+/* "all in" arrives on its own, with no counts beside it to separate. */
+.skin-ribbon .kb-c__docs-breakdown > span:only-child::before { background: var(--success-base); }
+
+/* Solid red is rationed: the column's overdue pill and the call-now band,
    and nothing else on the board. Everything else that is late says so in
    red type, so the two things worth interrupting for stay the two loudest
    things on screen. */
 .skin-ribbon .kb-c__docs-breakdown .is-rejected { font-weight: var(--weight-demi); }
-.skin-ribbon .kb-c__docs-breakdown { font-variant-numeric: tabular-nums; }
 
 /* ---------- Owner and actions ---------------------------------------------- */
 

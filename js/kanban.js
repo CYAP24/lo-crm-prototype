@@ -428,13 +428,22 @@ const KB_FILTERS = {
   partner: { label: 'Partner', of: (d) => (d.partner ? d.partner[1] : null),
              mark: (d) => (d.partner ? d.partner[0] : null),
              kind: 'search', placeholder: 'Search partners by name…' },
+  /* Searched like the two above and sitting under them, because it is the
+     same question asked one level up — which partner, then which group of
+     partners. A group has no initials of its own, so it wears the first
+     letter of each word: Auto Retail Group is AR. */
+  group:   { label: 'Partner group', of: (d) => partnerGroup(d),
+             mark: (d) => kbGroupMark(partnerGroup(d)),
+             kind: 'search', placeholder: 'Search partner groups…' },
 
   stage:   { label: 'Stage',       of: (d) => (KB_STAGES.find(s => s.id === kbBucket(d)) || {}).label },
   segment: { label: 'Consumer or commercial', of: (d) => d.segment, cap: true },
   product: { label: 'Loan type',   of: (d) => d.product },
-  source:  { label: 'Lead source', of: (d) => d.source },
-  group:   { label: 'Partner group', of: (d) => partnerGroup(d) }
+  source:  { label: 'Lead source', of: (d) => d.source }
 };
+
+const kbGroupMark = (name) =>
+  name ? name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() : null;
 
 const KB_SEARCH_KEYS = Object.keys(KB_FILTERS).filter(k => KB_FILTERS[k].kind === 'search');
 const KB_TICK_KEYS   = Object.keys(KB_FILTERS).filter(k => KB_FILTERS[k].kind !== 'search');

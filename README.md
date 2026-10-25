@@ -335,14 +335,17 @@ panel on it) or deleted. Nothing persists past a reload; this is a
 prototype.
 
 **Amount and date lead the filter panel**, because they are the two a broker
-reaches for without first deciding whose deals they are looking at. Broker
-and partner follow, and they are searched rather than ticked: type a name,
-pick it from the suggestions, and it becomes a removable tag. That is the
-work list's own `.chip-person`, so a person keeps the colour they have on a
-row and in a panel. Typing narrows the suggestions without touching the
-board — nothing filters until a name is picked. The five closed lists
-(stage, consumer or commercial, loan type, lead source, partner group) stay
-as ticks, which are quicker for a short list.
+reaches for without first deciding whose deals they are looking at. Broker,
+partner and partner group follow, and all three are searched rather than
+ticked: type a name, pick it from the suggestions, and it becomes a
+removable tag. That is the work list's own `.chip-person`, so a person keeps
+the colour they have on a row and in a panel; a group has no initials of its
+own and wears the first letter of each word instead, so Auto Retail Group is
+`AR`. Partner group sits directly under partner because it is the same
+question asked one level up. Typing narrows the suggestions without touching
+the board — nothing filters until a name is picked. The four closed lists
+(stage, consumer or commercial, loan type, lead source) stay as ticks, which
+are quicker for a short list.
 
 **Filters apply instantly**, so there is no Apply button and nothing to
 press. The panel says `Showing N of 27 deals` instead, which is the feedback
@@ -497,7 +500,7 @@ rather than v1's.
 | Card | 12px, with a hairline the same weight on all four sides and the barest lift. A **5px spine** runs inside it, full height, curving with the corner because the card clips it. Every card has one, so the quiet ones are grey and the loud ones are a colour rather than a new shape |
 | Labels | Uppercase, letterspaced, 10–11px: the stage name, the card's day-and-stage line, the document and task labels |
 | Figures | `font-variant-numeric: tabular-nums` on the whole board, so amounts, counts and dates line up down a column |
-| Documents | Rounded ticks rather than one bar changing colour |
+| Documents | A bar in the system's four status colours — green received, amber with us, red rejected, grey not requested — with **each colour repeated as a dot against the word for it** underneath, and the green dot on `3 of 6`. The bar is the picture and the line under it is the key |
 | The action row | 8px squircles — v1's footer is four pills in a row, and this one should not be mistaken for it |
 
 **The alert band is ranked three ways at once** — fill, weight and height —
