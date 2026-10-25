@@ -509,18 +509,26 @@ rather than by hue alone:
 | State | Band | Height | Also |
 |---|---|---|---|
 | Call now | Solid red, white small caps | Tallest | The whole card's box turns red, and the call key with it |
-| Tasks overdue | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine |
+| Tasks overdue | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine, and a solid red bar on the task itself |
 | Possible duplicate | Grey tint, near-black ink | Shortest | Near-black spine |
 
 Height is doing most of the work, and it costs nothing to read. v1 ranks the
 three by colour alone, which is why a board where half the cards carry
 something reads flat.
 
-**Solid red is rationed** to two places: the column's overdue pill and the
-call-now band. Everything else that is late says so in red type — an overdue
-task row is highlighted and struck in the margin with a lozenge, a rejected
-document is set in red demibold — so the two things worth interrupting for
-stay the two loudest things on screen.
+**An overdue task is a solid red bar**, bled to both edges of the card.
+Nothing else in the body spans the card's full width, so the bleed is what
+makes it read as a cut across the card rather than one more line in the
+list — and it is why a tint could never do this job however saturated: a
+pale ground inside the text column is still a row. The glyph stays the
+calendar clock the other task rows carry, since it is the same kind of
+thing as they are and only its state is different. White on `#D92D20` is
+4.8:1, and the lateness is held back from white in small caps so the bar
+reads task first.
+
+Everything else that is late says so in red type rather than red fill — a
+rejected document is set in red demibold — so the bar, the column's overdue
+pill and the call-now band stay the only solid red on the board.
 
 The tint and ink pairs are the design system's own and clear 4.5:1 as drawn,
 so the count beside each stage name takes the lighter weight rather than a

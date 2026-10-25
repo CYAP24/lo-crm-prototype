@@ -265,25 +265,36 @@
   border-bottom: 0;
   background: none;
 }
-/* The late one is highlighted and struck in the margin. It used to bleed
-   8px either side, which put its left edge about three pixels off the
-   spine — two red shapes almost touching, with no air between them. It now
-   sits inside the body's own column, so the spine has the card's full
-   padding to itself. The radius clips the inset tick, so the mark reads as
-   a lozenge with a rounded end. */
+/* The late one is a solid bar bled to both edges of the card. Nothing else
+   in the body spans the card's full width, so the bleed is what makes it
+   read as a cut across the card rather than one more line in the list —
+   and it is why a tint could never do this job, however saturated: a pale
+   ground inside the text column is still a row. White on #D92D20 is 4.8:1.
+
+   The glyph stays the calendar clock the other task rows carry. It is the
+   same kind of thing as they are; only its state is different. */
 .skin-ribbon .kb-c__block.is-overdue {
-  padding: var(--space-8) 10px;
-  border-radius: var(--radius-10);
-  background: var(--error-bg);
-  box-shadow: inset 4px 0 0 var(--error-base);
+  width: calc(100% + var(--space-16) * 2);
+  margin: 0 calc(var(--space-16) * -1);
+  padding: 5px var(--space-16);
+  border-radius: 0;
+  background: var(--error-base);
+  box-shadow: none;
 }
+.skin-ribbon .kb-c__block.is-overdue svg,
+.skin-ribbon .kb-c__block.is-overdue .kb-c__block-label { color: var(--text-on-dark); }
+.skin-ribbon .kb-c__block.is-overdue .kb-c__block-label { font-weight: var(--weight-demi); }
 .skin-ribbon .kb-c__block-due {
   font-variant-numeric: tabular-nums;
   color: var(--text-tertiary);
 }
+/* Small caps and held back from white, so the bar reads task first and
+   lateness second rather than as two competing labels. */
 .skin-ribbon .kb-c__block.is-overdue .kb-c__block-due {
-  color: var(--text-error);
-  font-weight: var(--weight-demi);
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .85);
 }
 
 /* ---------- Documents -----------------------------------------------------
