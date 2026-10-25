@@ -462,16 +462,26 @@ changes. `Esc` or a click anywhere outside closes.
 Their renderers and styles are deleted, as with the work list's removed
 versions.
 
-### Styling version — v1.2 Ribbon
+### Styling versions — Ribbon
 
-`v1.2` is **v1 exactly**. Same markup, same renderers, same text hierarchy,
-same seven functions on the toolbar, the same quick-actions sidebar, filter
-panel, bulk banner and `+ New lead`. The page loads one extra stylesheet
-after `css/kanban.css` and sets a skin class on its `.screen`:
+**The `.2` suffix means Ribbon.** `v1.2` is v1 restyled and `v2.2` is v2
+restyled — same markup, same renderers, same text hierarchy, same seven
+functions on the toolbar, the same quick actions, filter panel, bulk banner
+and `+ New lead` as the version they are a skin over. Each page loads one or
+two extra stylesheets after `css/kanban.css` and sets a skin class on its
+`.screen`:
 
 | | Page | Skin class | Stylesheet |
 |---|---|---|---|
 | **v1.2** Ribbon | `kanban-v1-2.html` | `.skin-ribbon` | `css/kanban-ribbon.css` |
+| **v2.2** Ribbon | `kanban-v2-2.html` | `.skin-ribbon .skin-ribbon-text` | the same, plus `css/kanban-ribbon-text.css` |
+
+`css/kanban-ribbon.css` is **shared**, so the stage ribbons and their capsule
+markers, the 12px card with the spine inside it, the small caps labels, the
+tabular figures, the capsule chips, the toolbar and the panels move for both
+at once. `css/kanban-ribbon-text.css` is only the places where v2's card is
+a different shape from v1's, and the places where carrying Ribbon over would
+have cost v2 what it is for.
 
 So there is **no second board** to keep in step: a change to `js/kanban.js`
 reaches every version, and a styling direction can be thrown away by
@@ -485,6 +495,26 @@ colour-coded work list; the skin reaches for them rather than restating the
 palette, and v1 and v2 simply ignore them. New lead is not a pipeline stage
 and has no entry, so it borrows the system's error tint — the ground it
 already stands on.
+
+#### v2.2 — Ribbon, answering with type
+
+v2 is the text-and-colour version: no tinted task blocks, no documents bar,
+fewer objects and more words. So where v1.2 answers a question with a shape,
+v2.2 answers it with type:
+
+| | v1.2 | v2.2 |
+|---|---|---|
+| An overdue task | A solid red bar across the card | The task goes red and demibold and its due date goes with it, in the list it was already in |
+| Documents | A bar in four status colours, every colour keyed to a dot | No bar, so nothing for a dot to key to — the counts carry their colour as words, and the dots are turned off |
+| What is late, in the heading | A solid red pill | The line of text v2 already had, in small caps |
+
+Two things the ribbon had to give v2 that v1.2 does not need. **The heading
+takes a second line**: v1.2 shortens its total to `$1.2M` and fits on one,
+v2 spells the figure out — which is the whole point of it — and seven
+figures beside a stage name does not fit 340px, so three of the seven names
+were being truncated. **`Upcoming tasks` drops to 10px**: set in capitals it
+is wider than the sentence case it replaces, and it is the one label on the
+card that takes width from the task name, which is what a broker is reading.
 
 #### What Ribbon does
 

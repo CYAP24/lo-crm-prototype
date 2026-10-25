@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Kanban v2.2 — Ribbon over the text-and-colour card
+   --------------------------------------------------------------------------
+   v2's board with the Ribbon styling on it. The page loads
+   css/kanban-ribbon.css first and this second, and carries both classes, so
+   everything the two versions share — the stage ribbons and their capsule
+   markers, the 12px card with the spine inside it, the small caps labels,
+   the tabular figures, the capsule chips, the toolbar and the panels — is
+   the same file v1.2 uses and moves when it moves.
+
+   This file is only the places where v2's card is a different shape from
+   v1's, and the one place where carrying Ribbon over would have cost v2
+   what it is for.
+
+   **v2 is the text-and-colour version**, and that is the point of it: no
+   tinted task blocks, no documents bar, fewer objects, more words. So where
+   v1.2 answers a question with a shape, this answers it with type:
+
+     overdue task   v1.2 draws a solid red bar across the card
+                    here the task goes red and demibold and its due date
+                    goes to small caps, in the list it was already in
+
+     documents      v1.2 colours a bar and keys every colour to a dot
+                    here there is no bar, so there is nothing for a dot to
+                    key to — the counts carry their own colour, as words
+
+     what is late   v1.2 stamps a solid red pill in the column heading
+                    here it stays the line of text v2 already had, set in
+                    small caps
+
+   Scoped to `.skin-ribbon-text`, set on the page's `.screen` alongside
+   `.skin-ribbon`.
+   ========================================================================== */
+
+/* ---------- Column heading ------------------------------------------------
+   The ribbon, its tint and its capsule marker all come from the shared
+   sheet. What sits inside it is v2's line of text rather than v1.2's figure
+   and pill, so only the type is set here. */
+
+/* The ribbon takes a second line here. v1.2 shortens its total to $1.2M and
+   fits everything on one; v2 spells the figure out, which is the whole
+   point of it, and seven figures beside a stage name does not fit 340px —
+   three of the seven names were being truncated. Wrapping costs each column
+   one line and keeps every word. */
+.skin-ribbon-text .kb-col__head { flex-wrap: wrap; row-gap: var(--space-2); }
+.skin-ribbon-text .kb-col__line { flex-basis: 100%; font-variant-numeric: tabular-nums; }
+.skin-ribbon-text .kb-col__value {
+  font: var(--weight-demi) 15px/16px var(--font-family);
+  color: var(--text-primary);
+}
+.skin-ribbon-text .kb-col__dot { color: var(--text-placeholder); }
+/* Small caps rather than v1.2's solid pill: the pill is a shape, and this
+   version answers with type. #B42318 clears 4.5:1 on every stage tint. */
+.skin-ribbon-text .kb-col__over {
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-error);
+}
+
+/* ---------- Tasks ---------------------------------------------------------
+   v2 lines the tasks up under one label so the second row reads as a
+   continuation of the first. The label joins the rest of the skin's small
+   caps; the late row is marked in weight and colour, in the row it already
+   occupied. */
+
+/* Small caps like the rest of the skin, but at 10px with a tighter gap
+   beside it. "Upcoming tasks" set in capitals is wider than the sentence
+   case it replaces, and this label is the one thing on the card that takes
+   width away from the task name — which is what a broker is reading. */
+.skin-ribbon-text .kb-c__list-row { gap: var(--space-10, 10px); }
+.skin-ribbon-text .kb-c__list-label {
+  font: var(--weight-medium) 10px/16px var(--font-family);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.skin-ribbon-text .kb-c__list-due {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+.skin-ribbon-text .kb-c__list-row.is-overdue .kb-c__list-task {
+  font-weight: var(--weight-demi);
+  color: var(--text-error);
+}
+/* Left in sentence case where the rest of the skin goes to small caps:
+   these read "1d overdue", and uppercasing that turns the d into a second
+   digit. The weight and the colour carry it without the capitals. */
+.skin-ribbon-text .kb-c__list-row.is-overdue .kb-c__list-due {
+  font-weight: var(--weight-demi);
+  color: var(--text-error);
+}
+
+/* ---------- Documents -----------------------------------------------------
+   The shared sheet gives every document count the dot of the bar segment it
+   counts. There is no bar on this card, so the dots are turned off rather
+   than left pointing at nothing — the counts already carry their colour in
+   the type, which is the whole idea of this version. */
+
+.skin-ribbon-text .kb-c__docs-line { font-variant-numeric: tabular-nums; }
+.skin-ribbon-text .kb-c__docs-line .kb-c__docs-label {
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.skin-ribbon-text .kb-c__docs-n { display: inline; }
+.skin-ribbon-text .kb-c__docs-breakdown > span:not(.kb-c__dot) { display: inline; }
+.skin-ribbon-text .kb-c__docs-n::before,
+.skin-ribbon-text .kb-c__docs-breakdown > span:not(.kb-c__dot)::before { content: none; }
+
+/* The rule above the documents line is the card's only divider, so it takes
+   the lighter of the two neutrals and stays out of the way. */
+.skin-ribbon-text .kb-c__hr { background: var(--border-subtle); }
+
+/* ---------- Quick actions -------------------------------------------------
+   v2 floats the work list's own cards beside the pill rather than opening a
+   sidebar. They already carry a 12px radius, so they need only the lift the
+   rest of this skin uses. */
+
+.skin-ribbon-text .pop {
+  box-shadow: 0 2px 6px rgba(16, 24, 40, .07),
+              0 18px 44px rgba(16, 24, 40, .2);
+}
