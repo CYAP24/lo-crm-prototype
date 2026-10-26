@@ -1,0 +1,578 @@
+/* ==========================================================================
+   Screen 2 — a standalone copy of the application view, to be reworked
+   into a different screen.
+   --------------------------------------------------------------------------
+   Everything here started as css/appview.css (the screen a deal opens into,
+   a rebuild of the Figma frame "Draft #2 - 1920px TO CODE") with the `av`
+   prefix renamed to `s2`, so the two can diverge without touching each
+   other. The measurements are still the frame's: columns 420 / 790 / 420
+   inside a 32px margin, which leaves 113px gutters.
+
+   Two things differ from the original, both because this is a screen in its
+   own right rather than an overlay over the work list:
+     - it is always shown, instead of waiting for `.is-open`
+     - the work-list affordance (`.v1-lead.is-openable`) and the tour
+       stand-aside rule are gone — there is no work list behind it.
+   ========================================================================== */
+
+/* The base reset, carried over from css/worklist.css — this page does not
+   load that stylesheet, since nothing of the work list is on it. */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #8A8A8A;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The 1920x1080 artboard, as the work-list pages have it. Capped at the
+   viewport so the frame shrinks rather than runs past the bottom of a
+   window shorter than 1080. */
+.screen {
+  width: 1920px;
+  height: min(1080px, 100vh);
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* The whole view, header included, sits on one flat ground. It is also what
+   the stage-path export has behind its own rounded ends, so that image
+   blends instead of showing corners. */
+.s2 { --s2-ground: #F5F5F5; }
+
+.s2 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--s2-ground);
+}
+
+.s2-spacer { flex: 1; }
+
+/* ---------- Top bar ------------------------------------------------------- */
+
+.s2__top {
+  flex: none;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: 0 var(--space-32);
+  background: var(--s2-ground);
+}
+
+.s2__logo {
+  width: 49px; height: 49px; flex: none;
+  border-radius: var(--radius-12);
+  display: grid; place-items: center;
+  background: var(--bg-brand); color: var(--text-on-dark);
+}
+
+/* The stage pipeline, as a flat export of the frame (1305x32). It shrinks
+   rather than grows so it keeps its proportions, and sits 65px short of the
+   controls as the frame has it. */
+.s2-path {
+  flex: 0 1 1305px;
+  min-width: 0;
+  height: auto;
+  margin-right: 49px;
+  object-fit: contain;
+  object-position: right center;
+}
+
+.s2-assign { color: var(--text-secondary); display: flex; align-items: center; gap: var(--space-6); }
+.s2-assign b { color: var(--text-primary); }
+.s2-assign svg { color: var(--text-brand); }
+
+.s2__rule { width: 1px; height: 27px; background: var(--border-subtle); }
+.s2__kebab,
+.s2__close {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.s2__close:hover { color: var(--text-primary); }
+
+/* ---------- Body ---------------------------------------------------------- */
+
+.s2__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 420px 790px 420px;
+  justify-content: space-between;
+  padding: var(--space-16) var(--space-32) var(--space-20);
+}
+
+.s2-col { min-height: 0; display: flex; flex-direction: column; gap: var(--space-16); }
+
+/* ---------- Cards --------------------------------------------------------- */
+
+.s2-card,
+.s2-ident,
+.s2-section,
+.s2-summary {
+  background: var(--bg-base);
+  border-radius: var(--radius-16);
+}
+
+.s2-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+.s2-card__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+.s2-card__glyph { display: flex; color: var(--text-brand); }
+/* The Broker Assist mark is a two-stop gradient, so it is the one glyph
+   here that ignores the colour set on its container. */
+.s2-card__glyph--assist { color: inherit; }
+
+.s2-plus,
+.s2-grow,
+.s2-kebab {
+  display: flex;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.s2-plus { color: var(--text-brand); }
+.s2-grow:hover, .s2-kebab:hover { color: var(--text-primary); }
+
+/* Every list in this view scrolls inside its card rather than growing it,
+   which is what keeps the three columns the same height. */
+.s2-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+.s2-scroll::-webkit-scrollbar { width: 4px; }
+.s2-scroll::-webkit-scrollbar-track { background: transparent; }
+.s2-scroll::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: var(--radius-pill);
+}
+.s2-scroll::-webkit-scrollbar-thumb:hover { background: var(--neutral-400); }
+
+/* ---------- Left: identity ------------------------------------------------ */
+
+.s2-ident { flex: none; padding: var(--space-16); }
+
+.s2-ident__row { display: flex; align-items: center; gap: var(--space-8); }
+.s2-ident__av {
+  width: 36px; height: 36px; flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--brand-100); color: var(--text-brand);
+  display: grid; place-items: center;
+  font: var(--weight-demi) 13px/1 var(--font-family);
+}
+.s2-ident__who { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.s2-ident__who span:first-child { color: var(--text-primary); }
+.s2-ident__who span:last-child  { color: var(--text-tertiary); }
+.s2-ident__edit { display: flex; color: var(--text-tertiary); cursor: pointer; }
+
+.s2-ident__acts { display: flex; gap: var(--space-8); margin-top: var(--space-12); }
+.s2-cta {
+  flex: 1;
+  height: 54px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4);
+  border-radius: var(--radius-10);
+  background: var(--bg-surface);
+  color: var(--text-brand);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  cursor: pointer;
+}
+.s2-cta:hover { background: var(--brand-50); }
+.s2-cta span { color: var(--text-secondary); }
+
+.s2-prog { margin-top: var(--space-16); }
+.s2-prog__top { display: flex; justify-content: space-between; align-items: center; }
+.s2-prog__top span:first-child { color: var(--text-tertiary); }
+.s2-prog__top span:last-child  { color: var(--text-brand); }
+.s2-prog__track {
+  height: 8px;
+  margin-top: var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--neutral-200);
+  overflow: hidden;
+}
+.s2-prog__track i { display: block; height: 100%; background: var(--bg-brand); border-radius: inherit; }
+
+/* ---------- Left: activity + notes ---------------------------------------- */
+
+.s2-card--activity { flex: 0 0 311px; }
+.s2-card--notes    { flex: 1; min-height: 240px; }
+
+/* Expanded, a panel takes the whole column rather than trading height with
+   its neighbour — there is not enough room between the two to share, and
+   the point of expanding is to read a long thread. It lifts over the
+   identity block and the other card, and the shadow says so. */
+.s2-col--left { position: relative; }
+
+.s2-card.is-tall {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-shadow: var(--elevation-overlay);
+}
+
+.s2-tabs { display: flex; gap: var(--space-12); }
+.s2-tab { color: var(--text-tertiary); cursor: pointer; padding-bottom: 2px; }
+.s2-tab.is-active { color: var(--text-primary); border-bottom: 1.5px solid var(--text-primary); }
+
+.s2-acts { padding: var(--space-16); }
+
+.s2-ev { display: flex; gap: var(--space-8); }
+.s2-ev__badge {
+  width: 24px; height: 24px; flex: none;
+  border-radius: var(--radius-6);
+  display: grid; place-items: center;
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+}
+.s2-ev__badge.is-brand { background: var(--brand-600); color: var(--text-on-dark); }
+.s2-ev__body { flex: 1; min-width: 0; padding-bottom: var(--space-16); }
+.s2-ev--comment .s2-ev__body {
+  border-left: 2px solid var(--brand-500);
+  padding-left: 10px;
+}
+.s2-ev__stamp { color: var(--text-tertiary); }
+.s2-ev__stamp b { color: var(--text-primary); font-weight: var(--weight-demi); }
+.s2-ev__text { color: var(--text-secondary); margin-top: var(--space-4); }
+.s2-ev__text.is-log { font-style: italic; color: var(--text-tertiary); }
+.s2-ev__chev { display: inline-flex; vertical-align: -1px; margin-right: var(--space-4); color: var(--text-brand); }
+
+.s2-notes { padding: var(--space-12) var(--space-16) 0; }
+.s2-note { padding-bottom: var(--space-12); }
+.s2-note__head { display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-4); }
+.s2-note__head span:first-child { color: var(--text-primary); }
+.s2-note__head .t-body-sm { color: var(--text-tertiary); }
+.s2-note__head .s2-kebab { margin-left: auto; }
+.s2-note__text { color: var(--text-tertiary); }
+
+.s2-composer {
+  flex: none;
+  position: relative;
+  margin: var(--space-8) var(--space-16) var(--space-16);
+  min-height: 72px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  color: var(--text-placeholder);
+}
+.s2-send {
+  position: absolute;
+  right: var(--space-8); bottom: var(--space-8);
+  width: 28px; height: 28px;
+  border-radius: var(--radius-6);
+  background: var(--bg-brand); color: var(--text-on-dark);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.s2-send:hover { background: var(--bg-brand-hover); }
+
+/* ---------- Middle -------------------------------------------------------- */
+
+.s2-col--mid { gap: var(--space-12); }
+
+.s2-midbar { flex: none; display: flex; align-items: center; }
+/* Both toolbar controls lift off the ground the same way the frame has
+   them: a soft 1px/1px/3px shadow at radius 10, a near-white translucent
+   fill, dark label, purple glyph. Neither is a brand-filled button — the
+   only brand colour is the icon. */
+.s2-pick,
+.s2-save {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-10);
+  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, .12);
+  font: var(--weight-medium) 12px/18px var(--font-family);
+  cursor: pointer;
+  transition: box-shadow .16s ease;
+}
+.s2-pick svg,
+.s2-save svg { color: var(--text-brand); }
+
+.s2-pick:hover,
+.s2-save:hover { box-shadow: 1px 2px 6px 0 rgba(0, 0, 0, .16); }
+
+.s2-pick {
+  gap: var(--space-4);
+  padding: var(--space-8);
+  background: rgba(233, 236, 239, .8);
+  border: 1px solid var(--neutral-100);
+  backdrop-filter: blur(3px);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.s2-save {
+  gap: var(--space-6);
+  padding: 6.5px 13px 7.5px;
+  background: rgba(248, 249, 250, .7);
+  border: 1px solid #E3E2E9;
+  color: #211D30;
+}
+
+.s2-mid { display: flex; flex-direction: column; gap: var(--space-16); padding-right: var(--space-4); }
+
+/* Quick summary */
+
+.s2-summary { flex: none; padding-top: var(--space-20); }
+.s2-summary__title { padding: 0 var(--space-16); color: var(--text-primary); }
+.s2-summary__row {
+  display: flex; align-items: center; gap: var(--space-12);
+  padding: var(--space-16) var(--space-16) var(--space-20);
+}
+.s2-gauges { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-24); }
+
+.s2-gauge { display: flex; flex-direction: column; align-items: center; }
+.s2-gauge__dial { position: relative; width: 86px; height: 86px; display: grid; place-items: center; }
+.s2-gauge__n {
+  position: absolute;
+  font: var(--weight-bold) 14.5px/1 var(--font-family);
+  color: #211D30;
+}
+.s2-gauge__label {
+  margin-top: -2px;
+  font: var(--weight-medium) 12px/16.5px var(--font-family);
+  color: rgba(136, 136, 136, .7);
+  text-align: center;
+}
+
+.s2-attn {
+  flex: none;
+  width: 189px;
+  display: flex; flex-direction: column; gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-left: 1px solid var(--border-subtle);
+}
+.s2-attn__label { font: var(--weight-medium) 10px/15px var(--font-family); color: var(--text-tertiary); }
+.s2-attn__item { display: flex; align-items: center; gap: var(--space-8); color: var(--text-secondary); }
+.s2-attn__ic { display: flex; }
+.s2-attn__ic.is-warn { color: var(--accent-amber); }
+.s2-attn__ic.is-err  { color: var(--error-base); }
+
+.s2-summary__foot {
+  height: 42px;
+  display: grid; place-items: center;
+  border-top: 1px solid var(--border-subtle);
+}
+.s2-link { color: var(--text-brand); text-decoration: underline; cursor: pointer; }
+
+/* Sections */
+
+.s2-section { flex: none; padding: var(--space-20); }
+.s2-section__head {
+  display: flex; align-items: center; gap: var(--space-12);
+  cursor: pointer;
+}
+.s2-section__title { color: var(--text-primary); }
+.s2-section__ai { display: flex; color: var(--accent-amber); }
+.s2-section__ok { display: flex; color: var(--success-base); }
+.s2-section__chev { display: flex; color: var(--text-tertiary); transition: transform .2s ease; }
+
+/* Collapse by max-height rather than the 1fr -> 0fr grid trick: this
+   container's height is indefinite, so a 0fr track still resolves to the
+   item's content size and nothing moves. The cap only has to clear the
+   tallest section. */
+.s2-section__body {
+  overflow: hidden;
+  max-height: 400px;
+  transition: max-height .28s ease, opacity .2s ease;
+}
+.s2-section__body > .s2-fields { padding-top: var(--space-16); }
+
+.s2-section.is-collapsed .s2-section__body { max-height: 0; opacity: 0; }
+.s2-section.is-collapsed .s2-section__chev { transform: rotate(-90deg); }
+
+/* Grid, not flex-wrap: the frame's 239/238/239 inside 750px leaves nothing
+   spare, so a sub-pixel rounding up drops the third field onto its own row.
+   Three equal tracks cannot round wrong. */
+.s2-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px 17px; }
+
+/* Three to a row at any width. The frame has them at 239/238/239 inside
+   750px, but a fixed width loses the third column as soon as the scrollbar
+   takes its 4px, so the thirds are computed instead. */
+.s2-field { min-width: 0; display: flex; flex-direction: column; gap: var(--space-6); }
+.s2-field__label { font: var(--weight-medium) 11px/16.5px var(--font-family); color: #6E6A81; }
+
+.s2-input {
+  position: relative;
+  height: 36px;
+  display: flex; align-items: center;
+  padding: 0 13px;
+  border: 1px solid #E3E2E9;
+  border-radius: var(--radius-10);
+  background: #F6F6F9;
+}
+.s2-input__val {
+  flex: 1;
+  font: var(--weight-regular) 14px/1 var(--font-family);
+  color: #211D30;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.s2-input__val--mid { font-size: 13px; text-align: center; }
+.s2-input__fix { font: var(--weight-regular) 12px/18px var(--font-family); color: #6E6A81; }
+.s2-input__fix--pre { margin-right: var(--space-8); }
+.s2-input__fix--suf { margin-left: var(--space-8); }
+.s2-input__chev { display: flex; color: var(--text-tertiary); margin-left: var(--space-8); }
+
+.s2-mid__foot { flex: none; display: grid; place-items: center; padding: var(--space-16) 0 var(--space-24); }
+.s2-submit {
+  height: 36px; padding: 0 var(--space-24);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand); color: var(--text-on-dark);
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.s2-submit:hover { background: var(--bg-brand-hover); }
+
+/* ---------- Right --------------------------------------------------------- */
+
+/* The column runs to the screen edge rather than stopping at the body's
+   bottom padding, so the assistant docked inside it can sit flush. Doing
+   it here keeps the maths in one place — the card itself then needs no
+   negative margin, and its raised state can anchor to bottom: 0. */
+.s2-col--right {
+  position: relative;
+  margin-bottom: calc(-1 * var(--space-20));
+}
+.s2-col--right > .s2-card:nth-child(1) { flex: 0 0 285px; }
+.s2-col--right > .s2-card:nth-child(2) { flex: 1 1 auto; min-height: 200px; }
+
+.s2-tasks { padding: var(--space-16); display: flex; flex-direction: column; gap: var(--space-8); }
+
+.s2-task {
+  flex: none;
+  display: flex; align-items: center; gap: var(--space-12);
+  min-height: 42px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+}
+.s2-task__t { flex: 1; color: var(--text-primary); }
+.s2-task.is-done { background: var(--bg-surface); border-color: transparent; }
+.s2-task.is-done .s2-task__t { color: var(--text-tertiary); text-decoration: line-through; }
+.s2-tick { display: flex; color: var(--success-base); }
+
+.s2-radio {
+  width: 16px; height: 16px; flex: none;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.s2-docs { padding: 0 var(--space-20); }
+
+.s2-doc {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-12) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.s2-doc:last-child { border-bottom: 0; }
+.s2-doc__mark { display: flex; color: var(--text-tertiary); }
+.s2-doc__mark.is-ok { color: var(--success-base); }
+.s2-doc__mark.is-rejected { color: var(--error-base); }
+.s2-doc__name { color: var(--text-primary); text-decoration: underline; cursor: pointer; }
+.s2-doc__go { display: flex; color: var(--text-tertiary); }
+
+.s2-pill {
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  white-space: nowrap;
+}
+.s2-pill.is-review   { background: var(--info-bg);    color: var(--info-text); }
+.s2-pill.is-pending  { background: var(--warning-bg); color: var(--warning-text); }
+.s2-pill.is-rejected { background: var(--error-bg);   color: var(--error-text); }
+
+/* AI support agent */
+
+/* Outlined rather than bare: the card is white on a #F5F5F5 ground, and
+   its tinted header already carries an edge, so without this the body
+   below just dissolves into the page. */
+/* The assistant is a dock, not another card in the stack: it runs to the
+   bottom edge of the screen, losing the body's bottom padding along with
+   its own lower corners and border, so it reads as attached rather than
+   floating with the others. */
+.s2-card--ai {
+  flex: none;
+  border: 1px solid var(--border-subtle);
+  border-bottom: 0;
+  border-radius: var(--radius-16) var(--radius-16) 0 0;
+}
+
+/* Expanded it rises over Documents, stopping just under that card's
+   heading so you can still see what is behind. The top is expressed as
+   the stack above it — the actions card, the column gap, and a heading —
+   rather than a magic number. */
+.s2-card--ai.is-raised {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  top: calc(285px + var(--space-16) + 48px);
+  z-index: 6;
+  box-shadow: var(--elevation-overlay);
+}
+
+/* Expanded, the thread takes the new room and the prompt stays put. */
+.s2-card--ai .s2-card__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.s2-card--ai .s2-ai__msg { flex: 1; min-height: 0; overflow-y: auto; }
+.s2-card--ai .s2-ai__input { flex: none; }
+.s2-card__head--ai {
+  background: linear-gradient(90deg, #E7E9EC 0%, #DBC8FB 100%);
+  color: var(--text-brand);
+  cursor: pointer;
+  border-bottom: 0;
+}
+.s2-card__head--ai .s2-card__glyph { color: var(--text-brand); }
+.s2-card__chev { display: flex; transition: transform .2s ease; }
+
+.s2-card__body { overflow: hidden; }
+/* The glyph points up because up is what the control does; it flips to
+   point back down once the panel is open. */
+.s2-card--ai.is-raised .s2-card__chev { transform: rotate(180deg); }
+
+.s2-ai__msg { padding: var(--space-16) var(--space-12) var(--space-12); }
+.s2-ai__stamp { color: var(--text-tertiary); }
+.s2-ai__stamp b { color: var(--text-primary); font-weight: var(--weight-demi); }
+.s2-ai__text { color: var(--text-secondary); margin-top: var(--space-4); }
+
+.s2-ai__input {
+  position: relative;
+  margin: 0 var(--space-12) var(--space-16);
+  height: 120px;
+  padding: var(--space-12);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-surface);
+}
+.s2-ai__ph { color: var(--text-placeholder); }
+.s2-ai__tools {
+  position: absolute;
+  left: var(--space-8); right: var(--space-8); bottom: var(--space-8);
+  display: flex; align-items: center; gap: var(--space-6);
+}
+.s2-chip {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  height: 24px; padding: 0 var(--space-8);
+  border-radius: var(--radius-6);
+  border: 1px solid var(--brand-200);
+  background: var(--bg-base);
+  color: var(--text-brand);
+}
+.s2-ai__tools .s2-send { position: static; }
+

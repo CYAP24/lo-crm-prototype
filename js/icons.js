@@ -21,6 +21,13 @@ const ICON_SPRITE = `
   <symbol id="i-clock" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8.2l2.2 1.3"/>
   </symbol>
+  <!-- Calendar with a clock, exported from the task rows on the CRM-2026
+       "To upload" page. The one filled glyph in this sprite rather than a
+       stroked one, so it carries a fill where the others carry a stroke.
+       Both resolve to currentColor, so it still takes the colour around it. -->
+  <symbol id="i-calendar-clock" viewBox="0 0 16.4834 16.4834" fill="currentColor">
+    <path d="M3.43404 5.49487H13.0494V4.12126H3.43404V5.49487ZM3.43404 15.1102C3.0563 15.1102 2.73292 14.9757 2.46392 14.7067C2.19492 14.4377 2.06042 14.1143 2.06042 13.7366V4.12126C2.06042 3.74351 2.19492 3.42014 2.46392 3.15114C2.73292 2.88214 3.0563 2.74764 3.43404 2.74764H4.12085V1.37402H5.49447V2.74764H10.9889V1.37402H12.3625V2.74764H13.0494C13.4271 2.74764 13.7505 2.88214 14.0195 3.15114C14.2885 3.42014 14.423 3.74351 14.423 4.12126V8.01889C14.2055 7.91587 13.9823 7.83002 13.7533 7.76134C13.5244 7.69266 13.2897 7.64115 13.0494 7.60681V6.86849H3.43404V13.7366H7.76093C7.84106 13.9884 7.9355 14.2288 8.04424 14.4577C8.15299 14.6867 8.28176 14.9041 8.43057 15.1102H3.43404ZM9.93297 14.7925C9.26333 14.1229 8.92851 13.313 8.92851 12.363C8.92851 11.4129 9.26333 10.603 9.93297 9.93337C10.6026 9.26373 11.4125 8.92891 12.3625 8.92891C13.3126 8.92891 14.1225 9.26373 14.7921 9.93337C15.4618 10.603 15.7966 11.4129 15.7966 12.363C15.7966 13.313 15.4618 14.1229 14.7921 14.7925C14.1225 15.4622 13.3126 15.797 12.3625 15.797C11.4125 15.797 10.6026 15.4622 9.93297 14.7925ZM13.513 13.9941L13.9937 13.5134L12.706 12.2256V10.3025H12.0191V12.5003L13.513 13.9941Z"/>
+  </symbol>
   <symbol id="i-note" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="2.2" width="10" height="11.6" rx="2"/><path d="M5.6 6.2h4.8M5.6 9.2h4.8"/>
   </symbol>

@@ -1,0 +1,1445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The overdue task &mdash; six variations</title>
+<meta name="viewport" content="width=1700">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/worklist.css?v=e4b809a5">
+<link rel="stylesheet" href="css/variants.css?v=6dbde3bb">
+<link rel="stylesheet" href="css/kanban.css?v=43b7e2b8">
+<link rel="stylesheet" href="css/kanban-ribbon.css?v=242659cd">
+<script src="js/icons.js?v=e5f50832" defer></script>
+<style>
+/* ==========================================================================
+   A scratch comparison sheet, not a prototype version.
+   --------------------------------------------------------------------------
+   Six shapes for the overdue task. The card is identical in all six, the
+   two ordinary cards around it are identical, and the words in the row are
+   identical — only the form of the row changes, so nothing else can take
+   the credit.
+
+   Each column is shown on the board's own ground with neighbours, because a
+   row that looks urgent on a white page and vanishes between cards has not
+   done its job. The strip at the top is the same six at a third of size.
+
+   Nothing here is wired into kanban.html. Delete this file and the board is
+   unchanged.
+   ========================================================================== */
+
+body { background: var(--bg-canvas); margin: 0; font-family: var(--font-family); }
+
+.cmp__head {
+  padding: var(--space-24) var(--space-32) var(--space-16);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.cmp__head h1 { margin: 0; font: var(--weight-demi) 20px/26px var(--font-family); color: var(--text-primary); }
+.cmp__head p  { margin: var(--space-6) 0 0; font: var(--weight-regular) 14px/20px var(--font-family); color: var(--text-tertiary); max-width: 880px; }
+
+.cmp__row { padding: var(--space-32); }
+.cmp__col { width: 380px; flex: none; }
+
+.cmp__kb {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-32) var(--space-16);
+  align-items: flex-start;
+  flex: none;
+  background: none;
+}
+
+.cmp__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: 14px;
+  border-radius: var(--radius-16);
+  background: var(--neutral-200);
+}
+
+.cmp__tag {
+  display: inline-block;
+  margin-bottom: var(--space-8);
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-4);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.cmp__tag--now { background: var(--neutral-900); color: var(--text-on-dark); }
+.cmp__col h2 { margin: 0 0 var(--space-4); font: var(--weight-demi) 15px/20px var(--font-family); color: var(--text-primary); }
+.cmp__col p  { margin: 0 0 var(--space-12); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); min-height: 96px; }
+
+.cmp__cost {
+  display: block;
+  margin-bottom: var(--space-8);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-tertiary);
+}
+.cmp__cost b { color: var(--success-text); font-weight: var(--weight-demi); }
+
+.sq {
+  padding: var(--space-24) var(--space-32) var(--space-32);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.sq h2 { margin: 0 0 var(--space-4); font: var(--weight-demi) 15px/20px var(--font-family); color: var(--text-primary); }
+.sq > p { margin: 0 0 var(--space-20); font: var(--weight-regular) 13px/19px var(--font-family); color: var(--text-tertiary); max-width: 880px; }
+.sq__row { display: flex; gap: var(--space-20); }
+.sq__col { flex: none; }
+.sq__label {
+  display: block;
+  margin-bottom: var(--space-6);
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.sq__box { width: 128px; height: 400px; overflow: hidden; }
+.sq__inner { width: 380px; transform: scale(.3365); transform-origin: top left; }
+
+/* ==========================================================================
+   V1 — solid bar, edge to edge
+   --------------------------------------------------------------------------
+   Nothing else in the body spans the card's full width, so the bleed is
+   what makes it read as a cut across the card rather than another line in
+   the list. White on #D92D20 is 4.8:1.
+   ========================================================================== */
+.v-bar {
+  width: calc(100% + 32px);
+  margin: 0 calc(var(--space-16) * -1);
+  padding: 5px var(--space-16);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+}
+.v-bar svg { flex: none; }
+.v-bar__task { flex: 1; min-width: 0; font: var(--weight-demi) 12px/18px var(--font-family); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-bar__late { flex: none; font: var(--weight-demi) 10px/14px var(--font-family); letter-spacing: .08em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+
+/* ==========================================================================
+   V2 — lateness first, as a tag
+   --------------------------------------------------------------------------
+   The row keeps the stack's rhythm exactly: same height, same baseline, one
+   coloured object at the head of it. The quietest of the six, and the only
+   one that could sit on every card without the board tiring.
+   ========================================================================== */
+.v-pill { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-2) 0; }
+.v-pill__tag {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .04em;
+}
+.v-pill__task { flex: 1; min-width: 0; font: var(--weight-demi) 12px/20px var(--font-family); color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ==========================================================================
+   V3 — the number, set big
+   --------------------------------------------------------------------------
+   28px is larger than the client's name, which is the point: on a card
+   where every other figure is 12 to 16px, the only way to be found without
+   fill is to be the biggest thing there.
+   ========================================================================== */
+.v-num {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-2) 0 var(--space-2) 10px;
+  border-left: 3px solid var(--error-base);
+}
+.v-num__n {
+  flex: none;
+  font: var(--weight-bold) 28px/28px var(--font-family);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  color: var(--error-base);
+}
+.v-num__col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.v-num__sub { font: var(--weight-demi) 9px/12px var(--font-family); letter-spacing: .1em; text-transform: uppercase; color: var(--text-error); }
+.v-num__task { font: var(--weight-demi) 12px/17px var(--font-family); color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ==========================================================================
+   V4 — a stamp on the right
+   --------------------------------------------------------------------------
+   The task stays an ordinary row and the colour goes where the eye
+   finishes. Figure over unit, so the block is read as a quantity rather
+   than a label.
+   ========================================================================== */
+.v-stamp { display: flex; align-items: center; gap: 10px; }
+.v-stamp__task {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: var(--space-8);
+  font: var(--weight-demi) 12px/18px var(--font-family);
+  color: var(--text-primary);
+}
+.v-stamp__task svg { flex: none; color: var(--text-tertiary); }
+.v-stamp__block {
+  flex: none;
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-4);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+  text-align: center;
+}
+.v-stamp__n { display: block; font: var(--weight-bold) 13px/15px var(--font-family); font-variant-numeric: tabular-nums; }
+.v-stamp__u { display: block; font: var(--weight-demi) 8px/10px var(--font-family); letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+
+/* ==========================================================================
+   V5 — a tab off the edge
+   --------------------------------------------------------------------------
+   The only option that changes the card's outline, which is why it works at
+   board scale: every other card is a straight-sided rectangle. The card has
+   to let it out, so overflow goes visible and the two ends that relied on
+   clipping get their radius back explicitly.
+   ========================================================================== */
+.opt-flag .kb-c.is-urgent { overflow: visible; }
+.opt-flag .kb-c.is-urgent .kb-c__banner { border-radius: 11px 11px 0 0; }
+.opt-flag .kb-c.is-urgent .kb-c__actions { border-radius: 0 0 11px 11px; }
+
+.v-flag { display: flex; align-items: center; gap: var(--space-8); }
+.v-flag__tab {
+  flex: none;
+  margin-left: -27px;
+  padding: 3px var(--space-6) 3px 10px;
+  border-radius: var(--radius-4) 0 0 var(--radius-4);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/15px var(--font-family);
+  box-shadow: 2px 2px 5px rgba(217, 45, 32, .35);
+}
+.v-flag__task { flex: 1; min-width: 0; font: var(--weight-demi) 12px/21px var(--font-family); color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-flag__late { flex: none; font: var(--weight-demi) 10px/14px var(--font-family); letter-spacing: .08em; text-transform: uppercase; color: var(--text-error); }
+
+/* ==========================================================================
+   V6 — inverted strip
+   --------------------------------------------------------------------------
+   One dark object inside a white card. The red is left to the dot: at 10px
+   on near-black the system's red does not clear 4.5:1, and the lightest
+   neutral does.
+   ========================================================================== */
+.v-dark {
+  width: calc(100% + 12px);
+  margin: 0 -6px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  border-radius: var(--radius-8);
+  background: var(--neutral-900);
+}
+.v-dark__dot { width: 7px; height: 7px; flex: none; border-radius: var(--radius-pill); background: var(--error-border); }
+.v-dark__task { flex: 1; min-width: 0; font: var(--weight-demi) 12px/18px var(--font-family); color: var(--white); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-dark__late { flex: none; font: var(--weight-demi) 10px/14px var(--font-family); letter-spacing: .08em; text-transform: uppercase; color: var(--neutral-400); }
+</style>
+</head>
+<body>
+
+<div class="cmp__head">
+  <h1>The overdue task, six ways</h1>
+  <p>
+    Same card, same neighbours, same words in the row &mdash; <em>Chase Freya</em>, two days late.
+    Only the shape of the row changes, so nothing else can take the credit. Each sits in a column
+    on the board&rsquo;s own ground, because a row that looks urgent on a white page and disappears
+    between cards has not done its job.
+  </p>
+</div>
+
+<div class="sq skin-ribbon">
+  <h2>The squint test</h2>
+  <p>
+    The same six at a third of size &mdash; roughly what a card is worth to someone scanning seven
+    columns. Same markup scaled, so it cannot flatter anything.
+  </p>
+  <div class="sq__row">
+      <div class="sq__col opt-ref">
+        <span class="sq__label">Now</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="ref">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="kb-c__block is-overdue"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+          <span class="kb-c__block-label">Chase Freya</span>
+          <span class="kb-c__block-due">2 days overdue</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-bar">
+        <span class="sq__label">V1</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="bar">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-bar"><svg width="14" height="14" aria-hidden="true"><use href="#i-alarm"></use></svg>
+          <span class="v-bar__task">Chase Freya</span>
+          <span class="v-bar__late">2 days late</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-pill">
+        <span class="sq__label">V2</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="pill">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-pill">
+          <span class="v-pill__tag">2d late</span>
+          <span class="v-pill__task">Chase Freya</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-num">
+        <span class="sq__label">V3</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="num">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-num">
+          <span class="v-num__n">2</span>
+          <span class="v-num__col">
+            <span class="v-num__sub">days overdue</span>
+            <span class="v-num__task">Chase Freya</span>
+          </span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-stamp">
+        <span class="sq__label">V4</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="stamp">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-stamp">
+          <span class="v-stamp__task"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg> Chase Freya</span>
+          <span class="v-stamp__block">
+            <span class="v-stamp__n">2</span>
+            <span class="v-stamp__u">days late</span>
+          </span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-flag">
+        <span class="sq__label">V5</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="flag">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-flag">
+          <span class="v-flag__tab">2d</span>
+          <span class="v-flag__task">Chase Freya</span>
+          <span class="v-flag__late">Overdue</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>
+      <div class="sq__col opt-dark">
+        <span class="sq__label">V6</span>
+        <div class="sq__box"><div class="cmp__stack sq__inner"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="dark">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-dark">
+          <span class="v-dark__dot"></span>
+          <span class="v-dark__task">Chase Freya</span>
+          <span class="v-dark__late">2 days late</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div></div>
+      </div>  </div>
+</div>
+
+<div class="cmp__row skin-ribbon">
+  <div class="kb cmp__kb">
+    <section class="cmp__col opt-ref">
+      <span class="cmp__tag cmp__tag--now">Now</span>
+      <h2>Tinted lozenge</h2>
+      <p>A pale ground inside the row with a tick in the margin. The shape every other option is trying to beat.</p>
+      <span class="cmp__cost" data-cost="ref">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="ref">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="kb-c__block is-overdue"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg>
+          <span class="kb-c__block-label">Chase Freya</span>
+          <span class="kb-c__block-due">2 days overdue</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-bar">
+      <span class="cmp__tag">V1</span>
+      <h2>Solid bar, edge to edge</h2>
+      <p>Full-bleed, solid, white type. Nothing else on the card spans its whole width, so it reads as a cut across the card rather than a line in a list.</p>
+      <span class="cmp__cost" data-cost="bar">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="bar">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-bar"><svg width="14" height="14" aria-hidden="true"><use href="#i-alarm"></use></svg>
+          <span class="v-bar__task">Chase Freya</span>
+          <span class="v-bar__late">2 days late</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-pill">
+      <span class="cmp__tag">V2</span>
+      <h2>Lateness first, as a tag</h2>
+      <p>The lateness leads as a small solid tag and the task follows in plain black. The row keeps the stack&rsquo;s rhythm exactly &mdash; only its first element is coloured.</p>
+      <span class="cmp__cost" data-cost="pill">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="pill">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-pill">
+          <span class="v-pill__tag">2d late</span>
+          <span class="v-pill__task">Chase Freya</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-num">
+      <span class="cmp__tag">V3</span>
+      <h2>The number, set big</h2>
+      <p>How late it is at 28px, larger than anything else on the card including the name, with a rule tying it to the words. No fill at all: size does the work.</p>
+      <span class="cmp__cost" data-cost="num">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="num">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-num">
+          <span class="v-num__n">2</span>
+          <span class="v-num__col">
+            <span class="v-num__sub">days overdue</span>
+            <span class="v-num__task">Chase Freya</span>
+          </span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-stamp">
+      <span class="cmp__tag">V4</span>
+      <h2>A stamp on the right</h2>
+      <p>The task reads as an ordinary row and the lateness is stamped at the end as a solid block with the figure over the unit. Puts the colour where the eye finishes rather than where it starts.</p>
+      <span class="cmp__cost" data-cost="stamp">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="stamp">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-stamp">
+          <span class="v-stamp__task"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg> Chase Freya</span>
+          <span class="v-stamp__block">
+            <span class="v-stamp__n">2</span>
+            <span class="v-stamp__u">days late</span>
+          </span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-flag">
+      <span class="cmp__tag">V5</span>
+      <h2>A tab off the edge</h2>
+      <p>The marker leaves the card: a tab in the gutter that breaks the outline. Nothing on a kanban board sticks out, so it is found down a column of straight edges without reading.</p>
+      <span class="cmp__cost" data-cost="flag">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="flag">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-flag">
+          <span class="v-flag__tab">2d</span>
+          <span class="v-flag__task">Chase Freya</span>
+          <span class="v-flag__late">Overdue</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+    <section class="cmp__col opt-dark">
+      <span class="cmp__tag">V6</span>
+      <h2>Inverted strip</h2>
+      <p>The one row goes dark inside a white card, with a red dot for status. Inverting one element makes it an object on the card rather than a tinted region of it.</p>
+      <span class="cmp__cost" data-cost="dark">&nbsp;</span>
+      <div class="cmp__stack"><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Jacob Mensah</span>
+            <span class="kb-c__amount">$35,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 10</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Dev P.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues is-urgent" data-opt="dark">
+      <div class="kb-c__banner">
+        <span class="kb-c__banner-label"><svg width="15" height="15" aria-hidden="true"><use href="#i-alarm"></use></svg>2 tasks overdue</span>
+        <span class="kb-c__banner-action">Action now</span>
+      </div>
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Freya Lindqvist</span>
+            <span class="kb-c__amount">$340,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 13</span><span>Conditional approval</span></div>
+        <div class="kb-c__blocks">
+          <div class="v-dark">
+          <span class="v-dark__dot"></span>
+          <span class="v-dark__task">Chase Freya</span>
+          <span class="v-dark__late">2 days late</span>
+        </div>
+          <div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div>
+        </div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">5 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:5"></span><span class="kb-c__seg kb-c__seg--review" style="flex:1"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article><article class="kb-c kb-c--cues">
+      <div class="kb-c__body">
+        <div class="kb-c__who">
+          <div class="kb-c__id">
+            <span class="kb-c__name">Thanh Nguyen</span>
+            <span class="kb-c__amount">$515,000</span>
+          </div>
+          <div class="kb-c__contact"><span class="kb-cp kb-cp--on" title="Call"><svg width="14" height="14" aria-hidden="true"><use href="#i-phone"></use></svg></span><span class="kb-cp" title="SMS"><svg width="14" height="14" aria-hidden="true"><use href="#i-chat"></use></svg></span><span class="kb-cp" title="Email"><svg width="14" height="14" aria-hidden="true"><use href="#i-mail"></use></svg></span></div>
+        </div>
+        <div class="kb-c__stage"><span>Day 5</span><span>With lender</span></div>
+        <div class="kb-c__blocks"><div class="kb-c__block"><svg width="16" height="16" aria-hidden="true"><use href="#i-calendar-clock"></use></svg><span class="kb-c__block-label">Reassign to Kenn Z.</span><span class="kb-c__block-due">due in 3 days</span></div></div>
+        <div class="kb-c__docs">
+        <div class="kb-c__docs-head">
+          <span class="kb-c__docs-label">Documents</span>
+          <span class="kb-c__docs-n">4 of 6</span>
+        </div>
+        <div class="kb-c__bar"><span class="kb-c__seg kb-c__seg--ok" style="flex:4"></span><span class="kb-c__seg kb-c__seg--review" style="flex:2"></span></div>
+        <div class="kb-c__docs-breakdown"><span class="is-review">1 pending</span><span class="kb-c__dot">&middot;</span><span>1 to request</span></div>
+      </div>
+        <div class="kb-c__owner"><span class="kb-c__ava">KZ</span></div>
+      </div>
+      <div class="kb-c__actions"><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-note"></use></svg> Note</span><span class="kb-ap kb-ap--grow"><svg width="14" height="14" aria-hidden="true"><use href="#i-check-circle"></use></svg> Task</span><span class="kb-ap"><svg width="14" height="14" aria-hidden="true"><use href="#i-article"></use></svg> Request docs</span><span class="kb-ap kb-ap--icon"><svg width="16" height="16" aria-hidden="true"><use href="#i-kebab"></use></svg></span></div>
+    </article></div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* Measured rather than asserted: height is the currency on a column you
+   scroll, so each card is compared with today's. */
+window.addEventListener('load', () => {
+  const cards = [...document.querySelectorAll('.cmp__col .kb-c[data-opt]')];
+  const base = Math.round(cards[0].getBoundingClientRect().height);
+  cards.forEach((c, i) => {
+    const h = Math.round(c.getBoundingClientRect().height);
+    const d = h - base;
+    const slot = document.querySelector(`.cmp__cost[data-cost="${c.dataset.opt}"]`);
+    slot.innerHTML = i === 0
+      ? `${h}px tall &mdash; the one to beat`
+      : `${h}px tall &middot; <b>${d === 0 ? 'same height' : (d < 0 ? d + 'px' : '+' + d + 'px')}</b>`;
+  });
+});
+</script>
+
+</body>
+</html>

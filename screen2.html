@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Screen 2 — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/shell.css?v=6e52a65e">
+<script>
+/* ======================================================================
+   The screen-2 prototype view — its own version list, numbered from v1.
+
+   Add a version here and it appears everywhere — tabs, compare pickers,
+   keyboard shortcuts and deep links. The chrome itself is js/shell.js,
+   shared with the work-list prototype view (index.html).
+
+   There is no tour on this screen yet, so that control is off; with one
+   version the compare control stands down on its own.
+   ====================================================================== */
+window.SHELL = {
+  title: 'Screen 2',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v1',
+  tour:  false,
+  versions: [
+    { id:'v1', label:'v1', sub:'Application view', file:'screen2-v1.html',
+      note:'A copy of the screen a deal opens into · the base to work from' }
+  ]
+};
+</script>
+<script src="js/shell.js?v=467b5747" defer></script>
+</head>
+<body>
+</body>
+</html>

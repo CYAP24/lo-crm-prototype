@@ -1,0 +1,1334 @@
+/* ==========================================================================
+   Kanban view — the board the work list can switch to.
+   --------------------------------------------------------------------------
+   The board follows the Figma frame "Draft #2 - 1440 px" (node 4235:8867):
+   a column with a 12px gutter, holding 340px cards stacked 12px apart.
+
+   The frame is 1440 and this artboard is the project's 1920, so the board
+   shows more columns rather than wider ones — the column is the unit, and
+   it keeps the frame's size.
+
+   Everything here sits on top of css/worklist.css, which carries the reset,
+   the artboard, the app bar and the shared components.
+   ========================================================================== */
+
+/* The board's ground. The frame samples #F5F5F5 here, the same flat grey the
+   application view stands on, but a white card on it barely separates once
+   there are six columns of them. A step down the neutral ramp gives the
+   cards an edge without the column reading as a filled panel. */
+.kb { --kb-ground: var(--neutral-200); }
+
+.kb {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+
+.kb-spacer { flex: 1; }
+
+/* A hairline between toolbar controls, as the frame draws it. */
+.kb-rule { width: 1px; height: 28px; background: var(--border-subtle); flex: none; }
+
+/* ---------- Toolbar -------------------------------------------------------- */
+
+/* The bar carries two named dropdowns, three view tabs, a wide search and
+   four controls, so its own gap comes in a step to pay for them. */
+.kb-bar {
+  flex: none;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: 0 var(--space-16) 0 var(--space-32);
+  background: var(--bg-base);
+}
+
+.kb-board-name { display: flex; align-items: center; gap: var(--space-8); flex: none; }
+.kb-board-name__ava {
+  width: 28px; height: 28px;
+  background: var(--brand-400);
+  font: var(--weight-demi) 11px/16.5px var(--font-family);
+}
+.kb-board-name__label { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-primary); }
+
+/* The frame's control shell: a hairline box over the page rather than a
+   filled field, with the shadow doing the lifting. */
+.kb-select {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border: 1px solid rgba(206, 212, 218, .5);
+  border-radius: var(--radius-10);
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, .12);
+  font: var(--weight-medium) 12px/16.5px var(--font-family);
+  color: var(--text-secondary);
+  flex: none;
+  cursor: pointer;
+}
+.kb-select svg { color: var(--text-secondary); }
+.kb-select--wide { width: 189px; justify-content: space-between; }
+
+.kb-views { display: flex; align-items: center; gap: var(--space-12); flex: none; }
+.kb-view {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--weight-medium) 12px/20px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  opacity: .8;
+}
+.kb-view.is-on {
+  font-weight: var(--weight-demi);
+  color: var(--text-brand);
+  opacity: 1;
+}
+
+.kb-search {
+  width: 460px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  flex: none;
+}
+.kb-search svg { color: var(--text-tertiary); flex: none; }
+.kb-search__ph {
+  font: var(--weight-medium) 12px/20px var(--font-family);
+  color: var(--text-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kb-new {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 12px/1 var(--font-family);
+  color: var(--text-brand);
+  flex: none;
+  cursor: pointer;
+}
+.kb-new svg { color: var(--text-brand); }
+
+.kb-filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-demi) 12px/16.5px var(--font-family);
+  color: var(--text-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  flex: none;
+  cursor: pointer;
+}
+
+/* ---------- Board ---------------------------------------------------------- */
+
+/* The x axis is `scroll` rather than `auto`: six columns never fit the
+   artboard, so the bar is always needed, and one that comes and goes would
+   shift every column each time a card is filtered out. */
+.kb-board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-12);
+  padding: 0 var(--space-16) var(--space-16);
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+/* Sized to what the column actually has to hold: the 340px card, the gutter
+   before the scrollbar, the 4px scrollbar itself, and its own padding on
+   both sides. Miss the scrollbar out and the last pixels of every card are
+   clipped. */
+.kb-col {
+  width: calc(340px + var(--space-8) + 4px + 14px * 2);
+  flex: none;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  border-radius: var(--radius-16);
+  background: var(--kb-ground);
+}
+
+/* New lead is the one column that is not a stage the deal has worked
+   through — it is the arrivals tray. The light red ground says so before the
+   heading is read, and it is the system's own error tint rather than a new
+   colour invented for it. */
+.kb-col[data-stage="newlead"] { background: var(--error-bg); }
+
+/* Snoozed is the opposite end of the same idea: deliberately parked, so the
+   column sits a step darker than the others and its cards hold back. The
+   fade is on the card rather than the column so the heading and its count
+   stay readable. */
+.kb-col[data-stage="snoozed"] { background: var(--neutral-400); }
+.kb-col[data-stage="snoozed"] .kb-c { opacity: .7; }
+
+/* The heading carries four things, in the order they are read: the stage,
+   how many deals, how much they are worth, and what is late. One row, with
+   the two totals sitting right where the filter control used to. */
+.kb-col__head {
+  flex: none;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 0 0 11px;
+  margin-bottom: var(--space-16);
+}
+/* The numbers on the right are the point of the row, so the stage name is
+   the thing that gives way if a longer label ever makes it tight. */
+.kb-col__name {
+  font: var(--weight-demi) 16px/16px var(--font-family);
+  color: var(--text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Two steps up from the placeholder grey it used to be: on the darker
+   ground that read as switched off rather than secondary. */
+.kb-col__n    { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-tertiary); }
+
+/* v1 — the overdue count as a chip, the language of its tinted task blocks.
+   The total runs as plain text at the stage name's size: it is on every
+   column, so chipping it would spend the shape on the thing that never
+   varies. The chip is solid red rather than tinted, which is what lets it
+   drop its border: a filled shape holds its own edge on the New lead and
+   Snoozed grounds as well as the grey ones. White on #D92D20 clears 4.5:1. */
+.kb-col__stats { display: flex; align-items: center; gap: var(--space-8); }
+.kb-col__sum {
+  font: var(--weight-demi) 16px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.kb-stat--over {
+  padding: 4px var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--error-base);
+  font: var(--weight-demi) 14px/18px var(--font-family);
+  color: var(--text-on-dark);
+  white-space: nowrap;
+}
+
+/* v2 — the same totals as a line of text, with colour doing the work. */
+.kb-col__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+  font: var(--weight-medium) 14px/18px var(--font-family);
+  white-space: nowrap;
+}
+.kb-col__value { color: var(--text-secondary); }
+.kb-col__dot   { color: var(--text-placeholder); }
+.kb-col__over  { color: var(--text-error); font-weight: var(--weight-demi); }
+
+
+/* Each column scrolls on its own, so a long stage never pushes the board
+   taller than the frame. */
+.kb-col__scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--space-8);
+}
+.kb-col__scroll::-webkit-scrollbar { width: 4px; }
+.kb-col__scroll::-webkit-scrollbar-thumb {
+  background: var(--border-muted);
+  border-radius: var(--radius-pill);
+}
+.kb-col__scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* ==========================================================================
+   The alert-state card — v1 and v2.
+   --------------------------------------------------------------------------
+   One card, two treatments, following the directions on the CRM-2026
+   "To upload" page (node 4622:10931). Everything outside the middle of the
+   card is shared, so the versions differ where they are meant to differ.
+
+   Two values are sampled from the frame rather than taken from a token: the
+   filled contact pill and the neutral task block. Both sit between steps on
+   the ramp, and matching the frame mattered more than inventing a token.
+   -------------------------------------------------------------------------- */
+
+.kb-c {
+  --kb-c-call: #ECDEFE;
+  --kb-c-task: #EFEFEF;
+
+  flex: none;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
+
+/* Only the state that wants an immediate call outlines the whole card. */
+.kb-c--cues.is-immediate {
+  outline: 1px solid var(--error-base);
+  outline-offset: -1px;
+}
+
+/* ---------- Banner --------------------------------------------------------- */
+
+.kb-c__banner {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: 10px var(--space-16);
+}
+.kb-c__banner-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+}
+.kb-c__banner-label svg { flex: none; }
+.kb-c__banner-action { font: var(--weight-regular) 12px/16px var(--font-family); }
+
+/* The first two are tinted: a pale ground carrying its own darker ink. The
+   system warning inverts that pair — dark ground, light ink — because it is
+   the one state that is not about the deal, and reading differently is the
+   point. The primitives rather than the text and background tokens, since
+   both are being used as the opposite of what they are named for. */
+.is-immediate .kb-c__banner { background: var(--error-base); color: var(--text-on-dark); }
+.is-urgent    .kb-c__banner { background: var(--warning-bg);  color: var(--warning-text); }
+.is-warning   .kb-c__banner { background: var(--neutral-900); color: var(--neutral-200); }
+
+/* ---------- Body ----------------------------------------------------------- */
+
+.kb-c__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-base);
+}
+
+.kb-c__who { display: flex; align-items: flex-start; gap: var(--space-12); }
+.kb-c__id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+.kb-c__name {
+  font: var(--weight-demi) 16px/20px var(--font-family);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__amount { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-secondary); }
+
+.kb-c__contact { display: flex; align-items: center; gap: var(--space-6); flex: none; }
+.kb-cp {
+  display: grid;
+  place-items: center;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-cp--on { background: var(--kb-c-call); border-color: transparent; color: var(--text-brand); }
+
+/* What stands where the contact buttons stand on every other card. */
+.kb-snooze {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.kb-snooze svg { flex: none; }
+
+.kb-c__stage {
+  display: flex;
+  gap: 14px;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+/* ---------- Tasks: v1 blocks ----------------------------------------------- */
+
+.kb-c__blocks { display: flex; flex-direction: column; gap: var(--space-4); }
+.kb-c__block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-8);
+  background: var(--kb-c-task);
+  font: var(--weight-regular) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__block svg { flex: none; color: var(--text-secondary); }
+.kb-c__block-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__block-due { flex: none; }
+.kb-c__block.is-overdue { background: var(--error-bg); color: var(--text-error); }
+.kb-c__block.is-overdue svg { color: var(--text-error); }
+.kb-c__block.is-overdue .kb-c__block-label { color: var(--text-error); font-weight: var(--weight-demi); }
+
+/* ---------- Tasks: v2 list ------------------------------------------------- */
+
+.kb-c__list { display: flex; flex-direction: column; gap: var(--space-6); }
+.kb-c__list-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-16);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+.kb-c__list-label { flex: none; color: var(--text-secondary); }
+/* The second row keeps the label's width rather than dropping it, so the two
+   tasks line up under each other — the whole point of this treatment. */
+.kb-c__list-label.is-hidden { visibility: hidden; }
+.kb-c__list-task {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kb-c__list-due { flex: none; }
+.kb-c__list-row.is-overdue .kb-c__list-task,
+.kb-c__list-row.is-overdue .kb-c__list-due { color: var(--text-error); }
+
+.kb-c__hr { height: 1px; background: var(--border-subtle); }
+
+/* ---------- Documents ------------------------------------------------------ */
+
+.kb-c__docs { display: flex; flex-direction: column; gap: var(--space-6); }
+.kb-c__docs-head { display: flex; align-items: center; gap: var(--space-4); }
+.kb-c__docs-label {
+  flex: 1;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__docs-n {
+  flex: none;
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+.kb-c__bar {
+  display: flex;
+  height: 9px;
+  border-radius: 5px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+.kb-c__seg { background: transparent; }
+.kb-c__seg--ok       { background: var(--success-base); }
+.kb-c__seg--review   { background: var(--warning-border); }
+.kb-c__seg--rejected { background: var(--error-base); }
+
+.kb-c__docs-breakdown {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: flex-end;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.kb-c__docs-breakdown .is-review   { color: var(--warning-text); }
+.kb-c__docs-breakdown .is-rejected { color: var(--text-error); }
+.kb-c__dot { font-weight: var(--weight-regular); color: var(--text-primary); }
+
+.kb-c__docs-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+}
+.kb-c__docs-line .kb-c__docs-label { flex: none; }
+
+/* ---------- Owner and actions ---------------------------------------------- */
+
+.kb-c__owner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+.kb-c__ava {
+  width: 24px; height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-12);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.kb-c__partner {
+  padding: 3px var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+
+.kb-c__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 10px var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+}
+.kb-ap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kb-ap svg { flex: none; }
+.kb-ap--grow { flex: 1; min-width: 0; }
+.kb-ap--icon { padding: 6px 9px; }
+
+/* ---------- Quick actions panel -------------------------------------------
+   The panel itself is the work list's, styled by the .dp-* block in
+   css/variants.css. Only two things are the kanban's own: a tab with nothing
+   behind it yet, and marking which card the panel is about.
+   -------------------------------------------------------------------------- */
+
+.dp__tab.is-disabled {
+  color: var(--text-placeholder);
+  cursor: default;
+}
+.dp__tab.is-disabled:hover { color: var(--text-placeholder); }
+
+/* The panel covers the right of the board, so the card it belongs to can be
+   off behind it — the ring is how you find your way back to it. */
+.kb-c.is-active {
+  outline: 2px solid var(--border-brand);
+  outline-offset: -2px;
+}
+
+/* ==========================================================================
+   The v1 toolbar — common views, filter, sort, select.
+   --------------------------------------------------------------------------
+   The bar is one row and already full, so everything that would widen it
+   drops into a menu or a panel instead: the nine common views, the five
+   sorts, and the eight filter groups.
+   -------------------------------------------------------------------------- */
+
+/* Each dropdown is named rather than left to speak for itself: "Newest
+   first" on its own does not say it is a sort. */
+.kb-views-pick,
+.kb-sort-pick { position: relative; display: flex; align-items: center; gap: var(--space-8); flex: none; }
+.kb-pick__label { color: var(--text-tertiary); white-space: nowrap; }
+
+/* ---------- Menus ---------------------------------------------------------- */
+
+.kb-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 232px;
+  padding: var(--space-6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: none;
+}
+.kb-menu--right { left: auto; right: 0; }
+.kb-menu.is-open { display: block; }
+
+.kb-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-8);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.kb-menu__item:hover { background: var(--bg-surface); color: var(--text-primary); }
+.kb-menu__item.is-on { color: var(--text-brand); font-weight: var(--weight-demi); }
+.kb-menu__tick { width: 12px; flex: none; display: grid; place-items: center; color: var(--text-brand); }
+
+.kb-menu__sep {
+  padding: var(--space-8) var(--space-8) var(--space-4);
+  color: var(--text-placeholder);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-6);
+}
+.kb-menu__default {
+  margin-left: auto;
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-4);
+  background: var(--bg-brand-subtle);
+  color: var(--text-brand);
+}
+
+.kb-menu__foot {
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-8);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+}
+.kb-menu__act {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--weight-medium) 12px/1.4 var(--font-family);
+  color: var(--text-brand);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ---------- Select mode ---------------------------------------------------- */
+
+.kb-sel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-10, 10px);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  flex: none;
+  cursor: pointer;
+}
+.kb-sel:hover { background: var(--bg-surface); }
+.kb-sel.is-on { background: var(--bg-brand-subtle); color: var(--text-brand); }
+
+.kb-filter__n {
+  margin-left: var(--space-4);
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/1.4 var(--font-family);
+}
+
+/* The box is the one shape select mode adds, so it is the same object on a
+   card, on a column and in the filter panel. */
+.kb-box {
+  width: 16px; height: 16px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-4);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+}
+.is-on > .kb-box,
+.is-picked .kb-cbox { background: var(--bg-brand); border-color: var(--bg-brand); }
+
+.kb-colsel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0 0 var(--space-8) 11px;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* Sits in the identity row ahead of the name, so turning select mode on
+   indents the row rather than hanging a control off the card's corner. The
+   negative margin trims the row's own 12px gap back to something that reads
+   as an indent rather than a column. */
+.kb-cbox {
+  width: 18px; height: 18px;
+  flex: none;
+  margin: 1px -4px 0 0;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-4);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+  cursor: pointer;
+}
+.kb-c.is-picked { outline: 2px solid var(--border-brand); outline-offset: -2px; }
+
+.kb-col__empty {
+  padding: var(--space-16) 11px;
+  color: var(--text-placeholder);
+}
+
+/* ---------- Filter panel --------------------------------------------------- */
+
+.kbf {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 380px;
+  z-index: 32;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .14);
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.kbf.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.kbf__head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-24) var(--space-20) var(--space-16);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.kbf__count { color: var(--text-tertiary); margin-top: var(--space-2); }
+.kbf__clear { color: var(--text-brand); cursor: pointer; margin-top: var(--space-4); white-space: nowrap; }
+
+.kbf__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-16) var(--space-20) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  background: var(--bg-surface);
+}
+
+.kbf__label { color: var(--text-tertiary); margin-bottom: var(--space-8); }
+.kbf__opts { display: flex; flex-direction: column; gap: var(--space-2); }
+.kbf__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kbf__opt:hover { background: var(--bg-base); }
+.kbf__opt.is-on { color: var(--text-primary); }
+
+.kbf__range { color: var(--text-primary); margin-bottom: var(--space-8); }
+
+/* ---------- Amount: one track, a handle at each end ------------------------
+   Two range inputs are stacked over a single drawn track. The inputs
+   themselves take no pointer events, only their thumbs, so each handle can
+   be grabbed independently and the band between them is a plain element
+   rather than anything the browser draws.
+   -------------------------------------------------------------------------- */
+
+.kbf__slider { position: relative; height: 22px; }
+
+.kbf__slider-track,
+.kbf__slider-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.kbf__slider-track { left: 0; right: 0; background: var(--border-default); }
+.kbf__slider-fill  { left: var(--lo); right: calc(100% - var(--hi)); background: var(--bg-brand); }
+
+.kbf__slider input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 22px;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.kbf__slider input[type="range"]:focus { outline: none; }
+.kbf__slider input[type="range"]::-webkit-slider-runnable-track { background: transparent; border: none; }
+.kbf__slider input[type="range"]::-moz-range-track { background: transparent; border: none; }
+
+.kbf__slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  cursor: grab;
+}
+.kbf__slider input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 16px; height: 16px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-brand);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  cursor: grab;
+}
+.kbf__slider input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+.kbf__slider input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: var(--elevation-focus); }
+
+/* The upper handle sits above, so the two are still separable when they
+   meet at the same value. */
+.kbf__slider input[data-kb-amount="max"] { z-index: 2; }
+
+.kbf__dates { display: flex; align-items: center; gap: var(--space-8); }
+.kbf__to { color: var(--text-tertiary); flex: none; }
+.kbf input[type="date"] {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+/* ---------- Filter panel: people as tags ----------------------------------
+   Broker and partner are searched rather than ticked, so each one is a list
+   of chosen people and a field to find the next. The chip is the work
+   list's `.chip-person`, so a person keeps the same colour they have on a
+   row, in a panel and here.
+   -------------------------------------------------------------------------- */
+
+.kbf__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+.kbf__tag .chip-person { height: 28px; }
+.kbf__tag .chip-person__av { width: 22px; height: 22px; }
+.kbf__tag .chip-person__x { cursor: pointer; }
+.kbf__tag .chip-person__x:hover { color: var(--text-error); }
+
+.kbf__search {
+  width: 100%;
+  padding: var(--space-8) var(--space-10, 10px);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  background: var(--bg-base);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-primary);
+}
+.kbf__search::placeholder { color: var(--text-placeholder); }
+.kbf__search:focus { outline: none; border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+
+/* Sits under the field rather than over it: the panel scrolls, and a
+   floating list would need to be re-anchored every time it did. */
+.kbf__sugg {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+}
+.kbf__sugg-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kbf__sugg-item:hover { background: var(--bg-surface); color: var(--text-primary); }
+.kbf__sugg-av {
+  width: 22px; height: 22px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 10px/1 var(--font-family);
+  color: var(--text-secondary);
+}
+.kbf__nomatch { padding: var(--space-6); color: var(--text-placeholder); }
+
+/* ---------- Bulk actions banner --------------------------------------------
+   Selecting cards puts the board in a mode, so the banner takes the board's
+   own toolbar rather than floating over the cards — it covers the row that
+   chooses what you are looking at, which is the row that stops applying
+   while a selection is live. The CRM header above it stays put, because
+   leaving the board entirely is still allowed.
+
+   Sized to the toolbar it replaces: 64px down (the header's height, set in
+   css/worklist.css) and 65px tall (the toolbar's own).
+   -------------------------------------------------------------------------- */
+
+.kb-bb {
+  position: absolute;
+  top: 64px; left: 0; right: 0;
+  z-index: 45;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-10, 10px);
+  padding: 0 var(--space-20);
+  background: var(--bg-brand-subtle);
+  /* Bordered on both edges, so the banner reads as a band laid over the
+     toolbar rather than as the toolbar having changed colour. A grey line
+     rather than a brand one: the edges only have to say where the band
+     stops, and the brand is already doing the work inside it. */
+  border-top: 1px solid var(--border-muted);
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.kb-bb__x {
+  width: 28px; height: 28px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-bb__x:hover { background: var(--bg-base); color: var(--text-primary); }
+
+.kb-bb__n {
+  min-width: 26px;
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  text-align: center;
+  flex: none;
+}
+
+.kb-bb__act {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid var(--border-brand);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-brand);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kb-bb__act:hover { background: var(--bg-brand-subtle); }
+.kb-bb__act.is-on { background: var(--bg-brand); color: var(--text-on-dark); border-color: var(--bg-brand); }
+
+.kb-bb__note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-success);
+}
+
+/* ---------- The form under a chip ------------------------------------------ */
+
+.kb-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: var(--space-20);
+  z-index: 46;
+  width: 320px;
+  padding: var(--space-16);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-10);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+.kb-pop__title { color: var(--text-primary); }
+.kb-pop__label { color: var(--text-tertiary); margin-top: var(--space-4); }
+
+.kb-pop__list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 220px; overflow-y: auto; }
+.kb-pop__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-pop__opt:hover { background: var(--bg-surface); color: var(--text-primary); }
+
+.kb-pop__seg { display: flex; gap: var(--space-4); padding: 3px; border-radius: var(--radius-8); background: var(--bg-muted); }
+.kb-pop__segbtn {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-6);
+  border-radius: var(--radius-6);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-pop__segbtn.is-on { background: var(--bg-base); color: var(--text-brand); box-shadow: var(--elevation-card); }
+
+.kb-pop__text {
+  min-height: 84px;
+  resize: vertical;
+  padding: var(--space-8) var(--space-10, 10px);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  background: var(--bg-base);
+  font: var(--weight-medium) 13px/1.5 var(--font-family);
+  color: var(--text-primary);
+}
+.kb-pop__text:focus { outline: none; border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+
+.kb-pop input[type="date"] {
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-primary);
+}
+
+.kb-pop__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-12);
+  margin-top: var(--space-4);
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+}
+.kb-pop__cancel { color: var(--text-tertiary); cursor: pointer; }
+.kb-pop__cancel:hover { color: var(--text-primary); }
+.kb-pop__save {
+  padding: var(--space-8) var(--space-16);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 13px/1 var(--font-family);
+  cursor: pointer;
+}
+.kb-pop__save:hover { background: var(--bg-brand-hover); }
+/* Live only once the form has been told enough to act on. */
+.kb-pop__save.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }
+
+/* ---------- Saved views: editing ------------------------------------------
+   Editing is a state of the same menu rather than a dialog over it: the
+   rows stay where they were, and each one gains its name as a field plus
+   the two things that can be done to it.
+   -------------------------------------------------------------------------- */
+
+.kb-menu__none { padding: var(--space-8); color: var(--text-placeholder); }
+
+.kb-menu__edit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+}
+.kb-menu__rename {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-6);
+  background: var(--bg-base);
+  font: var(--weight-medium) 13px/1.4 var(--font-family);
+  color: var(--text-primary);
+}
+.kb-menu__rename:focus { outline: none; border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+
+.kb-menu__editact {
+  width: 26px; height: 26px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kb-menu__editact:hover { background: var(--bg-surface); color: var(--text-primary); }
+.kb-menu__editact--del:hover { background: var(--error-bg); color: var(--text-error); }
+
+/* The one destructive way out of this menu, so it is the one red thing in
+   it rather than another brand-coloured link among several. */
+.kb-menu__act--danger { color: var(--text-error); }
+.kb-menu__act--danger:hover { text-decoration: underline; }
+
+/* ---------- Saving a view from the filter panel ---------------------------- */
+
+.kbf__save {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-20);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+}
+.kbf__save .kbf__search { flex: 1; min-width: 0; }
+.kbf__savebtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-8);
+  background: var(--bg-brand);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.kbf__savebtn:hover { background: var(--bg-brand-hover); }
+/* Needs both a name and something worth saving. */
+.kbf__savebtn.is-off { background: var(--bg-disabled); color: var(--text-disabled); cursor: default; }
+
+/* A line under a form that says where its content lands. */
+.kb-pop__hint { color: var(--text-tertiary); }
+
+/* ==========================================================================
+   The "+ New lead" panel
+   --------------------------------------------------------------------------
+   The second sidebar on this board, so it keeps the filter panel's geometry
+   and motion and differs only where the Figma frame does: 460px rather than
+   380, a rounded leading edge, and a form rather than a list of controls.
+
+   The frame is a 460px panel holding a 428px column, so every field here is
+   measured from that column and the panel pads to it.
+   -------------------------------------------------------------------------- */
+
+.kbnl {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 460px;
+  z-index: 34;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  border-right: 0;
+  border-radius: var(--radius-12) 0 0 var(--radius-12);
+  box-shadow: -24px 0 60px rgba(0, 0, 0, .14);
+  opacity: 0;
+  transform: translateX(12px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.kbnl.is-open { opacity: 1; transform: none; pointer-events: auto; }
+
+.kbnl__head {
+  flex: none;
+  position: relative;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.kbnl__title { font: var(--weight-demi) 16px/16px var(--font-family); color: var(--text-secondary); }
+.kbnl__x {
+  position: absolute;
+  right: var(--space-16);
+  display: flex;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.kbnl__x:hover { color: var(--text-primary); }
+
+/* ---------- Tabs ----------------------------------------------------------
+   The three steps of the form, centred under the title. "(optional)" sits
+   on its own line so the three labels keep one baseline.
+   -------------------------------------------------------------------------- */
+
+.kbnl__tabs {
+  flex: none;
+  align-self: center;
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-20) 0 var(--space-24);
+  padding: var(--space-4);
+  border-radius: var(--radius-8);
+  background: var(--bg-muted);
+}
+.kbnl__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-12);
+  border-radius: var(--radius-6);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.kbnl__tab:hover { color: var(--text-primary); }
+.kbnl__tab.is-on { background: var(--bg-base); color: var(--text-brand); }
+.kbnl__tab-l { font: var(--weight-medium) 14px/18px var(--font-family); }
+.kbnl__tab-o { font: var(--weight-regular) 10px/10px var(--font-family); color: var(--text-tertiary); }
+.kbnl__tab.is-on .kbnl__tab-o { color: var(--text-brand); }
+
+/* ---------- Form ----------------------------------------------------------- */
+
+.kbnl__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--space-16) var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+.kbnl__soon { color: var(--text-tertiary); padding: var(--space-24) var(--space-4); }
+
+.kbnl__f { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+.kbnl__pair { display: flex; gap: var(--space-16); }
+.kbnl__pair > .kbnl__f { flex: 1; }
+
+.kbnl__lab { font: var(--weight-medium) 14px/18px var(--font-family); color: var(--text-primary); }
+.kbnl__lab--sm { font-size: 12px; line-height: 16px; color: var(--text-tertiary); }
+
+.kbnl__in {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  height: 36px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.kbnl__in:focus-within { border-color: var(--border-brand); box-shadow: var(--elevation-focus); }
+.kbnl__in--chip { gap: var(--space-4); }
+
+.kbnl__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: var(--weight-regular) 14px/18px var(--font-family);
+  color: var(--text-primary);
+}
+.kbnl__input:focus { outline: none; }
+.kbnl__input::placeholder { color: var(--text-tertiary); }
+
+/* The country code reads as a chosen value rather than a placeholder, so it
+   carries the demibold the rest of the field does not. */
+.kbnl__cc {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font: var(--weight-demi) 14px/18px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex: none;
+}
+.kbnl__rule { width: 1px; height: 26px; background: var(--border-subtle); flex: none; }
+
+.kbnl__in--chip .chip-person { height: 24px; }
+.kbnl__in--chip .chip-person__x { cursor: pointer; }
+.kbnl__in--chip .chip-person__x:hover { color: var(--text-error); }
+
+/* ---------- Applicant type ------------------------------------------------- */
+
+.kbnl__seg { display: flex; }
+.kbnl__segbtn {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--space-16) var(--space-8);
+  border: 1px solid var(--border-subtle);
+  font: var(--weight-medium) 14px/24px var(--font-family);
+  color: var(--text-tertiary);
+  background: var(--bg-base);
+  cursor: pointer;
+}
+.kbnl__segbtn:first-child { border-radius: var(--radius-8) 0 0 var(--radius-8); }
+/* The two halves share one seam, so the second overlaps the first by its
+   border rather than dropping it — whichever half is chosen keeps a brand
+   edge all the way round. */
+.kbnl__segbtn:last-child { border-radius: 0 var(--radius-8) var(--radius-8) 0; margin-left: -1px; }
+.kbnl__segbtn.is-on {
+  position: relative;
+  background: var(--bg-brand-subtle);
+  border-color: var(--border-brand);
+  color: var(--text-brand);
+  font-weight: var(--weight-demi);
+}
+
+/* ---------- Footer --------------------------------------------------------- */
+
+.kbnl__foot {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-28);
+  padding: var(--space-16);
+  border-top: 1px solid var(--border-subtle);
+}
+.kbnl__checks { flex: 1; display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+.kbnl__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.kbnl__check .kb-box { color: transparent; }
+.kbnl__check.is-on .kb-box { background: var(--bg-brand); border-color: var(--bg-brand); color: var(--text-on-dark); }
+
+.kbnl__add {
+  flex: none;
+  display: grid;
+  place-items: center;
+  height: 36px;
+  padding: 0 var(--space-16);
+  border-radius: 7px;
+  background: var(--bg-brand);
+  font: var(--weight-medium) 16px/16px var(--font-family);
+  color: var(--text-on-dark);
+  cursor: pointer;
+}
+.kbnl__add:hover { background: var(--bg-brand-hover); }

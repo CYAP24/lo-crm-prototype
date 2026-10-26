@@ -28,18 +28,32 @@ changes and a normal server lets the browser keep showing the previous design
 under the current name. If you ever serve this another way, hard-refresh
 (`Ctrl+Shift+R`) after any edit.
 
-Then open <http://localhost:8137/> — that's the prototype shell, which is the
-easiest way in. Individual screens are at `/worklist-v2.html` etc. if you want
-one on its own.
+Then open <http://localhost:8137/> — that's the work-list prototype view,
+which is the easiest way in. The other screens have their own prototype
+views at <http://localhost:8137/kanban.html> and
+<http://localhost:8137/screen2.html>. Individual versions are at
+`/worklist-v2.html`, `/kanban-v1.html` etc. if you want one on its own.
 
 Opening the `.html` directly with `file://` will **not** work — the stylesheets
 and fonts won't resolve. It needs to be served.
 
-## Prototype shell (`index.html`)
+## Prototype views
+
+Each screen gets its own prototype view — a dark harness that frames that
+screen's versions and lets you switch between them:
+
+| Page | Screen | Versions |
+|---|---|---|
+| `index.html` | The work list | v1, v2, v3 |
+| `kanban.html` | The kanban board | v1, v2 |
+| `screen2.html` | Screen 2 | v1 |
+
+Each numbers its versions **from v1 in its own right**: the kanban's v1 and
+the work list's v1 are different screens, not two takes on one.
 
 | Control | |
 |---|---|
-| `1` `2` `3` | Jump to a version |
+| `1` `2` `3` … | Jump to a version — one key per version |
 | `←` `→` | Step through versions |
 | `C` | Compare — two versions side by side, each with its own picker |
 | `Z` | Toggle fit-to-window / 100% |
@@ -47,8 +61,32 @@ and fonts won't resolve. It needs to be served.
 The view is in the URL, so any state can be bookmarked or pasted to someone:
 `#v2`, or `#compare=v1,v2`.
 
-To add a version, append one entry to the `VERSIONS` array at the bottom of
-`index.html` — tabs, compare pickers, shortcuts and deep links all follow.
+### The shared shell
+
+The harness itself — toolbar, tabs, compare, scaling, shortcuts, deep links —
+is `js/shell.js` and `css/shell.css`, one copy for both views. A prototype
+view is just a page that declares what it frames, inline, before that script:
+
+```js
+window.SHELL = {
+  title: 'Work list view',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v2',                 // which version opens first
+  tour:  true,                 // show the replay-the-tour button
+  versions: [
+    { id:'v1', label:'v1', sub:'Pipeline + AI', file:'worklist-v1.html',
+      note:'…the line under the toolbar' }
+  ]
+};
+```
+
+To add a version, append one entry to that `versions` array — tabs, compare
+pickers, shortcuts and deep links all follow. To add a **screen**, copy one of
+the two pages and point it at that screen's versions.
+
+Two controls look after themselves: compare stands down when there is only one
+version, since there is nothing to hold it against, and the tour button appears
+only where `tour` is set — screen 2 has no tour yet.
 
 ## The artboard and scrolling
 
@@ -73,7 +111,11 @@ assets/brand/    logo.svg and assist.svg, exported from CRM-2026 — the sprite
                  stage-path.png is used directly, see below.
 css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ramp.
                  Variable names match the code syntax set on the Figma variables.
-css/worklist.css Layout + components. Shared by all versions.
+css/shell.css    The prototype views' own chrome — the dark harness, not the
+                 mocks it frames. Shared by index.html and screen2.html.
+js/shell.js      The harness itself: tabs, compare, scaling, shortcuts, deep
+                 links. Driven by the page's window.SHELL.
+css/worklist.css Layout + components. Shared by all work-list versions.
 css/draft2.css   Overrides for the draft-parity page only.
 stamp.py         Rewrites asset links with a content hash, see above.
 js/icons.js      SVG sprite + icon() helper. Shared by all versions.
@@ -88,11 +130,21 @@ js/tour.js        Points-of-interest tour — engine and the step list per
 css/tour.css      Spotlight and callout styles.
 js/appview.js     Application view — the screen a deal opens into (v1).
 css/appview.css   Its styles.
+js/kanban.js      Kanban board — the deals as cards. See below.
+css/kanban.css    Its styles, on top of worklist.css.
+js/screen2.js     Screen 2 — a standalone copy of the application view, being
+css/screen2.css   reworked into a different screen. See below.
 js/variants.js    Concept renderers (v3–v5).
 worklist-draft2.html  Reference — the original Figma draft, rebuilt. Not in
                       the shell; open it directly if you need it.
 worklist-v1.html      v1 — top nav is a placeholder band.
 worklist-v2.html      v2 — real global navigation bar.
+index.html            The work-list prototype view — v1, v2, v3.
+kanban.html           The kanban prototype view — v1, v2.
+kanban-v1.html        v1 — alert states, tasks as tinted blocks.
+kanban-v2.html        v2 — alert states, text and colour only.
+screen2.html          The screen-2 prototype view — v1.
+screen2-v1.html       Screen 2, v1 — the copy of the application view.
 ```
 
 ## Versions
@@ -190,6 +242,438 @@ All three versions open into it: each passes `appView` to the shared mount.
 They still differ in the row itself — v2 keeps Broker Assist in its quick-view
 sidebar, v3 keeps the split action columns — but the screen behind a deal is
 the same one.
+
+## Kanban view
+
+The board is a rebuild of the Figma frame **`Draft #2 - 1440 px`** (node
+`4235:8867`) — the deals as cards, grouped by the master pipeline stage. The
+card in it comes from a later frame; see **Alert states** below.
+
+**It runs on the same deals as the work list.** `js/data.js` already carried
+everything a card needs, so nothing is invented: the name, reference, amount,
+product, created and last-activity dates, the stage and its day count, the
+documents, the people on the deal and the task / note / activity counts all
+come from the deal. The column counts are the real ones, so they move when
+the data does.
+
+| Column | |
+|---|---|
+| New lead | Arrivals nobody has called yet. Sits in front of the pipeline, on a light red ground |
+| Qualifying, Discovery, In Progress, Approval, Settlement | `MASTER_STAGES`, in order |
+| Snoozed | Broker-set, and it wins over the pipeline stage — the same rule the grouped work list uses. Two steps darker than the others, its cards at 70%, and the contact buttons replaced by `Snoozed until <date>` |
+
+New lead and Snoozed are the two ends of the same idea — one is the arrivals
+tray, the other is what has been deliberately parked — so they are the two
+columns that do not look like the pipeline between them. A parked deal also
+drops its call, SMS and email buttons: there is no point offering to ring
+someone you have put off until February, so the card says when it comes back
+instead. `snoozedUntil` is on the deal, beside the `snoozed` flag.
+
+**New lead is the board's own column, not a new pipeline stage.** `KB_STAGES`
+puts it in front of `MASTER_STAGES` locally, because that array is the work
+list's spine too and an arrivals tray is a board idea rather than a change to
+the pipeline. Membership is the immediate state: a deal that wants calling
+right now *is* a new arrival, which is what keeps the call-now card exclusive
+to that one column instead of scattered down the board.
+
+**The artboard is this project's 1920, not the frame's 1440.** The column is
+the unit and keeps the frame's size (340 wide, 12px gutter, 312px cards), so
+the wider artboard shows more of the board rather than a wider board. Six
+columns still do not fit, so the board scrolls sideways — as it does in the
+frame, where four of the six are visible.
+
+**Where it leaves the frame**, and why:
+
+- the icons are the sprite's, not the frame's exports — `js/icons.js` already
+  carried every one of them
+- the per-column filter reads `View all` on every column; the frame shows a
+  filter glyph on two of them, and there is no filter state to drive it yet
+
+**Interactions are thin**, as on the other screens: the columns scroll, the
+board scrolls sideways, the column filter toggles. **Nothing drags yet**, and
+a card does not open the application view — both are the obvious next
+things.
+
+#### The toolbar
+
+The global CRM nav sits above the board in both versions, the same `navBar()`
+the work list uses, in place of the placeholder band.
+
+The toolbar under it is shared: both versions get the same one, and with it
+the same views menu, filter panel, sort, select mode, bulk banner and
+`+ New lead`. They differ below the bar, not in it. Seven things the brief
+asks for, and where each one went:
+
+| | |
+|---|---|
+| Switch board / list / Easy View | Three tabs with a glyph, as before |
+| Jump to a common view | A `Your views` dropdown beside the board name, replacing the deal-type select |
+| Search | The one field, saying what it actually searches |
+| Filter | A side panel that applies as you change it |
+| Sort | The `-Sort by-` dropdown |
+| Add a lead | `+ New lead` |
+| Work on several deals | `Select`, which turns the board into checkboxes and raises a bulk bar |
+
+**The views, filters and sort are real**, not drawn. `kbDeals()` is the one
+path: it runs the view's predicate, then the saved view's, then each filter
+group, then the amount and date ranges, then the sort — so a view and a
+filter compose instead of fighting, and the column headings count what is
+actually on screen. The nine views give 10 / 22 / 12 / 1 / 14 / 19 / 4 / 2 /
+20 deals against today's data.
+
+**A saved view is a set of filters with a name on it**, not a rule of its
+own. That is what lets it be adjusted: applying one loads its filters into
+the panel, so a broker can see and change exactly what it stands for, and
+changing anything by hand detaches the name — the dropdown stops claiming to
+be a view it no longer is.
+
+Saving happens in the **filter panel**, where the thing being saved was made
+and can be seen, rather than in the views menu. `Edit saved views` at the
+foot of the menu — the one red thing in it — turns the saved list into rows
+that can be renamed in place, adjusted (which loads the view and opens the
+panel on it) or deleted. Nothing persists past a reload; this is a
+prototype.
+
+**Amount and date lead the filter panel**, because they are the two a broker
+reaches for without first deciding whose deals they are looking at. Broker,
+partner and partner group follow, and all three are searched rather than
+ticked: type a name, pick it from the suggestions, and it becomes a
+removable tag. That is the work list's own `.chip-person`, so a person keeps
+the colour they have on a row and in a panel; a group has no initials of its
+own and wears the first letter of each word instead, so Auto Retail Group is
+`AR`. Partner group sits directly under partner because it is the same
+question asked one level up. Typing narrows the suggestions without touching
+the board — nothing filters until a name is picked. The four closed lists
+(stage, consumer or commercial, loan type, lead source) stay as ticks, which
+are quicker for a short list.
+
+**Filters apply instantly**, so there is no Apply button and nothing to
+press. The panel says `Showing N of 27 deals` instead, which is the feedback
+the button would have carried, and the Filter control takes a badge counting
+the groups that are actually constraining.
+
+**Sorting cannot jump around.** It orders on `created`, `activity`, `amount`
+and the next follow-up — all of them dates and counts the *deal* records.
+Opening a card or its quick-actions panel changes none of them, so the board
+a broker comes back to is the board they left.
+
+**Select mode** puts a box on every card and a `Select all` on every column.
+Picking anything raises a banner **over the board's own toolbar** rather than
+floating a bar over the cards: the selection is a mode the board is in, so it
+takes the row that chooses what you are looking at — the row that stops
+applying while a selection is live. The CRM header above it stays put,
+because leaving the board entirely is still allowed. A cross on the left drops the selection, the
+count sits beside it, and each action opens a small form under its own chip:
+
+| Action | The form |
+|---|---|
+| Reassign broker | Search by name, pick one, it becomes a removable chip |
+| Move stage | The seven stages, one of them chosen |
+| Message | SMS or Email, then free text |
+| Add a task | What needs doing, who it is for, when it is due — the quick-actions panel's own vocabulary |
+| Add a note | Free text, landing on every selected deal as an internal note |
+
+Save is live only once the form has been told enough to act on, and the
+confirmation sits **beside** the actions rather than replacing them, since
+having just reassigned, the next thing a broker wants is often to message the
+same deals. Nothing is written: the board behind the banner is unchanged, and
+the line says what would have happened.
+
+The selection itself is real, and it survives filtering.
+
+Three things the data gained for this: `segment` (consumer or commercial,
+which follows the product), `source` (where the lead came from, which nothing
+could previously express), and `PARTNER_GROUPS`, so a broker can filter by a
+whole partner group rather than naming each dealership. Two settlement dates
+were also pulled into the current week, so `Settling this week` is not an
+empty view in the mock data.
+
+#### Quick actions
+
+The `Note` and `Task` pills on a card open the same two things the work list
+offers, and each version borrows the shape that suits it:
+
+| | |
+|---|---|
+| **v1** | The full-height sidebar, on the tab you pressed |
+| **v2** | A card floated beside the pill, the way the work list's own quick actions do — `js/popups.js`, unchanged |
+
+v2's are the work list's popups outright: `Next required actions` and
+`Internal notes`, seeded off the deal, so the same row tells the same story
+wherever it is opened from.
+
+The sidebar, in v1: It is the work list's panel, not a
+copy: `css/variants.css` supplies the `.dp-*` styles and `js/variants.js`
+supplies `panelTasks` and `panelNotes`, so the task and note lists are the
+ones the work list already tells. Both files come along on the kanban pages
+for that alone — `window.VARIANT` is unset there, so the work-list renderer
+loads and never runs.
+
+What the kanban changes is the head and the tabs:
+
+| | |
+|---|---|
+| Head | `Quick actions`, the client's name, then **amount · day in stage · stage**. The reference and the product are on the card already, so the panel names the three things the card does not repeat |
+| Tabs | **Add task**, **Add note**, **Docs & forms** |
+
+`Docs & forms` is a placeholder: it holds the shape of the panel but has no
+renderer, so it is drawn disabled and titled `Nothing here yet`. `Request
+docs` on the card stays inert for the same reason — there is nothing yet for
+it to open.
+
+The card the panel belongs to takes a brand ring, since the panel covers the
+right of the board and can hide it. `Esc` or a click anywhere outside closes.
+
+#### + New lead
+
+Both versions open the same panel behind the toolbar's `+ New lead`, from the
+Figma frame of that name (`4633:26032`). It is the board's second full-height
+sidebar, so it keeps the filter panel's geometry and motion and differs only
+where the frame does: 460px rather than 380, a rounded leading edge, and a
+form rather than a list of controls.
+
+| | |
+|---|---|
+| Head | `New lead` and a close cross |
+| Tabs | **Main details**, **Enquiry details** *(optional)*, **Lead details** *(optional)* |
+| Main details | Mobile no. (`+61` and the number in one field), Email address, First / Last name, Applicant type as **Person · Business**, then Assign broker, Assign partner, Referral source and Referring person as person chips |
+| Foot | `Don't send welcome SMS & Email`, `Send broker notifications`, and **Add now** |
+
+The two optional tabs have no fields behind them in the frame, so they say so
+rather than showing an empty form — the same honesty `Docs & forms` keeps.
+
+The person chips are the work list's `personChip`, so a broker wears the same
+colour here as on a row; the cross on one clears it back to `+ Assign`. The
+checkboxes, the segmented control and the tabs all toggle. Nothing is
+submitted: `Add now` is inert.
+
+The button is wired by delegation from the screen rather than bound to
+itself, because v1 repaints its whole toolbar whenever a view, filter or sort
+changes. `Esc` or a click anywhere outside closes.
+
+#### Removed
+
+- **The first board card** — the one from the `Draft #2 - 1440 px` frame, with
+  the documents ring and the assignee stack. The alert-state card replaced it.
+- **Visual cues 1** — the treatment that ran the tasks as full-bleed bands
+  across the card, separated by hairlines. Cut after review; `Visual cues 2`
+  survived and is now v1.
+
+Their renderers and styles are deleted, as with the work list's removed
+versions.
+
+### Styling versions — Ribbon
+
+**The `.2` suffix means Ribbon.** `v1.2` is v1 restyled and `v2.2` is v2
+restyled — same markup, same renderers, same text hierarchy, same seven
+functions on the toolbar, the same quick actions, filter panel, bulk banner
+and `+ New lead` as the version they are a skin over. Each page loads one or
+two extra stylesheets after `css/kanban.css` and sets a skin class on its
+`.screen`:
+
+| | Page | `KB_VARIANT` | Skin class | Stylesheet |
+|---|---|---|---|---|
+| **v1.2** Ribbon | `kanban-v1-2.html` | `v1-2` | `.skin-ribbon` | `css/kanban-ribbon.css` |
+| **v2.2** Ribbon | `kanban-v2-2.html` | `v2-2` | `.skin-ribbon .skin-ribbon-text` | the same, plus `css/kanban-ribbon-text.css` |
+
+Each page names its own variant in `KB_VARIANTS`, which says which card
+renderer it uses and which column heading — two decisions that used to be
+one.
+
+`css/kanban-ribbon.css` is **shared**, so the stage ribbons and their capsule
+markers, the 12px card with the spine inside it, the small caps labels, the
+tabular figures, the capsule chips, the toolbar and the panels move for both
+at once. `css/kanban-ribbon-text.css` is only the places where v2's card is
+a different shape from v1's, and the places where carrying Ribbon over would
+have cost v2 what it is for.
+
+So there is **no second board** to keep in step: a change to `js/kanban.js`
+reaches every version, and a styling direction can be thrown away by
+deleting one file and one page. Nothing in `js/kanban.js` knows which skin
+is on. Another direction is another sheet and another page beside these.
+
+The one thing the JS gained for it is `kbTone()`, which hands each column
+its stage's `colour`, `tint` and `ink` from `MASTER_STAGES` as `--kb-stage`,
+`--kb-tint` and `--kb-ink`. Those three values already existed for the
+colour-coded work list; the skin reaches for them rather than restating the
+palette, and v1 and v2 simply ignore them. New lead is not a pipeline stage
+and has no entry, so it borrows the system's error tint — the ground it
+already stands on.
+
+#### v2.2 — Ribbon, answering with type
+
+v2 is the text-and-colour version: no tinted task blocks, no documents bar,
+fewer objects and more words. So where v1.2 answers a question with a shape,
+v2.2 answers it with type:
+
+| | v1.2 | v2.2 |
+|---|---|---|
+| An overdue task | A solid red bar across the card | The task goes red and demibold and its due date goes with it, in the list it was already in |
+| Documents | A bar in four status colours, every colour keyed to a dot | No bar, so nothing for a dot to key to — the counts carry their colour as words, and the dots are turned off |
+
+**The column heading is v1.2's**, not v2's. `kbColumnHead()` used to pick
+its treatment from the card mode, which meant the text-and-colour card came
+with the line-of-text heading whether or not that was wanted; `KB_VARIANTS`
+in `js/kanban.js` now names the card and the heading separately, so v2.2
+takes v2's card under v1.2's heading. That also settles a fit problem: v2's
+heading spells the total out, and seven figures beside a stage name does not
+fit 340px, so three of the seven names were being truncated.
+
+**`Upcoming tasks` drops to 10px**: set in capitals it is wider than the
+sentence case it replaces, and it is the one label on the card that takes
+width from the task name, which is what a broker is reading.
+
+#### What Ribbon does
+
+A broker reading this board is time poor, so every signal on it is ranked
+rather than merely present, and the geometry is the brand's own roundness
+rather than v1's.
+
+| | |
+|---|---|
+| Board | White end to end. No column grounds and no rules between columns — the heading ribbons are what mark one column from the next |
+| Column heading | A **rounded ribbon in the stage's own `tint`**, its name in that stage's `ink`, with a **capsule in its `colour`** at the head of the row. A column is found by colour before a word of it is read |
+| What is late | A **solid red pill** in that ribbon. It is the loudest thing in the heading because it is the only thing in the heading to act on |
+| Card | 12px, with a hairline the same weight on all four sides and the barest lift. A **5px spine** runs inside it, full height, curving with the corner because the card clips it. Every card has one, so the quiet ones are grey and the loud ones are a colour rather than a new shape |
+| Labels | Uppercase, letterspaced, 10–11px: the stage name, the card's day-and-stage line, the document and task labels |
+| Figures | `font-variant-numeric: tabular-nums` on the whole board, so amounts, counts and dates line up down a column |
+| Documents | A bar in the system's four status colours — green received, amber with us, red rejected, grey not requested — with **each colour repeated as a dot against the word for it** underneath, and the green dot on `3 of 6`. The bar is the picture and the line under it is the key |
+| The action row | 8px squircles — v1's footer is four pills in a row, and this one should not be mistaken for it |
+
+**The alert band is ranked three ways at once** — fill, weight and height —
+rather than by hue alone:
+
+| State | Band | Height | Also |
+|---|---|---|---|
+| Call now | Solid red, white small caps | Tallest | The whole card's box turns red, and the call key with it |
+| Documents to review | Amber tint, amber ink, 2px amber rule under | Middle | Amber spine |
+| Possible duplicate | Grey tint, near-black ink | Shortest | Near-black spine |
+
+Height is doing most of the work, and it costs nothing to read. v1 ranks the
+three by colour alone, which is why a board where half the cards carry
+something reads flat.
+
+**An overdue task is a solid red bar**, bled to both edges of the card.
+Nothing else in the body spans the card's full width, so the bleed is what
+makes it read as a cut across the card rather than one more line in the
+list — and it is why a tint could never do this job however saturated: a
+pale ground inside the text column is still a row. The glyph stays the
+calendar clock the other task rows carry, since it is the same kind of
+thing as they are and only its state is different. White on `#D92D20` is
+4.8:1, and the lateness is held back from white in small caps so the bar
+reads task first.
+
+Everything else that is late says so in red type rather than red fill — a
+rejected document is set in red demibold — so the bar, the column's overdue
+pill and the call-now band stay the only solid red on the board.
+
+The tint and ink pairs are the design system's own and clear 4.5:1 as drawn,
+so the count beside each stage name takes the lighter weight rather than a
+lower opacity, which would take it under.
+
+#### Removed
+
+- **v1.3 Midnight** — v1 dropped onto a deep plum from the top of the brand
+  ramp, with glass columns and lifted white cards. Cut in favour of working
+  one direction properly.
+- **Ledger** — the first pass at this direction, and what Ribbon was
+  duplicated from: the same thinking drawn as a ruled document, square and
+  hairlined, with the stage band bled to the column's rules. Cut once the
+  rounded version had it.
+
+### Alert states
+
+All three versions use the alert-state card from the CRM-2026 `To upload` page
+(node `4622:10931`). The board is identical in all of them — each
+passes its own card renderer to `renderKanban`, so the columns, the toolbar
+and the chrome are shared rather than copied, and v1.2 uses v1's renderer
+outright.
+
+| | The card | The column heading |
+|---|---|---|
+| **v1** Visual cues | One body, and the tasks are rounded tinted blocks inside it | The total as plain text at the stage name's size, and the overdue count as a chip, with the value shortened to `$1.2M` |
+| **v2** Text & colour | No tints and no progress bar: a labelled two-column task list, and the documents as words | The totals as a line of text, value spelled out, colour doing the work |
+
+**Each heading carries four things**, in the order a broker reads them: the
+stage, how many deals, what they are worth, and what is late — one row, with
+the totals where the `View all` control used to sit. The stage's description
+moved onto the name as a tooltip, since that is where it went with the
+control. Both totals are summed from the column's own deals, so a heading
+cannot drift from the cards under it, and both drop the overdue count when
+there is none, since an empty `0 overdue` on every column is what stops the
+real ones registering.
+
+**The four states are read off the deal**, not set by hand — `kbState()` in
+`js/kanban.js` is the whole rule:
+
+| State | When | How it shows |
+|---|---|---|
+| Immediate | A high-urgency deal still in Qualifying, not snoozed | Red banner, `New lead - call now`, a red outline on v1, and the card moves to the New lead column |
+| Urgent | Documents the client sent that have sat unchecked for ten days | Amber banner naming the count |
+| Warning | `duplicate` is set on the deal | Grey banner, `Possible duplicate` |
+| None | Nothing wants attention | No banner |
+
+**The band is about documents, not tasks.** An overdue task already says so
+on the task itself, in a red bar across the card, so a band repeating the
+count above it spends the loudest thing on the card telling a broker
+something they can already see. The band is left to the one thing the body
+does not carry: work that has arrived and is waiting on them to look at it.
+
+**The threshold is what keeps the board honest.** An alert on every card is
+the same as no alerts at all, and 20 of the 27 deals have a document in
+review at any moment — so firing on arrival would put a band on three cards
+in four. A document in review for two days is the process working; one
+sitting for ten is not. That gives **3 immediate, 5 urgent, 2 warning and 17
+quiet** — a board a broker could triage rather than a wall of amber.
+
+**A call-now card drops its tasks and its documents** in both versions. The
+only thing being asked for is the call, and rows of progress underneath argue
+with it; what is left is who, how much, the day and stage, and the three ways
+to reach them.
+
+**`duplicate` is the one field the model gained for this.** Everything else a
+card shows was already in `js/data.js`. The task rows are derived from
+`nextAction`, `tasksOverdue` and `tasksDue`, so the due counts stand in for
+real dates — `kbTasks()` is the single place to change when the model
+carries them.
+
+Two values are sampled from the frame rather than taken from a token: the
+filled contact pill (`#ECDEFE`) and the neutral task block (`#EFEFEF`). Both
+sit between steps on the ramp, and matching the frame mattered more than
+inventing a token for them.
+
+## Screen 2 — the copy of the application view
+
+`screen2-v1.html` is a **standalone duplicate of the application view**, the
+starting point for a different screen. It is a copy rather than a second
+skin, because the two are meant to diverge: the `av` prefix was renamed to
+`s2` throughout, so `js/screen2.js` and `css/screen2.css` can be reshaped
+freely without any of it reaching the screen a deal opens into.
+
+It still shares what is genuinely common — `css/tokens.css`, the icon sprite
+in `js/icons.js`, and the deal data in `js/data.js`.
+
+Two things differ from the original, both because this is a screen in its own
+right rather than an overlay over the work list:
+
+- it renders on load, from `DEALS[0]`, instead of waiting for a row to be
+  clicked — so the `.is-open` gate and the row-opening wiring are gone
+- the close `×` is gone from the top bar: there is nothing behind it to close
+  back to
+
+The interactions that were asked for are all still there — sections collapse,
+Activity and Internal notes expand over the column, Broker Assist raises, the
+external/internal tabs switch, the lists scroll.
+
+It has its own prototype view at `screen2.html`, where it is **v1** — the
+numbering starts again, because this is a different screen rather than another
+take on the work list. The page itself is `screen2-v1.html`, and it opens on
+its own at `/screen2-v1.html`.
+
+A second version of this screen goes the way the work list's do: a page that
+sets `window.S2_VARIANT`, an entry in `S2_MOUNTERS` at the bottom of
+`js/screen2.js` skinning the same mount, and one line in the `versions` array
+in `screen2.html`.
 
 ## Points-of-interest tour
 

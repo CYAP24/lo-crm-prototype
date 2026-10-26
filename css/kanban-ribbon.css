@@ -1,0 +1,411 @@
+/* ==========================================================================
+   Kanban v1.2 — Ribbon
+   --------------------------------------------------------------------------
+   v1's board, restyled. Same markup, same renderers, same hierarchy, same
+   controls: this file only changes how it looks, and it is loaded after
+   css/kanban.css on kanban-v1-2.html alone.
+
+   The idea: a broker reading this board is time poor, so every signal on it
+   is ranked rather than merely present. The stage's own colour leads its
+   column, alerts separate by fill, weight and height rather than by hue
+   alone, solid red is rationed to the two things worth interrupting for,
+   and the labels go to small caps with tabular figures underneath so a
+   column of numbers can be read down rather than across.
+
+   The geometry is the brand's own roundness — ribbons, capsules, lozenges —
+   rather than v1's, which carries its stages on grey grounds and says none
+   of this in type.
+
+   Scoped to `.skin-ribbon`, set on the page's `.screen`.
+   ========================================================================== */
+
+/* Every figure on the board is set in tabular numerals, so amounts, counts
+   and dates line up down a column whether or not anything is aligned to
+   them. It is the one typographic decision the whole skin rests on. */
+.skin-ribbon .kb { font-variant-numeric: tabular-nums; }
+
+/* ---------- Toolbar -------------------------------------------------------
+   The bar keeps the curves the base board gives it and changes one thing:
+   the create button is filled rather than outlined, because it is the only
+   control on the bar that makes something. */
+
+.skin-ribbon .kb-bar { border-bottom: 1px solid var(--border-subtle); }
+.skin-ribbon .kb-new {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ribbon .kb-new svg { color: var(--text-on-dark); }
+
+/* ---------- Board ---------------------------------------------------------
+   No column fills and no rules between them: the heading ribbons are what
+   mark one column from the next, so the white under them is open. */
+
+.skin-ribbon .kb-board {
+  gap: 0;
+  padding: 0 var(--space-24) var(--space-16);
+  background: var(--bg-base);
+}
+
+.skin-ribbon .kb-board { gap: var(--space-8); }
+.skin-ribbon .kb-col {
+  width: calc(340px + var(--space-8) + 4px + 14px * 2);
+  padding: var(--space-16) 14px 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* The two columns that were coloured grounds in v1 keep their identity in
+   the heading band instead — see below. Snoozed still holds its cards back,
+   since that is what the column means rather than how it is drawn, and it
+   holds back less than v1 does: a card at .55 is no longer readable at a
+   glance, which is the opposite of the point. */
+.skin-ribbon .kb-col[data-stage="newlead"],
+.skin-ribbon .kb-col[data-stage="snoozed"] { background: none; }
+.skin-ribbon .kb-col[data-stage="snoozed"] .kb-c { opacity: .7; }
+
+/* ---------- Column heading ------------------------------------------------
+   The first thing scanned, so it is the one place the skin spends colour
+   without being asked: a ribbon in the stage's own `tint`, its name in that
+   stage's `ink`, and a capsule in its `colour` at the head of the row.
+   Those three values come from `MASTER_STAGES`, so this is the system's
+   stage palette rather than a new one, and a broker finds a column by
+   colour before reading a word of it.
+
+   It is a rounded ribbon sitting inside the column rather than a band bled
+   to its edges, which is the shape the brand actually uses. */
+
+.skin-ribbon .kb-col__head {
+  height: auto;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-12);
+  margin: 0 0 var(--space-12);
+  background: var(--kb-tint, var(--bg-surface));
+  border-radius: var(--radius-10);
+}
+.skin-ribbon .kb-col__head::before {
+  content: '';
+  flex: none;
+  width: 4px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--kb-stage, var(--border-default));
+}
+/* Snoozed has no tint of its own — it is not a pipeline stage — so it takes
+   a plain grey band, which is the right answer for it anyway. */
+.skin-ribbon .kb-col[data-stage="snoozed"] .kb-col__head { background: var(--bg-muted); }
+
+.skin-ribbon .kb-col__name {
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--kb-ink, var(--text-primary));
+}
+.skin-ribbon .kb-col__n {
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .06em;
+  /* The stage's own ink, at the lighter weight rather than a lower opacity:
+     the tint/ink pairs clear 4.5:1 as drawn, and fading one takes it under. */
+  color: var(--kb-ink, var(--text-tertiary));
+}
+.skin-ribbon .kb-col__stats { align-items: baseline; gap: var(--space-12); }
+.skin-ribbon .kb-col__sum {
+  font: var(--weight-demi) 15px/16px var(--font-family);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+/* Solid red, and a pill. It is the loudest thing in the heading because it
+   is the only thing in the heading a broker has to do something about. */
+.skin-ribbon .kb-stat--over {
+  padding: 3px var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--error-base);
+  color: var(--text-on-dark);
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.skin-ribbon .kb-colsel { margin: var(--space-4) 0 var(--space-8) 3px; }
+.skin-ribbon .kb-box { border-radius: var(--radius-6); }
+.skin-ribbon .kb-col__empty { padding-left: 0; }
+
+/* ---------- Card ----------------------------------------------------------
+   The same spine in the margin, the way a reader marks a page — but drawn
+   inside the card rather than as its left border. A 5px border on one edge
+   and 1px on the other three gives the box four different corners and a
+   silhouette that leans; laid inside a hairline that is the same weight all
+   the way round, the card is square to its neighbours and the spine still
+   runs the full height, curving with the corner because the card clips it.
+
+   Every card has one, so the quiet ones are grey and the loud ones are not
+   a surprise shape — only a different colour, in the place the eye is
+   already running down.
+
+   12px rather than v1's 16px, and a hairline with the barest lift rather
+   than v1's shadow: rounded, but not the same round. */
+
+.skin-ribbon .kb-c {
+  position: relative;
+  border-radius: var(--radius-12);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.skin-ribbon .kb-c::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  z-index: 1;
+  width: 5px;
+  background: var(--neutral-300);
+  pointer-events: none;
+}
+.skin-ribbon .kb-c:hover { border-color: var(--border-muted); }
+.skin-ribbon .kb-c.is-immediate::before { background: var(--error-base); }
+.skin-ribbon .kb-c.is-urgent::before    { background: var(--warning-base); }
+.skin-ribbon .kb-c.is-warning::before   { background: var(--neutral-900); }
+/* The one state that wants the phone picked up now takes the whole box as
+   well as the spine — evenly, on all four sides. It is the only card on the
+   board drawn in red. */
+.skin-ribbon .kb-c--cues.is-immediate {
+  outline: 0;
+  border-color: var(--error-base);
+}
+.skin-ribbon .kb-cbox { border-radius: var(--radius-pill); }
+
+/* ---------- The alert band ------------------------------------------------
+   Three states, ranked by three things at once — fill, weight and height —
+   so a broker scanning a column reads the order without reading the words:
+
+     call now        solid red, white type, the tallest band
+     tasks overdue   amber tint, amber ink, and an amber rule under it
+     possible dup.   grey tint, near-black ink, the shortest band
+
+   v1 ranks them by hue alone, which is why its boards look flat when half
+   the cards carry something. Height is doing most of the work here, and it
+   costs nothing to read. */
+.skin-ribbon .kb-c__banner { padding: 6px var(--space-12); }
+.skin-ribbon .is-immediate .kb-c__banner { padding: 10px var(--space-12); }
+.skin-ribbon .is-urgent .kb-c__banner {
+  padding: 8px var(--space-12);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-bottom: 2px solid var(--warning-base);
+}
+.skin-ribbon .is-warning .kb-c__banner {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-muted);
+}
+.skin-ribbon .kb-c__banner-label {
+  font: var(--weight-demi) 10px/14px var(--font-family);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.skin-ribbon .kb-c__banner-action {
+  font: var(--weight-medium) 10px/14px var(--font-family);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.skin-ribbon .kb-c__body { gap: 14px; padding: var(--space-16); }
+/* The name leads and the figure answers it, a step down — v1 separates the
+   two by colour alone, which is not a separation at a glance. */
+.skin-ribbon .kb-c__name { letter-spacing: -.01em; }
+.skin-ribbon .kb-c__amount {
+  font-size: 15px;
+  letter-spacing: -.01em;
+  color: var(--text-secondary);
+}
+
+/* Square contact keys, and the one that is the next action filled rather
+   than tinted. On a call-now card that key turns red, so the alert at the
+   top of the card and the control that answers it are the same colour. */
+.skin-ribbon .kb-cp {
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  border-color: var(--border-default);
+}
+.skin-ribbon .kb-cp--on {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ribbon .is-immediate .kb-cp--on {
+  background: var(--error-base);
+  border-color: var(--error-base);
+}
+.skin-ribbon .kb-snooze { border-radius: var(--radius-pill); border-color: var(--border-default); }
+
+/* Day and stage become the card's ruled meta line. */
+.skin-ribbon .kb-c__stage {
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-subtle);
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* ---------- Tasks ---------------------------------------------------------
+   v1's tinted blocks become ruled rows. An overdue row keeps its red type
+   and loses its ground: on a page this quiet, the colour is enough. */
+
+/* Spaced rather than ruled. A hairline above the stack and one under every
+   row puts a line hard against the top and bottom of the highlighted row,
+   which is what made the card feel crowded: the lozenge had nothing to sit
+   in. The rows carry their own gap instead, and the stack is held apart
+   from the lines above and below it by the body's own spacing. */
+.skin-ribbon .kb-c__blocks { gap: var(--space-6); border-top: 0; }
+.skin-ribbon .kb-c__block {
+  gap: var(--space-8);
+  padding: var(--space-2) 0;
+  border-radius: 0;
+  border-bottom: 0;
+  background: none;
+}
+/* The late one is a solid bar bled to both edges of the card. Nothing else
+   in the body spans the card's full width, so the bleed is what makes it
+   read as a cut across the card rather than one more line in the list —
+   and it is why a tint could never do this job, however saturated: a pale
+   ground inside the text column is still a row. White on #D92D20 is 4.8:1.
+
+   The glyph stays the calendar clock the other task rows carry. It is the
+   same kind of thing as they are; only its state is different. */
+.skin-ribbon .kb-c__block.is-overdue {
+  width: calc(100% + var(--space-16) * 2);
+  margin: 0 calc(var(--space-16) * -1);
+  padding: 5px var(--space-16);
+  border-radius: 0;
+  background: var(--error-base);
+  box-shadow: none;
+}
+.skin-ribbon .kb-c__block.is-overdue svg,
+.skin-ribbon .kb-c__block.is-overdue .kb-c__block-label { color: var(--text-on-dark); }
+.skin-ribbon .kb-c__block.is-overdue .kb-c__block-label { font-weight: var(--weight-demi); }
+.skin-ribbon .kb-c__block-due {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+/* Small caps and held back from white, so the bar reads task first and
+   lateness second rather than as two competing labels. */
+.skin-ribbon .kb-c__block.is-overdue .kb-c__block-due {
+  font: var(--weight-demi) 10px/16px var(--font-family);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .85);
+}
+
+/* ---------- Documents -----------------------------------------------------
+   The bar is four states in one line, so it only works if a broker can tell
+   which is which without being told twice. Two things make that true: the
+   bar carries the system's own status colours, and every colour in it is
+   repeated as a dot against the word for it underneath. The bar is the
+   picture, the line under it is the key, and `3 of 6` takes the green dot
+   because that is the count the green stands for.
+
+      green   received
+      amber   with us, not yet checked  ("pending")
+      red     rejected
+      grey    not requested yet         ("to request")
+*/
+
+.skin-ribbon .kb-c__docs-label {
+  font: var(--weight-medium) 11px/16px var(--font-family);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.skin-ribbon .kb-c__docs-n {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  font-variant-numeric: tabular-nums;
+}
+
+.skin-ribbon .kb-c__bar {
+  height: 10px;
+  gap: 2px;
+  border-radius: 0;
+  background: none;
+}
+/* The unclassed segment is the one with no status yet — a document nobody
+   has asked for. Stating it here rather than on `.kb-c__seg` is the whole
+   point: a rule on the base class outruns the three state classes and
+   paints the entire bar one grey, which is what it was doing. */
+.skin-ribbon .kb-c__seg {
+  border-radius: var(--radius-pill);
+  min-width: 5px;
+  background: var(--neutral-300);
+}
+.skin-ribbon .kb-c__seg--ok       { background: var(--success-base); }
+.skin-ribbon .kb-c__seg--review   { background: var(--warning-base); }
+.skin-ribbon .kb-c__seg--rejected { background: var(--error-base); }
+
+/* The key. Every count gets the dot of the segment it is counting, so the
+   bar is read once and understood from then on. */
+.skin-ribbon .kb-c__docs-breakdown { font-variant-numeric: tabular-nums; }
+.skin-ribbon .kb-c__docs-breakdown > span:not(.kb-c__dot) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.skin-ribbon .kb-c__docs-n::before,
+.skin-ribbon .kb-c__docs-breakdown > span:not(.kb-c__dot)::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--neutral-300);
+}
+.skin-ribbon .kb-c__docs-n::before { background: var(--success-base); }
+/* Written as `> span.is-review` rather than `.is-review`: the grey default
+   above is `> span:not(.kb-c__dot)`, and the `:not()` carries a class of
+   its own, so a plain `.is-review` loses to it on specificity. */
+.skin-ribbon .kb-c__docs-breakdown > span.is-review::before   { background: var(--warning-base); }
+.skin-ribbon .kb-c__docs-breakdown > span.is-rejected::before { background: var(--error-base); }
+/* "all in" arrives on its own, with no counts beside it to separate. */
+.skin-ribbon .kb-c__docs-breakdown > span:only-child::before { background: var(--success-base); }
+
+/* Solid red is rationed: the column's overdue pill and the call-now band,
+   and nothing else on the board. Everything else that is late says so in
+   red type, so the two things worth interrupting for stay the two loudest
+   things on screen. */
+.skin-ribbon .kb-c__docs-breakdown .is-rejected { font-weight: var(--weight-demi); }
+
+/* ---------- Owner and actions ---------------------------------------------- */
+
+.skin-ribbon .kb-c__ava { border-radius: var(--radius-pill); }
+.skin-ribbon .kb-c__partner {
+  border-radius: var(--radius-pill);
+  border-color: var(--border-default);
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.skin-ribbon .kb-c__actions {
+  padding: var(--space-8) var(--space-12);
+  background: var(--bg-surface);
+}
+/* A squircle rather than a capsule: v1's footer is four pills in a row, and
+   this one should not be mistaken for it. */
+.skin-ribbon .kb-ap {
+  border-radius: var(--radius-8);
+  border-color: var(--border-default);
+  background: var(--bg-base);
+}
+
+/* ---------- Panels --------------------------------------------------------
+   The sidebars keep the radius the base board gives them. Only the labels
+   change, so a panel opened from this board is still speaking in the small
+   caps the board is written in. */
+
+.skin-ribbon .kbf { border-radius: var(--radius-12) 0 0 var(--radius-12); }
+.skin-ribbon .kbf__label,
+.skin-ribbon .kbnl__lab--sm {
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}

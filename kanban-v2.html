@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanban view — v2 · Text & colour cues</title>
+<meta name="viewport" content="width=1920">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/worklist.css?v=e4b809a5">
+<!-- variants.css and variants.js come along for the quick actions panel
+     only: its .dp-* styles and its panelTasks / panelNotes renderers.
+     window.VARIANT is unset here, so the work-list renderer never runs. -->
+<link rel="stylesheet" href="css/variants.css?v=6dbde3bb">
+<link rel="stylesheet" href="css/kanban.css?v=43b7e2b8">
+<script>window.KB_VARIANT = 'v2';</script>
+<script src="js/icons.js?v=e5f50832" defer></script>
+<script src="js/data.js?v=14202ee9" defer></script>
+<script src="js/variants.js?v=849d918f" defer></script>
+<script src="js/popups.js?v=2606b5e5" defer></script>
+<script src="js/kanban.js?v=e4001d81" defer></script>
+</head>
+<body>
+<!-- v2 of the kanban — tasks as a labelled list, documents as words. The board is the same in both
+     versions; only the card differs, and the alert state on each card is
+     read off the deal. -->
+<div class="screen" id="app"></div>
+</body>
+</html>

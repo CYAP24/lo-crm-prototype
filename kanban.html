@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanban — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/shell.css?v=6e52a65e">
+<script>
+/* ======================================================================
+   The kanban prototype view — its own version list, numbered from v1.
+
+   Add a version here and it appears everywhere — tabs, compare pickers,
+   keyboard shortcuts and deep links. The chrome itself is js/shell.js,
+   shared with the other prototype views.
+   ====================================================================== */
+window.SHELL = {
+  title: 'Kanban view',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v1',
+  tour:  false,
+  versions: [
+    { id:'v1', label:'v1', sub:'Visual cues', file:'kanban-v1.html',
+      note:'Alert states · tasks as rounded tinted blocks in one body' },
+    /* v1.2 sits next to the version it restyles rather than at the end of
+       the list: it is v1 exactly — same markup, same hierarchy, same
+       controls — with a stylesheet over it. A styling direction, not a
+       different board. */
+    { id:'v1-2', label:'v1.2', sub:'Ribbon', file:'kanban-v1-2.html',
+      note:'v1 restyled · stage-coloured ribbons, ranked alerts, small caps and tabular figures' },
+    { id:'v2', label:'v2', sub:'Text & colour', file:'kanban-v2.html',
+      note:'Alert states · carried by words and colour, no bar and no tints' },
+    { id:'v2-2', label:'v2.2', sub:'Ribbon', file:'kanban-v2-2.html',
+      note:'v2 restyled · the same ribbons and capsules, answering with type where v1.2 answers with a shape' }
+  ]
+};
+</script>
+<script src="js/shell.js?v=467b5747" defer></script>
+</head>
+<body>
+</body>
+</html>
