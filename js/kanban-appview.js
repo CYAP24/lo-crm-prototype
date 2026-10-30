@@ -46,6 +46,8 @@
     const frame = layer.querySelector('iframe');
 
     let loading = false;
+    let active = null;       /* the deal whose window is open */
+    let openedAt = null;     /* the stage it opened in */
 
     const mark = (i) => app.querySelectorAll('.kb-c').forEach(c =>
       c.classList.toggle('is-opened', i !== null && Number(c.dataset.dealRow) === i));
@@ -54,6 +56,8 @@
       const d = DEALS[i];
       if (!d) return;
       mark(i);
+      active = i;
+      openedAt = d.master;
       loading = true;
       layer.hidden = false;
       layer.classList.remove('is-ready');
@@ -63,7 +67,10 @@
          would leave the layer stuck half-open. */
       void layer.offsetWidth;
       layer.classList.add('is-open');
-      frame.src = `${cfg.view}?deal=${encodeURIComponent(d.ref.replace(/^#/, ''))}&embed=1`;
+      /* The stage travels with the deal: the window loads its own copy of
+         the data, and the board may have moved this card since. */
+      frame.src = `${cfg.view}?deal=${encodeURIComponent(d.ref.replace(/^#/, ''))}`
+        + `&stage=${encodeURIComponent(d.master)}&embed=1`;
     };
 
     /* The window rises in once its page has loaded, so the broker sees the
@@ -78,6 +85,7 @@
     const close = () => {
       if (layer.hidden) return;
       loading = false;
+      active = null;
       layer.classList.remove('is-open', 'is-ready');
       mark(null);
       setTimeout(() => {
@@ -97,9 +105,25 @@
 
     /* The window asks to be closed by its × button, by Esc once it has
        nothing else to close, or by a press on the dimmed board around it. */
+    /* If the stage changed while the window was open — the stage menu, or
+       submitting the application — the card moves to match when it
+       closes. Only a real change: opening a new lead and closing it again
+       must not count as having moved it out of New lead. */
     window.addEventListener('message', (e) => {
       if (e.source !== frame.contentWindow) return;
-      if (e.data && e.data.type === 'apv:close') close();
+      if (!e.data || e.data.type !== 'apv:close') return;
+      const to = e.data.stage;
+      const i = active;
+      close();
+      if (i === null || !to || to === openedAt || typeof kbMoveDeal !== 'function') return;
+      if (!kbMoveDeal(DEALS[i], to)) return;
+      app.dispatchEvent(new Event('kb:repaint'));
+      /* The same pulse a dragged card gets, so the eye finds where it went. */
+      const moved = app.querySelector(`.kb-c[data-deal-row="${i}"]`);
+      if (moved) {
+        moved.classList.add('is-just-moved');
+        setTimeout(() => moved.classList.remove('is-just-moved'), 1300);
+      }
     });
 
     /* Esc pressed while focus is still on the board. */

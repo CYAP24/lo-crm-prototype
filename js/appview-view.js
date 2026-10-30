@@ -96,16 +96,21 @@ function apvRender(d) {
 /* Every page mounts the same screen. What differs between them is the
    skin class on `.screen` and the stylesheet that answers it.
 
-   Two things can come in on the query string, both from the board:
-   `?deal=APP-2026-0876` opens that deal instead of the first one, and
-   `?embed=1` says the page is inside the board's overlay, so its ground
-   goes clear and closing it hands control back to the board. */
+   Three things can come in on the query string, all from the board:
+   `?deal=APP-2026-0876` opens that deal instead of the first one;
+   `?stage=approval` is the stage the board has it in, which wins over the
+   deal's own because the board may have moved it since this page's copy
+   of the data was written; and `?embed=1` says the page is inside the
+   board's overlay, so its ground goes clear and closing it hands control
+   back to the board. */
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
   if (!app) return;
   const q = new URLSearchParams(location.search);
   const ref = (q.get('deal') || '').replace(/^#/, '');
-  const deal = (ref && DEALS.find(d => d.ref === '#' + ref)) || DEALS[0];
+  const found = (ref && DEALS.find(d => d.ref === '#' + ref)) || DEALS[0];
+  const stage = q.get('stage');
+  const deal = stage && AP_STAGES.some(s => s.id === stage) ? { ...found, master: stage } : found;
   if (q.get('embed') === '1') document.documentElement.classList.add('is-embedded');
   apMount(app, apvRender, deal);
 });

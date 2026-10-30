@@ -12,22 +12,15 @@
    ========================================================================== */
 
 /* ---------- A card is something you can open -------------------------------
-   The whole card is the way in, so the pointer says so, and the client's
-   name underlines on hover — the same cue the work list gives its own way
-   into this screen. The controls on the card keep their own cursors. */
+   The board's own soft grey ring already marks a card under the pointer
+   (css/kanban.css). Here a press also opens the deal, so the pointer is a
+   hand that points rather than one that grabs; the card still drags. The
+   controls on the card keep their own cursors. */
 
 .kxa .kb-c { cursor: pointer; }
-.kxa .kb-c:hover .kb-c__name {
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px;
-}
 
 /* The card whose window is open stays marked, visible through the scrim. */
-.kxa .kb-c.is-opened {
-  outline: 2px solid var(--brand-600);
-  outline-offset: 2px;
-}
+.kxa .kb-c.is-opened { outline-color: var(--brand-600); }
 
 /* ---------- The layer ------------------------------------------------------- */
 

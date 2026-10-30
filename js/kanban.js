@@ -58,7 +58,10 @@ const kbDaysSince = (date) => Math.round((parseDMY(TODAY) - parseDMY(date)) / 86
 function kbState(d) {
   const c = docCounts(d);
 
-  if (d.urgency === 'high' && d.master === 'qualifying' && !d.snoozed)
+  /* `contacted` is set when a broker moves the deal by hand (see
+     kbMoveDeal): a lead somebody has dragged out of New lead has been dealt
+     with, and should stop shouting to be called. */
+  if (d.urgency === 'high' && d.master === 'qualifying' && !d.snoozed && !d.contacted)
     return { id:'immediate', glyph:'alarm', label:'New lead - call now', action:'Call by today 4:07pm' };
 
   /* The glyph is the document one rather than the alarm: the band names a
@@ -1053,6 +1056,199 @@ const KB_VARIANTS = {
   'v2-2': { card: 'text', head: 'cues' }
 };
 
+/* ---------- Moving a deal to another stage --------------------------------
+   A card can be dragged to any stage column, or to Snoozed. Not to New
+   lead: that column is the arrivals tray the system fills, not a stage a
+   broker sends a deal back to. Dropping a card where it already is does
+   nothing.
+
+   The move is to the in-memory deal, so it lasts until the page reloads —
+   which is the right lifetime for a prototype being clicked through. */
+
+/* What a deal's sub-stage reads as on the day it arrives in a stage. The
+   card shows it under the day count, and the deal's old one would be wrong
+   the moment it moved. These are labels the board already uses. */
+const KB_STAGE_ENTRY = {
+  qualifying: 'First contact',
+  discovery:  'Docs requested',
+  progress:   'Sent to lender',
+  approval:   'Approval received',
+  settlement: 'Settlement booked'
+};
+
+/* DD/MM/YY, `n` days after the board's today. */
+const kbDatePlus = (n) => {
+  const t = parseDMY(TODAY);
+  t.setDate(t.getDate() + n);
+  const p = (x) => String(x).padStart(2, '0');
+  return `${p(t.getDate())}/${p(t.getMonth() + 1)}/${String(t.getFullYear()).slice(2)}`;
+};
+
+const kbCanDrop = (d, to) =>
+  to !== 'newlead' && to !== kbBucket(d) && KB_STAGES.some(s => s.id === to);
+
+/* Moves the deal and says whether anything changed. Snoozing parks it for a
+   week; any other column un-snoozes it and, if the stage is new, restarts
+   its day count. Either way the deal has now been handled by somebody. */
+function kbMoveDeal(d, to) {
+  if (!kbCanDrop(d, to)) return false;
+  if (to === 'snoozed') {
+    d.snoozed = true;
+    d.snoozedUntil = kbDatePlus(7);
+  } else {
+    d.snoozed = false;
+    if (d.master !== to) {
+      d.master = to;
+      d.day = 1;
+      d.stage = KB_STAGE_ENTRY[to] || d.stage;
+    }
+  }
+  d.contacted = true;
+  return true;
+}
+
+/* Everything on a card that already does a job keeps doing it, and a press
+   that starts on one of them is never the start of a drag. */
+const KB_OWN_JOB = [
+  '.kb-cbox', '.kb-cp', '.kb-ap', '.kb-snooze',
+  '[data-kb-panel]', '[data-pop]', '[data-kb-pick]',
+  'a', 'button', 'input', 'select', 'textarea'
+].join(', ');
+
+/* Dragging a card. Pointer events rather than the browser's own drag and
+   drop, so the card that follows the pointer is the card itself, in its
+   skin, lifted and tilted, rather than a faded screenshot of it.
+
+   A press only becomes a drag once it has moved six pixels, so a plain
+   click still lands as a click. The column under the pointer lights up
+   when the card can go there and greys out when it cannot (New lead); the
+   board scrolls itself when the pointer nears either edge, so the far
+   columns can be reached without letting go. On release the deal moves
+   and the board repaints, and the moved card pulses once in its new place.
+   Esc, or releasing over the column it came from, puts it back.
+
+   The click a browser fires after a drag is swallowed, so on the Kanban x
+   App View pages finishing a drag does not also open the deal. */
+function wireDrag(app, board, repaint) {
+  const THRESHOLD = 6;
+  let press = null;
+  let drag = null;
+  let swallow = false;
+  let last = { x: 0, y: 0 };
+  let timer = null;
+  let speed = 0;
+
+  const colAt = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    return el ? el.closest('.kb-col') : null;
+  };
+
+  const clearMarks = () => board.querySelectorAll('.kb-col.is-drop, .kb-col.is-nodrop')
+    .forEach(c => c.classList.remove('is-drop', 'is-nodrop'));
+
+  const mark = (col) => {
+    if (!drag || drag.over === col) return;
+    clearMarks();
+    drag.over = col;
+    drag.ghost.classList.remove('is-blocked');
+    if (!col || col.dataset.stage === drag.from) return;
+    const ok = kbCanDrop(DEALS[drag.i], col.dataset.stage);
+    col.classList.add(ok ? 'is-drop' : 'is-nodrop');
+    if (!ok) drag.ghost.classList.add('is-blocked');
+  };
+
+  const stopScroll = () => { clearInterval(timer); timer = null; speed = 0; };
+  const edgeScroll = (x) => {
+    const r = board.getBoundingClientRect();
+    const zone = 96;
+    speed = x < r.left + zone ? -Math.ceil((r.left + zone - x) / 5)
+          : x > r.right - zone ? Math.ceil((x - (r.right - zone)) / 5) : 0;
+    if (!speed) { stopScroll(); return; }
+    if (!timer) timer = setInterval(() => {
+      board.scrollLeft += speed;
+      mark(colAt(last.x, last.y));
+    }, 16);
+  };
+
+  const start = () => {
+    const { card, i } = press;
+    const r = card.getBoundingClientRect();
+    const ghost = card.cloneNode(true);
+    ghost.classList.add('kb-ghost');
+    ghost.classList.remove('is-opened', 'is-active');
+    ghost.style.width = `${r.width}px`;
+    ghost.style.left = `${r.left}px`;
+    ghost.style.top = `${r.top}px`;
+    /* Inside the board's own root, so the skin's selectors still reach it. */
+    (app.querySelector('.kb') || app).appendChild(ghost);
+    card.classList.add('is-drag-source');
+    document.documentElement.classList.add('kb-dragging');
+    const sel = window.getSelection && window.getSelection();
+    if (sel) sel.removeAllRanges();
+    drag = { ghost, card, i, dx: press.x - r.left, dy: press.y - r.top,
+             from: kbBucket(DEALS[i]), over: null };
+  };
+
+  const finish = (drop) => {
+    stopScroll();
+    if (!drag) { press = null; return; }
+    const { ghost, card, i, over } = drag;
+    ghost.remove();
+    card.classList.remove('is-drag-source');
+    document.documentElement.classList.remove('kb-dragging');
+    clearMarks();
+    drag = null;
+    press = null;
+    swallow = true;
+    setTimeout(() => { swallow = false; }, 0);
+
+    if (drop && over && kbMoveDeal(DEALS[i], over.dataset.stage)) {
+      repaint();
+      const moved = board.querySelector(`.kb-c[data-deal-row="${i}"]`);
+      if (moved) {
+        moved.classList.add('is-just-moved');
+        setTimeout(() => moved.classList.remove('is-just-moved'), 1300);
+      }
+    }
+  };
+
+  board.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.pointerType === 'touch') return;
+    const card = e.target.closest('.kb-c');
+    if (!card || e.target.closest(KB_OWN_JOB)) return;
+    /* No text selection or native image drag from a card being picked up.
+       The click still fires, so a press without a move is still a press. */
+    e.preventDefault();
+    press = { card, i: Number(card.dataset.dealRow), x: e.clientX, y: e.clientY, id: e.pointerId };
+  });
+
+  document.addEventListener('pointermove', (e) => {
+    if (!press || e.pointerId !== press.id) return;
+    last = { x: e.clientX, y: e.clientY };
+    if (!drag) {
+      if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < THRESHOLD) return;
+      start();
+    }
+    drag.ghost.style.left = `${e.clientX - drag.dx}px`;
+    drag.ghost.style.top = `${e.clientY - drag.dy}px`;
+    mark(colAt(e.clientX, e.clientY));
+    edgeScroll(e.clientX);
+  });
+
+  document.addEventListener('pointerup', (e) => {
+    if (press && e.pointerId === press.id) finish(true);
+  });
+  document.addEventListener('pointercancel', () => finish(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drag) finish(false); });
+
+  document.addEventListener('click', (e) => {
+    if (!swallow) return;
+    swallow = false;
+    e.stopImmediatePropagation();
+    e.preventDefault();
+  }, true);
+}
+
 /* A card's Note and Task pills: the full-height sidebar in v1, the work
    list's floating cards in v2. Both bind to the triggers they find, so both
    are remounted whenever the board is repainted. */
@@ -1408,6 +1604,14 @@ function mountKanbanBar(app, mode, head) {
     closeMenus();
     fp.classList.remove('is-open');
   });
+
+  /* Moving deals. The board element persists across repaints, so the drag
+     is wired once; anything else that moves a deal — the application view
+     closing with a new stage, on the Kanban x App View pages — asks for
+     the same repaint with a `kb:repaint` event. */
+  const afterMove = () => { paintBoard(); paintFilters(); };
+  wireDrag(app, board, afterMove);
+  app.addEventListener('kb:repaint', afterMove);
 
   wireBar(); wireBoard(); paintBulk();
 }

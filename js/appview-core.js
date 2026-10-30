@@ -824,7 +824,9 @@ const apEmbedded = () => document.documentElement.classList.contains('is-embedde
 
 function apClose() {
   if (apEmbedded() && window.parent !== window) {
-    window.parent.postMessage({ type: 'apv:close' },
+    /* The stage goes back with it: changing stage or submitting here moves
+       the card on the board when the window closes. */
+    window.parent.postMessage({ type: 'apv:close', stage: AP.stage },
       location.origin === 'null' ? '*' : location.origin);
     return;
   }

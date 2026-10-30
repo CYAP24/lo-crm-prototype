@@ -479,10 +479,12 @@ dim and blur it.
 - **Open** — a press anywhere on a card *except* the things on it that
   already do a job: the select box, the call / SMS / email keys, the Note
   and Task pills (the sidebar in v1, the floating card in v2), Request docs,
-  the ⋮. The pointer says the card can be opened, and the client's name
-  underlines on hover, the same cue the work list gives its own way in. The
-  board dims, then the window rises in once its page has loaded, and the
-  card stays outlined behind the scrim.
+  the ⋮. Under the pointer a card wears the board's soft grey ring and a
+  pointing hand. The board dims, then the window rises in once its page has
+  loaded, and the card stays outlined in purple behind the scrim. A press
+  that moves becomes a drag instead (see *Moving a deal*, under Kanban view),
+  and the click a browser fires after a drag is swallowed, so finishing one
+  never opens the deal.
 - **Close** — the window's ×; a press on the dimmed board around it; or
   `Esc`, which peels one layer at a time inside the window (an open menu,
   then a full view back to the form) and only closes the window once there
@@ -503,6 +505,15 @@ asset, the figures in the form — the same sample values on every deal.
 `?embed=1` turns the page's own ground and scrim transparent and makes
 closing hand control back to the board; without it the page behaves as it
 always has.
+
+**The stage travels both ways.** The window loads its own copy of the data,
+so a card dragged to Approval would otherwise open showing its old stage.
+The board passes the card's stage with `?stage=`, and the window opens at
+it. Going back, the window's close message carries its stage: if it changed
+while the window was open (the stage menu, or submitting, which moves the
+deal to In Progress) the card moves to match as the window closes, and
+pulses in its new column. Opening a deal and closing it with no change
+moves nothing, so a new lead looked at and put down stays a new lead.
 
 ## Kanban view
 
@@ -711,6 +722,47 @@ submitted: `Add now` is inert.
 The button is wired by delegation from the screen rather than bound to
 itself, because v1 repaints its whole toolbar whenever a view, filter or sort
 changes. `Esc` or a click anywhere outside closes.
+
+#### Moving a deal
+
+**Drag a card to another column to change its stage.** In every version, and
+on the Kanban x App View pages too, since they are the same board.
+
+- **Where it can go** — any stage column, or Snoozed. Not New lead: that is
+  the arrivals tray the system fills, not a stage a deal is sent back to,
+  and the column greys out under a card that cannot land there. Dropping a
+  card on the column it came from does nothing.
+- **What moving does** — to a stage: the deal takes that stage, its day
+  count restarts at 1 and its sub-stage becomes the stage's entry label
+  (*Docs requested*, *Sent to lender*…), from `KB_STAGE_ENTRY`. To Snoozed:
+  parked for a week from the board's today. Out of Snoozed: un-parked. Any
+  move marks the deal `contacted`, which is what lets a lead dragged out of
+  New lead stop shouting *call now* — `kbState` checks it. The change is
+  to the in-memory deal and lasts until the page reloads.
+- **How it feels** — a press only becomes a drag after six pixels, so a
+  click is still a click. The card itself lifts and tilts under the pointer,
+  in its own skin; the gap it left fades; the column it would land in is
+  outlined in dashed purple. Near either edge the board scrolls itself, so
+  the far columns can be reached without letting go. On release the board
+  repaints and the moved card pulses once in its new place. `Esc`, or
+  letting go over the column it came from, puts it back.
+- **What still works** — the things on a card that already do a job are
+  never the start of a drag: the select box, the call / SMS / email keys,
+  the Note and Task pills, Request docs, the ⋮.
+
+Pointer events rather than the browser's own drag and drop, so what follows
+the pointer is the card in its skin rather than a faded screenshot of it.
+The drag is wired once on the board element, which survives every repaint;
+`kbMoveDeal()` does the move and anything else that moves a deal asks for
+the same repaint with a `kb:repaint` event.
+
+**Every card says it can be picked up.** Under the pointer a card wears a
+soft grey ring just inside its edge (inside, so the column's own scrolling
+never clips it) and the pointer becomes a hand that grabs. A call-now card
+keeps its red ring. **The buttons along a card's foot** — Note, Task,
+Request docs, ⋮ — take a grey fill, a firmer edge and darker type on
+hover; Ribbon restates the hover because it sets the button's ground at the
+same weight as the base.
 
 #### Removed
 
