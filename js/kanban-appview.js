@@ -118,12 +118,8 @@
       if (i === null || !to || to === openedAt || typeof kbMoveDeal !== 'function') return;
       if (!kbMoveDeal(DEALS[i], to)) return;
       app.dispatchEvent(new Event('kb:repaint'));
-      /* The same pulse a dragged card gets, so the eye finds where it went. */
-      const moved = app.querySelector(`.kb-c[data-deal-row="${i}"]`);
-      if (moved) {
-        moved.classList.add('is-just-moved');
-        setTimeout(() => moved.classList.remove('is-just-moved'), 1300);
-      }
+      /* Brought into view and pulsed, the same as a dragged card. */
+      kbShowMoved(app, i);
     });
 
     /* Esc pressed while focus is still on the board. */

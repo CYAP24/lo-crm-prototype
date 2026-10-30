@@ -744,14 +744,23 @@ on the Kanban x App View pages too, since they are the same board.
   in its own skin; the gap it left fades; the column it would land in is
   outlined in dashed purple. Near either edge the board scrolls itself, so
   the far columns can be reached without letting go. On release the board
-  repaints and the moved card pulses once in its new place. `Esc`, or
-  letting go over the column it came from, puts it back.
+  repaints, scrolls the moved card into view and pulses it once — a card
+  can land in a column off the edge of the screen, especially once the
+  board has scrolled itself mid-drag, and a move you cannot see reads as
+  the card having vanished. `Esc`, or letting go over the column it came
+  from, puts it back.
 - **What still works** — the things on a card that already do a job are
   never the start of a drag: the select box, the call / SMS / email keys,
   the Note and Task pills, Request docs, the ⋮.
 
 Pointer events rather than the browser's own drag and drop, so what follows
 the pointer is the card in its skin rather than a faded screenshot of it.
+The dragged card's position, and the fade on the gap it left, are set
+**inline**, and the drag styles lead with `.screen`: a skin restyles cards
+and columns at higher specificity than a one-class rule, and on the Ribbon
+boards `.skin-ribbon .kb-c { position: relative }` once won over
+`.kb-ghost { position: fixed }` and dropped the dragged card into the page
+below the board.
 The drag is wired once on the board element, which survives every repaint;
 `kbMoveDeal()` does the move and anything else that moves a deal asks for
 the same repaint with a `kb:repaint` event.

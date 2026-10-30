@@ -1107,6 +1107,19 @@ function kbMoveDeal(d, to) {
   return true;
 }
 
+/* After a move, the card is brought into view and pulses once. A card can
+   land somewhere the broker cannot see — a column off the edge of the
+   board, or below the fold of a long one, especially once the board has
+   scrolled itself during the drag — and a move you cannot see reads as the
+   card having vanished. */
+function kbShowMoved(root, i) {
+  const moved = root.querySelector(`.kb-c[data-deal-row="${i}"]`);
+  if (!moved) return;
+  moved.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  moved.classList.add('is-just-moved');
+  setTimeout(() => moved.classList.remove('is-just-moved'), 1300);
+}
+
 /* Everything on a card that already does a job keeps doing it, and a press
    that starts on one of them is never the start of a drag. */
 const KB_OWN_JOB = [
@@ -1176,12 +1189,24 @@ function wireDrag(app, board, repaint) {
     const ghost = card.cloneNode(true);
     ghost.classList.add('kb-ghost');
     ghost.classList.remove('is-opened', 'is-active');
-    ghost.style.width = `${r.width}px`;
-    ghost.style.left = `${r.left}px`;
-    ghost.style.top = `${r.top}px`;
+    /* What makes it follow the pointer is set inline, because a skin can
+       outrank a stylesheet rule and this cannot be allowed to lose: Ribbon
+       gives every card `position: relative` at higher specificity than
+       `.kb-ghost`, which left the dragged card in the page flow below the
+       board instead of under the pointer. */
+    Object.assign(ghost.style, {
+      position: 'fixed',
+      zIndex: '900',
+      margin: '0',
+      pointerEvents: 'none',
+      width: `${r.width}px`,
+      left: `${r.left}px`,
+      top: `${r.top}px`
+    });
     /* Inside the board's own root, so the skin's selectors still reach it. */
     (app.querySelector('.kb') || app).appendChild(ghost);
     card.classList.add('is-drag-source');
+    card.style.opacity = '.35';   /* inline for the same reason: a skin's snoozed column fades its cards harder */
     document.documentElement.classList.add('kb-dragging');
     const sel = window.getSelection && window.getSelection();
     if (sel) sel.removeAllRanges();
@@ -1195,6 +1220,7 @@ function wireDrag(app, board, repaint) {
     const { ghost, card, i, over } = drag;
     ghost.remove();
     card.classList.remove('is-drag-source');
+    card.style.opacity = '';
     document.documentElement.classList.remove('kb-dragging');
     clearMarks();
     drag = null;
@@ -1204,11 +1230,7 @@ function wireDrag(app, board, repaint) {
 
     if (drop && over && kbMoveDeal(DEALS[i], over.dataset.stage)) {
       repaint();
-      const moved = board.querySelector(`.kb-c[data-deal-row="${i}"]`);
-      if (moved) {
-        moved.classList.add('is-just-moved');
-        setTimeout(() => moved.classList.remove('is-just-moved'), 1300);
-      }
+      kbShowMoved(board, i);
     }
   };
 
