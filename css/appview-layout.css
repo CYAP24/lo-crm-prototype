@@ -1,0 +1,155 @@
+/* ==========================================================================
+   Application view — the layout. Shared by every skin.
+   --------------------------------------------------------------------------
+   Components are css/appview-core.css. This file divides the window:
+
+     296  the navigator — progress, then the form's sections, in one card
+     1fr  the workspace — the short task strip, then the tabs
+     404  the pinned panel
+
+   Nothing here is about how the screen looks; that is the skins, each
+   scoped to its own class on `.screen` and loaded after this file.
+   ========================================================================== */
+
+/* ---------- Header ---------------------------------------------------------- */
+
+.apv-head {
+  flex: none;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.apv-head__top {
+  height: 88px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: 0 var(--space-32);
+}
+
+/* Assignment and warnings share the last line, so the header is two
+   bands with one job each rather than rows of mixed facts. The
+   assignment controls are a label over a picker, so the band is taller
+   than it was when it held three bare avatars. */
+.apv-head__foot {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-16);
+  padding: var(--space-6) var(--space-32);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.apv-rule { width: 1px; height: 28px; background: var(--border-subtle); flex: none; }
+
+/* ---------- Body ------------------------------------------------------------- */
+
+.apv-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 296px minmax(0, 1fr) 404px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--space-20);
+  padding: var(--space-20) var(--space-32) var(--space-24);
+}
+
+/* One card from the top of the column to the bottom, rather than two short
+   ones with dead space under them. Inside it, progress and the form's
+   sections are groups divided by a rule — the sectioning the feedback said
+   was nearly right. */
+.apv-side { min-height: 0; display: flex; }
+.apv-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 14px var(--space-12);
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+}
+.apv-card__title { color: var(--text-tertiary); padding: 0 10px var(--space-6); }
+
+/* The sections scroll inside the card; progress above them never moves. */
+.apv-card__group {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+  overflow-y: auto;
+}
+
+/* Progress — the bar round one asked for, now the only place on the
+   screen that draws the six stages. */
+.apv-prog { flex: none; display: flex; flex-direction: column; gap: var(--space-4); padding: 0 10px var(--space-4); }
+.apv-prog__line { display: flex; align-items: baseline; gap: var(--space-8); }
+.apv-prog__now  { display: flex; align-items: center; gap: var(--space-6); }
+.apv-prog__pct  { margin-left: auto; color: var(--text-tertiary); }
+.apv-prog__meter {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--neutral-200);
+  overflow: hidden;
+}
+.apv-prog__fill { display: block; height: 100%; border-radius: var(--radius-pill); }
+.apv-prog__of   { color: var(--text-placeholder); }
+
+/* The middle: the strip takes what it needs, the workspace takes the rest
+   and does its own scrolling inside. */
+.apv-main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+.apv-main .ap-next { flex: none; }
+.apv-main .ap-ws   { flex: 1; min-height: 0; }
+
+/* The wide presentation of what-to-do-next: the three bands side by side
+   instead of stacked, which is what the middle column's width is for.
+   Three columns of ~350px cannot also hold a sentence of explanation under
+   every job, so here the reason is the row's tooltip and the card stays
+   short — which is what gives the form back its presence. */
+.ap-next--wide .ap-todo__why { display: none; }
+.ap-next--wide .ap-next__bands {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ap-next--wide .ap-band {
+  border-bottom: 0;
+  border-right: 1px solid var(--border-subtle);
+}
+.ap-next--wide .ap-band:last-child { border-right: 0; }
+.ap-next--wide .ap-band__head { background: transparent; }
+.ap-next--wide .ap-band.is-error .ap-band__head { background: var(--error-bg); }
+/* The row is a grid now and holds its shape on its own; what the narrow
+   column still cannot take is a second line of explanation under every
+   label, so here the reason is the row's tooltip. */
+.ap-next--wide .ap-todo__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* The footer's only control moves up into the head, which was already
+   there - 47px of card back for the form. */
+.ap-next--wide .ap-next__foot { display: none; }
+.ap-next--wide .ap-next__add  { display: inline-flex; }
+
+/* The hard answer to *this takes up too much space*: the strip may not
+   grow past this, whatever the stage puts in it. A busy stage scrolls its
+   bands rather than pushing the form down the screen. */
+.ap-next--wide { max-height: 240px; }
+.ap-next--wide .ap-next__bands { min-height: 0; overflow: hidden; }
+/* Each band scrolls its own jobs, so the three coloured headings stay put
+   instead of sliding away together. */
+.ap-next--wide .ap-band      { min-height: 0; }
+.ap-next--wide .ap-band__body { min-height: 0; overflow-y: auto; }
+
+/* Three bands side by side can run to different lengths; stretch them so
+   the card has one bottom edge rather than a ragged one. */
+.ap-next--wide .ap-band { display: flex; flex-direction: column; }
+.ap-next--wide .ap-band__body { flex: 1; }
+
+.apv-panel { min-height: 0; }

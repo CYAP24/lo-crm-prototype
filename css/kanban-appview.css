@@ -1,0 +1,70 @@
+/* ==========================================================================
+   Kanban × App view — the overlay a deal opens into.
+   --------------------------------------------------------------------------
+   Loaded after the kanban's own stylesheets on the kanban-x-appview-*.html
+   pages only, with js/kanban-appview.js. Two jobs: say on the board that a
+   card can be pressed, and draw the layer the application view opens in.
+
+   The layer covers the artboard, dims and softens the board under it, and
+   holds a transparent frame with the application view inside. The window
+   itself, its close control and its inset from the edges all come from the
+   application view's own page; this only supplies what is behind it.
+   ========================================================================== */
+
+/* ---------- A card is something you can open -------------------------------
+   The whole card is the way in, so the pointer says so, and the client's
+   name underlines on hover — the same cue the work list gives its own way
+   into this screen. The controls on the card keep their own cursors. */
+
+.kxa .kb-c { cursor: pointer; }
+.kxa .kb-c:hover .kb-c__name {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* The card whose window is open stays marked, visible through the scrim. */
+.kxa .kb-c.is-opened {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+/* ---------- The layer ------------------------------------------------------- */
+
+.kxa-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.kxa-layer[hidden] { display: none; }
+.kxa-layer.is-open { opacity: 1; }
+
+/* Panels sits on a dark board; Tape sits on a light table, so its scrim is
+   a pale frost rather than a shade. Each matches the desk that version of
+   the application view draws when it stands alone. */
+.kxa-layer.is-dark  { background: rgba(17, 18, 23, .55); }
+.kxa-layer.is-light { background: rgba(222, 226, 230, .72); }
+.kxa-layer { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
+.kxa-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color-scheme: normal;
+  opacity: 0;
+  transform: translateY(14px) scale(.985);
+  transform-origin: 50% 40%;
+  transition: opacity .22s ease, transform .26s cubic-bezier(.2, .8, .2, 1);
+}
+.kxa-layer.is-ready .kxa-frame { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kxa-layer,
+  .kxa-frame { transition: none; }
+  .kxa-frame { transform: none; }
+}

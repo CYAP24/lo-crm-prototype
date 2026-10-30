@@ -1,0 +1,1122 @@
+/* ==========================================================================
+   Application view — the styles every skin is built from.
+   --------------------------------------------------------------------------
+   The window frame and every component the screen is built from. What is
+   NOT here is the layout — how the window divides into columns and where
+   the task strip sits is css/appview-layout.css — and nothing here is a
+   skin. v1 uses this file as it stands; v2, Tape, is
+   css/appview-tape.css on top of its base layer, css/appview-ribbon.css.
+
+   **Where it borrows, it borrows from the kanban**, values unchanged —
+   `.ap-cp` is the card's `.kb-cp`, `.ap-ap` is `.kb-ap`, `.ap-ava` is
+   `.kb-c__ava`, and the warning tones are the card's `.is-immediate` /
+   `.is-urgent` / `.is-warning` banners. The board and the deal are the two
+   screens a broker moves between all day.
+   ========================================================================== */
+
+/* ---------- The page ------------------------------------------------------ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #8A8A8A;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.screen {
+  width: 1920px;
+  height: min(1080px, 100vh);
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* The deal is a window opened over the board, not a page of the CRM. So
+   `.ap` is the dimmed board behind it and `.ap-win` is the window: inset,
+   rounded, lifted, with its own close control at the top right. The CRM's
+   product nav is deliberately absent - it belongs to the thing underneath. */
+.ap {
+  --ap-ground: #F3F4F6;
+  position: absolute;
+  inset: 0;
+  padding: var(--space-24);
+  background: #2A2B31;
+  color: var(--text-primary);
+  font: var(--weight-medium) 14px/20px var(--font-family);
+}
+
+/* Opened from the board, the page sits in an overlay that draws the dimmed
+   board itself, so the page's own ground and the scrim inside it go clear
+   and the board shows through around the window. Specific enough to beat
+   any skin's own scrim colour. */
+html.is-embedded,
+html.is-embedded body { background: transparent; }
+html.is-embedded .ap { background: transparent; }
+
+.ap-win {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-16);
+  background: var(--ap-ground);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .45), 0 2px 8px rgba(0, 0, 0, .3);
+  overflow: hidden;
+}
+
+.ap-ip--close:hover { background: var(--error-bg); color: var(--error-text); }
+
+.ap-spacer { flex: 1; }
+.ap-empty { margin: 0; padding: var(--space-8) 2px; color: var(--text-placeholder); font: var(--weight-regular) 12px/18px var(--font-family); }
+
+/* ==========================================================================
+   Atoms borrowed from the board
+   ========================================================================== */
+
+.ap-cp {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer; white-space: nowrap;
+}
+.ap-cp:hover { border-color: var(--border-brand); color: var(--text-brand); }
+.ap-cp--on { background: #ECDEFE; border-color: transparent; color: var(--text-brand); }
+.ap-cp--ghost { border: 0; padding: 2px; color: var(--text-placeholder); }
+.ap-cp--ghost:hover { color: var(--text-brand); }
+
+.ap-ap {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-secondary);
+  white-space: nowrap; cursor: pointer;
+}
+.ap-ap:hover { border-color: var(--border-brand); color: var(--text-brand); }
+.ap-ap.is-on { background: var(--bg-brand); border-color: transparent; color: var(--text-on-dark); }
+.ap-ap svg { flex: none; }
+
+.ap-ava {
+  width: 24px; height: 24px; flex: none;
+  display: inline-grid; place-items: center;
+  border-radius: var(--radius-12);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 11px/14px var(--font-family);
+  color: var(--text-secondary);
+}
+.ap-ava--p  { background: var(--brand-100); color: var(--text-brand); }
+.ap-ava--xs { width: 20px; height: 20px; font-size: 10px; }
+
+.ap-ip {
+  display: inline-grid; place-items: center;
+  width: 28px; height: 28px; flex: none;
+  border-radius: var(--radius-8);
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.ap-ip:hover { background: var(--bg-surface); color: var(--text-primary); }
+.ap-ip--sm { width: 24px; height: 24px; }
+.ap-ip--send { color: var(--text-on-dark); background: var(--bg-brand); }
+.ap-ip--send:hover { background: var(--bg-brand-hover); color: var(--text-on-dark); }
+
+.ap-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-6);
+  padding: 8px 14px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-8);
+  background: var(--bg-base);
+  font: var(--weight-demi) 13px/18px var(--font-family);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.ap-btn:hover { border-color: var(--border-brand); color: var(--text-brand); }
+.ap-btn--brand { background: var(--bg-brand); border-color: transparent; color: var(--text-on-dark); }
+.ap-btn--brand:hover { background: var(--bg-brand-hover); color: var(--text-on-dark); }
+.ap-btn--ghost { background: transparent; border-color: var(--border-subtle); }
+.ap-btn--wide  { width: 100%; }
+.ap-btn--sm    { padding: 5px 10px; font-size: 12px; }
+.ap-btn--dashed {
+  width: 100%; background: transparent;
+  border: 1px dashed var(--border-muted); color: var(--text-tertiary);
+}
+.ap-btn--dashed:hover { border-color: var(--border-brand); color: var(--text-brand); }
+.ap-btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+.ap-btn[disabled]:hover { border-color: var(--border-muted); color: var(--text-secondary); }
+
+.ap-tag {
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+.ap-tag.is-primary   { background: var(--brand-100);   color: var(--text-brand); }
+.ap-tag.is-internal  { background: var(--neutral-200); color: var(--text-secondary); }
+.ap-tag.is-partner   { background: var(--info-bg);     color: var(--text-info); }
+.ap-tag.is-optional  { background: var(--warning-bg);  color: var(--warning-text); }
+.ap-tag.is-asset     { background: var(--success-bg);  color: var(--success-text); }
+.ap-tag.is-liability { background: var(--error-bg);    color: var(--error-text); }
+
+.ap-chip { padding: 2px var(--space-8); border-radius: var(--radius-pill);
+  font: var(--weight-demi) 11px/16px var(--font-family); white-space: nowrap; }
+.ap-dot  { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+/* ---------- Menus ---------------------------------------------------------- */
+
+.ap-menu {
+  position: absolute; z-index: 60;
+  min-width: 232px; margin: 6px 0 0; padding: var(--space-6);
+  list-style: none;
+  border-radius: var(--radius-12);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: none;
+}
+.ap-menu.is-open { display: block; }
+.ap-menu__row {
+  display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap;
+  padding: 8px 10px; border-radius: var(--radius-8);
+  font: var(--weight-medium) 13px/18px var(--font-family);
+  color: var(--text-secondary); cursor: pointer;
+}
+.ap-menu__row:hover { background: var(--bg-surface); color: var(--text-primary); }
+.ap-menu__row.is-on { color: var(--text-brand); font-weight: var(--weight-demi); }
+.ap-menu__row.has-rule { margin-top: var(--space-6); padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.ap-menu__tick { margin-left: auto; color: var(--text-brand); }
+.ap-menu__sub {
+  flex-basis: 100%; padding-left: 23px;
+  font: var(--weight-regular) 11px/15px var(--font-family);
+  color: var(--text-placeholder);
+}
+.ap-menu--quick { right: 0; }
+.ap-menu--seg   { left: 0; min-width: 300px; }
+.ap-menu--stage { right: 0; min-width: 210px; }
+
+/* ==========================================================================
+   Header atoms
+   ========================================================================== */
+
+.ap-who { flex: none; }
+.ap-who__line { display: flex; align-items: center; gap: var(--space-8); }
+.ap-who__name { margin: 0; }
+/* Which application, and when it last moved: the two facts worth carrying
+   under the client's name. */
+.ap-who__meta { display: flex; align-items: center; gap: var(--space-6); color: var(--text-tertiary); }
+.ap-who__meta b { color: var(--text-secondary); font-weight: var(--weight-demi); }
+.ap-who__sep { color: var(--border-default); }
+
+.ap-segpick { position: relative; }
+.ap-seg {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  padding: 3px var(--space-8);
+  border-radius: var(--radius-6);
+  background: var(--brand-50);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-brand); cursor: pointer;
+}
+.ap-seg:hover { background: var(--brand-100); }
+
+/* The money is the deal, so it is set at headline size rather than filed
+   as one more labelled column. */
+.ap-money {
+  display: flex; flex-direction: column; gap: 0; flex: none;
+  padding-left: var(--space-20);
+  border-left: 1px solid var(--border-subtle);
+}
+.ap-money__n { font: var(--weight-bold) 22px/26px var(--font-family); letter-spacing: -0.01em; }
+.ap-money__t { color: var(--text-tertiary); }
+
+.ap-contact { display: flex; align-items: center; gap: var(--space-12); flex: none; }
+.ap-contact__lines { display: flex; flex-direction: column; gap: 2px; }
+.ap-contact__line {
+  display: flex; align-items: center; gap: var(--space-6);
+  font: var(--weight-medium) 12px/17px var(--font-family);
+  color: var(--text-secondary);
+}
+.ap-contact__line svg { color: var(--text-placeholder); flex: none; }
+.ap-contact__pills { display: flex; gap: var(--space-6); }
+
+/* ---------- The assignment strip -------------------------------------------
+   Three avatars in a row were unreadable: nothing said which was the
+   broker, which the partner, or that either could be changed. Each slot
+   now names its role in an overline above a control that opens a picker,
+   so the row answers *who is on this deal* and is the place to change it.
+   -------------------------------------------------------------------------- */
+
+.ap-assigns { display: flex; align-items: center; gap: var(--space-8); flex: none; }
+.ap-assigns__rule { width: 1px; height: 32px; margin: 0 var(--space-4); background: var(--border-subtle); flex: none; }
+
+.ap-assign { position: relative; display: flex; flex-direction: column; gap: 1px; flex: none; }
+/* 6px is the control's own 5px of padding plus its 1px border, so the
+   label starts exactly above the avatar rather than near it. */
+.ap-assign__label { color: var(--text-placeholder); padding-left: 6px; }
+
+.ap-assign__ctl {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 3px var(--space-8) 3px 5px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font: var(--weight-demi) 13px/18px var(--font-family);
+  color: var(--text-primary);
+  white-space: nowrap; cursor: pointer;
+}
+.ap-assign__ctl:hover { border-color: var(--border-muted); background: var(--bg-base); }
+.ap-assign__ctl.is-fixed { cursor: default; }
+.ap-assign__ctl.is-fixed:hover { border-color: transparent; background: transparent; }
+.ap-assign__ctl > svg:last-child { color: var(--text-placeholder); }
+.ap-assign__cal { display: inline-grid; place-items: center; width: 24px; height: 24px; color: var(--text-tertiary); }
+.ap-assign__name.is-empty { color: var(--text-placeholder); font-weight: var(--weight-medium); }
+.ap-ava--none {
+  background: transparent;
+  border: 1px dashed var(--border-default);
+  color: var(--text-placeholder);
+}
+.ap-menu--assign { left: 0; min-width: 252px; }
+.ap-menu__head {
+  padding: var(--space-8) var(--space-12) var(--space-6);
+  color: var(--text-placeholder);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-4);
+}
+
+.ap-save {
+  display: flex; align-items: center; gap: var(--space-6); flex: none;
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-success);
+}
+.ap-save.is-saving { color: var(--text-tertiary); }
+
+.ap-quick { position: relative; flex: none; }
+
+/* ---------- Warnings ------------------------------------------------------- */
+
+.ap-warns { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
+.ap-warn {
+  display: inline-flex; align-items: center; gap: var(--space-8);
+  padding: 5px var(--space-8) 5px 10px;
+  border-radius: var(--radius-8);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+}
+.ap-warn b { font-weight: var(--weight-demi); }
+.ap-warn svg { flex: none; }
+.ap-warn__note { opacity: 0.82; }
+.ap-warn__act {
+  padding: 2px var(--space-8); border-radius: var(--radius-6);
+  background: rgba(255, 255, 255, 0.22);
+  font-weight: var(--weight-demi); cursor: pointer;
+}
+.ap-warn__act:hover { background: rgba(255, 255, 255, 0.4); }
+.ap-warn.is-error  { background: var(--error-base);  color: var(--text-on-dark); }
+.ap-warn.is-warn   { background: var(--warning-bg);  color: var(--warning-text); }
+.ap-warn.is-dark   { background: var(--neutral-900); color: var(--neutral-200); }
+.ap-warn.is-locked { background: var(--neutral-200); color: var(--neutral-800); }
+.ap-warn.is-warn .ap-warn__act,
+.ap-warn.is-locked .ap-warn__act { background: rgba(0, 0, 0, 0.07); }
+
+/* ==========================================================================
+   Stage progress
+   --------------------------------------------------------------------------
+   A segmented track with no notches. v1's chevron run had to be an export
+   because a clip-path chevron cannot both interlock and leave room for
+   "Application submitted"; this sidesteps that rather than fighting it —
+   the current step takes the slack so its label always fits, and the
+   finished ones compress to a tick and a short name.
+   ========================================================================== */
+
+.ap-track { display: flex; align-items: center; gap: 3px; min-width: 0; flex: 1; }
+.ap-step {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-6);
+  min-width: 0; height: 30px; padding: 0 10px;
+  border: 0; border-radius: var(--radius-6);
+  background: var(--neutral-200);
+  font: var(--weight-medium) 12px/16px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex: 1 1 0;
+  transition: flex-grow 0.2s;
+}
+.ap-step__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-step:hover { background: var(--neutral-300); }
+
+.ap-step.is-done {
+  background: var(--brand-100);
+  color: var(--brand-700);
+  flex-grow: 0.75;
+}
+.ap-step__tick {
+  display: grid; place-items: center;
+  width: 15px; height: 15px; flex: none;
+  border-radius: 50%;
+  background: var(--brand-600); color: var(--text-on-dark);
+}
+/* The one in progress gets the room, which is what makes the labels work. */
+.ap-step.is-now {
+  flex-grow: 1.9;
+  background: var(--ap-tint);
+  color: var(--ap-ink);
+  font-weight: var(--weight-demi);
+  box-shadow: inset 0 0 0 1px var(--ap-stage);
+}
+.ap-step__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ap-stage); flex: none; }
+.ap-step.is-next { background: var(--neutral-200); color: var(--text-placeholder); }
+
+.ap-track__pct {
+  flex: none; padding-left: 10px;
+  color: var(--text-secondary); font-variant-numeric: tabular-nums;
+}
+.ap-track.is-compact .ap-step { height: 24px; font-size: 11px; }
+
+/* The same spine stood on its end. */
+.ap-spine { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ap-spine__step {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  padding: var(--space-8) 10px;
+  border-radius: var(--radius-8);
+  font: var(--weight-medium) 13px/18px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+.ap-spine__step:hover { background: var(--bg-surface); }
+.ap-spine__node {
+  width: 18px; height: 18px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-300);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+}
+/* The line that makes them one run rather than six rows. */
+.ap-spine__step::before {
+  content: ''; position: absolute;
+  left: 18px; top: -4px; width: 2px; height: 12px;
+  background: var(--neutral-300);
+}
+.ap-spine__step:first-child::before { display: none; }
+.ap-spine__step.is-done { color: var(--text-secondary); }
+.ap-spine__step.is-done .ap-spine__node { background: var(--brand-600); border-color: var(--brand-600); }
+.ap-spine__step.is-done::before { background: var(--brand-300); }
+.ap-spine__step.is-now {
+  background: var(--brand-50);
+  color: var(--text-brand);
+  font-weight: var(--weight-demi);
+}
+.ap-spine__step.is-now .ap-spine__node { border-color: var(--ap-stage); box-shadow: 0 0 0 3px var(--brand-100); }
+.ap-spine__n {
+  margin-left: auto; min-width: 20px; padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--error-base); color: var(--text-on-dark);
+  font: var(--weight-demi) 11px/16px var(--font-family); text-align: center;
+}
+
+/* ==========================================================================
+   Submit
+   ========================================================================== */
+
+.ap-submitwrap { position: relative; flex: none; }
+.ap-submit {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 9px 16px;
+  border: 0; border-radius: var(--radius-8);
+  font: var(--weight-demi) 13px/18px var(--font-family);
+  cursor: pointer;
+}
+.ap-submit.is-ready   { background: var(--success-base); color: var(--text-on-dark); }
+.ap-submit.is-ready:hover { background: var(--success-text); }
+.ap-submit.is-blocked { background: var(--neutral-200); color: var(--text-tertiary); }
+.ap-submit.is-blocked:hover { background: var(--neutral-300); color: var(--text-primary); }
+.ap-submit.is-sent    { background: var(--success-bg); color: var(--success-text); }
+
+.ap-ready {
+  position: absolute; right: 0; z-index: 60;
+  width: 380px; margin-top: 8px; padding: var(--space-16);
+  border-radius: var(--radius-12);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-overlay);
+  display: none;
+}
+.ap-ready.is-open { display: block; }
+.ap-ready__head { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-12); }
+.ap-ready__head .t-caption { color: var(--text-tertiary); }
+
+.ap-gate {
+  display: flex; align-items: flex-start; gap: var(--space-8);
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.ap-gate__icon { display: grid; place-items: center; color: var(--error-base); flex: none; margin-top: 1px; }
+.ap-gate.is-ok .ap-gate__icon { color: var(--success-base); }
+.ap-gate__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ap-gate__label { font: var(--weight-medium) 13px/18px var(--font-family); }
+.ap-gate__detail { color: var(--text-tertiary); }
+.ap-gate__state { flex: none; color: var(--text-placeholder); padding-top: 2px; }
+.ap-ready .ap-btn { margin-top: var(--space-12); }
+
+/* ==========================================================================
+   What to do next
+   --------------------------------------------------------------------------
+   The piece the feedback asked for most. Hierarchy does the work: a header
+   that names the stage and how much of it is left, then three bands —
+   blocking, due, later — each with its own colour, its own count and its
+   own fold, and every item carrying the control that does the thing.
+   ========================================================================== */
+
+.ap-next {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
+
+/* Neutral, and with no stage on it. These are the deal's tasks, and a
+   task does not stop being one when the deal moves to the next stage —
+   dressing this in the stage's colour said the opposite. */
+.ap-next__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 var(--space-16);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+.ap-next__head:hover { background: var(--bg-muted); }
+.ap-next__eyebrow { color: var(--text-secondary); }
+.ap-next__count   { color: var(--text-tertiary); font: var(--weight-demi) 12px/16px var(--font-family); }
+.ap-next__chev    { display: grid; place-items: center; color: var(--text-tertiary); transition: transform .24s ease; }
+.ap-next.is-shut .ap-next__chev { transform: rotate(-90deg); }
+
+/* Always rendered, shown only when folded, so the scroll can fold the
+   card with a class instead of a repaint on every frame. */
+.ap-next__pips { display: none; align-items: center; gap: var(--space-6); }
+.ap-next.is-shut .ap-next__pips { display: flex; }
+.ap-next__pip {
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 11px/15px var(--font-family);
+}
+.ap-next__pip.is-error { background: var(--error-base);   color: var(--text-on-dark); }
+.ap-next__pip.is-warn  { background: var(--warning-bg);   color: var(--warning-text); }
+.ap-next__pip.is-calm  { background: var(--neutral-200);  color: var(--neutral-700); }
+
+/* The fold is animated rather than switched. A grid row from 1fr to 0fr
+   is the one way to transition to a height the content decides, and the
+   card collapses and returns at the same speed whether the broker folded
+   it or the scroll did. */
+.ap-next__fold {
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+  transition: grid-template-rows .26s cubic-bezier(.4, 0, .2, 1);
+}
+.ap-next.is-shut .ap-next__fold { grid-template-rows: 0fr; }
+.ap-next__inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ap-next__bands { display: flex; flex-direction: column; }
+
+.ap-next__foot {
+  flex: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: var(--space-8) var(--space-12);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-placeholder);
+}
+.ap-next__foot .ap-btn { flex: none; white-space: nowrap; }
+.ap-next__foot .t-caption { min-width: 0; }
+
+/* Add a task rides in the head only where the foot has been dropped for
+   height; the stack layout keeps the foot and hides this. */
+.ap-next__add { display: none; }
+
+.ap-band { border-bottom: 1px solid var(--border-subtle); }
+.ap-band:last-child { border-bottom: 0; }
+.ap-band__head {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-8) var(--space-16);
+  cursor: pointer;
+}
+.ap-band__head:hover { background: var(--bg-surface); }
+.ap-band__pip { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.ap-band__label { flex: 1; font: var(--weight-demi) 12px/16px var(--font-family); }
+.ap-band__count {
+  min-width: 20px; padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  text-align: center;
+}
+.ap-band__chev { display: grid; place-items: center; color: var(--text-tertiary); }
+.ap-band.is-folded .ap-band__body { display: none; }
+.ap-band.is-folded .ap-band__chev { transform: rotate(-90deg); }
+.ap-band__body { display: flex; flex-direction: column; gap: var(--space-6); padding: 0 var(--space-12) var(--space-12); }
+
+/* *Your tasks* is the one that grows. Twenty of them cost the same room
+   as four: the body has a ceiling and scrolls inside it, and the count in
+   the heading is what says how many are down there. */
+.ap-band.is-long .ap-band__body { max-height: 196px; overflow-y: auto; }
+
+/* The three tones. Colour is doing real work here — it is the difference
+   between what stops the deal and what is merely next. */
+.ap-band.is-error .ap-band__pip   { background: var(--error-base); }
+.ap-band.is-error .ap-band__label { color: var(--error-text); }
+.ap-band.is-error .ap-band__count { background: var(--error-base); color: var(--text-on-dark); }
+.ap-band.is-error .ap-band__head  { background: var(--error-bg); }
+
+.ap-band.is-warn .ap-band__pip   { background: var(--accent-amber); }
+.ap-band.is-warn .ap-band__label { color: var(--warning-text); }
+.ap-band.is-warn .ap-band__count { background: var(--warning-bg); color: var(--warning-text); }
+
+.ap-band.is-calm .ap-band__pip   { background: var(--neutral-400); }
+.ap-band.is-calm .ap-band__label { color: var(--text-tertiary); }
+.ap-band.is-calm .ap-band__count { background: var(--bg-muted); color: var(--text-tertiary); }
+
+/* One shape for every task, whatever it carries. The tick and the task on
+   the first line with the options at the far right, the date and whose it
+   is on the second. No action button: a task is something you tick, and
+   the button was what made these rows break differently from each other. */
+.ap-todo {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) 22px;
+  grid-template-areas: "tick body opt" ". meta .";
+  align-items: start;
+  gap: var(--space-4) var(--space-8);
+  padding: var(--space-8) 10px;
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+}
+.ap-todo > .ap-tick    { grid-area: tick; margin-top: 1px; }
+.ap-todo__body         { grid-area: body; min-width: 0; display: flex; flex-direction: column; gap: 0; }
+.ap-todo > .ap-opt     { grid-area: opt; }
+.ap-todo__gap          { grid-area: opt; }
+.ap-todo__meta         { grid-area: meta; display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+.ap-todo__label { font: var(--weight-demi) 13px/18px var(--font-family); }
+.ap-todo__why   { color: var(--text-tertiary); }
+.ap-todo.is-done { opacity: 0.55; }
+.ap-todo.is-done .ap-todo__label { text-decoration: line-through; }
+
+/* A task that is the deal's own rather than the stage's standard step. */
+.ap-todo.is-task { background: transparent; border: 1px dashed var(--border-muted); }
+
+/* The warning that used to be a banner of its own, now sitting on the job
+   it was about. */
+.ap-flag {
+  flex: none;
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--error-bg);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--error-text);
+  white-space: nowrap;
+}
+.ap-flag svg { color: var(--error-base); }
+
+.ap-due {
+  flex: none;
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  padding: 2px var(--space-8);
+  border-radius: var(--radius-6);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  white-space: nowrap;
+}
+.ap-due svg { opacity: .75; }
+
+/* Every row is a task, so every row has the same three things behind a
+   dot: edit it, move it, be rid of it. */
+.ap-opt { position: relative; flex: none; }
+/* Always there, not on hover: a control that appears when the pointer
+   finds it is a control nobody knows about. */
+.ap-opt__dot {
+  display: grid; place-items: center;
+  width: 22px; height: 22px;
+  border-radius: var(--radius-6);
+  color: var(--text-placeholder);
+  cursor: pointer;
+}
+.ap-todo:hover .ap-opt__dot { color: var(--text-secondary); }
+.ap-opt__dot:hover { background: var(--bg-muted); color: var(--text-primary); }
+.ap-menu--opt  { right: 0; top: 24px; min-width: 188px; }
+.ap-winmore    { position: relative; }
+.ap-menu--more { right: 0; min-width: 216px; }
+.ap-menu__row.is-danger { color: var(--error-text); }
+.ap-menu__row.is-danger svg { color: var(--error-base); }
+.ap-menu__row.is-danger:hover { background: var(--error-bg); color: var(--error-text); }
+.ap-due.is-error { background: var(--error-base);  color: var(--text-on-dark); }
+.ap-due.is-warn  { background: var(--warning-bg);  color: var(--warning-text); }
+.ap-due.is-calm  { background: var(--bg-muted);    color: var(--text-tertiary); }
+
+.ap-tick {
+  width: 17px; height: 17px; flex: none; margin-top: 1px;
+  display: grid; place-items: center;
+  border: 1.5px solid var(--border-muted);
+  border-radius: var(--radius-4);
+  background: var(--bg-base);
+  color: var(--text-on-dark);
+  cursor: pointer;
+}
+.ap-tick:hover { border-color: var(--border-brand); }
+.ap-tick.is-on { background: var(--bg-brand); border-color: transparent; }
+
+/* ==========================================================================
+   Pinned containers
+   ========================================================================== */
+
+.ap-card {
+  flex: none;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
+.ap-card__head {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  cursor: pointer;
+}
+.ap-card__head:hover { background: var(--bg-surface); }
+.ap-card__glyph { display: grid; place-items: center; color: var(--text-brand); }
+.ap-card__title { flex: 1; min-width: 0; }
+.ap-card__count {
+  padding: 2px var(--space-8); border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-tertiary);
+}
+.ap-card__count.is-warn  { background: var(--warning-bg); color: var(--warning-text); }
+.ap-card__count.is-error { background: var(--error-bg);   color: var(--error-text); }
+.ap-card__chev { display: grid; place-items: center; color: var(--text-tertiary); }
+
+/* A card that stands for a full view says so in its header, where it can
+   still be read when the card is folded shut. It is quiet until the head
+   is hovered, so six cards do not turn into six buttons. */
+.ap-card__open {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  padding: 3px var(--space-8);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-pill);
+  background: var(--bg-base);
+  font: var(--weight-demi) 11px/15px var(--font-family);
+  color: var(--text-brand);
+  white-space: nowrap; cursor: pointer;
+  opacity: .78;
+}
+.ap-card__head:hover .ap-card__open { opacity: 1; }
+.ap-card__open:hover { border-color: var(--border-brand); background: var(--brand-50); }
+.ap-card__open svg { color: var(--text-brand); }
+.ap-card.has-view .ap-card__glyph { color: var(--text-brand); }
+.ap-card__body { display: flex; flex-direction: column; gap: var(--space-8); padding: 0 var(--space-16) var(--space-16); }
+.ap-card.is-closed .ap-card__body { display: none; }
+.ap-card.is-closed .ap-card__chev { transform: rotate(-90deg); }
+
+.ap-row {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-8) 10px;
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  font: var(--weight-medium) 13px/18px var(--font-family);
+}
+.ap-row__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ap-row__meta { color: var(--text-tertiary); font-size: 11px; white-space: nowrap; }
+.ap-row__meta.is-urgent { color: var(--error-text); font-weight: var(--weight-demi); }
+.ap-row.is-overdue { background: var(--error-bg); }
+.ap-row.is-done .ap-row__main { color: var(--text-placeholder); text-decoration: line-through; }
+.ap-row--sign { align-items: center; }
+
+/* ---------- Notes ----------------------------------------------------------- */
+
+/* Nine notes today, twenty next month: the list scrolls rather than
+   hiding the tail behind a *read more*. */
+.ap-notes {
+  display: flex; flex-direction: column; gap: var(--space-8);
+  max-height: 244px;
+  overflow-y: auto;
+  padding-right: var(--space-4);
+}
+.ap-notes__bar { display: flex; gap: var(--space-6); padding-bottom: 2px; }
+.ap-ap--sm { padding: 3px var(--space-8); font-size: 11px; }
+
+.ap-note { padding: 10px; border-radius: var(--radius-8); background: var(--bg-surface); }
+.ap-note__top { display: flex; align-items: center; gap: var(--space-6); }
+.ap-note__when { color: var(--text-tertiary); flex: 1; }
+.ap-note__body { margin: var(--space-6) 0 0; font: var(--weight-regular) 12px/18px var(--font-family); color: var(--text-secondary); }
+
+.ap-compose { display: flex; flex-direction: column; gap: var(--space-8); }
+.ap-compose__field { display: flex; align-items: center; gap: var(--space-8); }
+.ap-input--note {
+  flex: 1; height: 36px; padding: 0 var(--space-12);
+  border: 1px solid var(--border-default); border-radius: var(--radius-8); font-size: 13px;
+}
+.ap-input--note:focus { outline: 0; border-color: var(--border-focus); box-shadow: var(--elevation-focus); }
+
+/* ---------- Documents -------------------------------------------------------- */
+
+/* The summary the panel leads with: four numbers, so the state of the pile
+   is one glance rather than six rows. */
+.ap-docsum { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-6); }
+.ap-docsum__cell {
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  padding: var(--space-8) var(--space-4);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+  font: var(--weight-regular) 10px/14px var(--font-family);
+  color: var(--text-tertiary);
+  text-align: center;
+}
+.ap-docsum__cell b { font: var(--weight-bold) 17px/20px var(--font-family); color: var(--text-primary); }
+.ap-docsum__cell.is-ok b       { color: var(--success-text); }
+.ap-docsum__cell.is-review b   { color: var(--warning-text); }
+.ap-docsum__cell.is-rejected b { color: var(--error-text); }
+.ap-docsum__cell.is-zero       { opacity: 0.45; }
+
+.ap-doc { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-6) 10px; border-radius: var(--radius-8); background: var(--bg-surface); }
+.ap-doc__pip  { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.ap-doc__name { flex: 1; min-width: 0; font: var(--weight-medium) 13px/18px var(--font-family); }
+.ap-doc__acts { display: flex; gap: 2px; flex: none; }
+.ap-doc .ap-ip { color: var(--text-placeholder); }
+.ap-doc .ap-ip:hover { background: var(--bg-base); color: var(--text-brand); }
+
+/* ---------- Checklist, signatures, activity ----------------------------------- */
+
+/* Three moments, three lists, one at a time. */
+.ap-ctabs {
+  display: flex; gap: var(--space-4);
+  padding: 2px; margin-bottom: var(--space-4);
+  border-radius: var(--radius-8);
+  background: var(--bg-surface);
+}
+.ap-ctab {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-6);
+  font: var(--weight-demi) 12px/16px var(--font-family);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ap-ctab:hover { color: var(--text-primary); }
+.ap-ctab.is-on { background: var(--bg-base); color: var(--text-brand); box-shadow: var(--elevation-card); }
+.ap-ctab__n { font: var(--weight-medium) 11px/15px var(--font-family); color: var(--text-placeholder); }
+.ap-ctab.is-on .ap-ctab__n { color: var(--text-brand); }
+
+.ap-meter--wide { margin-bottom: var(--space-4); }
+
+.ap-clist { display: flex; flex-direction: column; gap: 1px; }
+.ap-citem {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-6);
+}
+.ap-citem:hover { background: var(--bg-surface); }
+.ap-citem__label { flex: 1; min-width: 0; font: var(--weight-medium) 13px/18px var(--font-family); }
+.ap-citem.is-on .ap-citem__label { color: var(--text-tertiary); }
+/* The system's own ticks say so, so a broker does not spend a moment
+   wondering why one will not come off. */
+.ap-citem__auto {
+  flex: none; padding: 1px var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  color: var(--text-placeholder);
+}
+.ap-citem.is-auto .ap-tick { cursor: default; background: var(--success-base); border-color: transparent; }
+
+.ap-check { display: flex; flex-direction: column; gap: var(--space-4); }
+.ap-check__top { display: flex; align-items: baseline; gap: var(--space-8); }
+.ap-check__n { margin-left: auto; color: var(--text-tertiary); }
+.ap-check__note { color: var(--text-placeholder); }
+.ap-meter { display: block; height: 6px; border-radius: var(--radius-pill); background: var(--neutral-200); overflow: hidden; }
+.ap-meter__fill { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--brand-500); }
+.ap-meter__fill.is-done { background: var(--success-base); }
+
+.ap-sign__icon { display: grid; place-items: center; flex: none; }
+.ap-sign__icon.is-ok   { color: var(--success-base); }
+.ap-sign__icon.is-wait { color: var(--accent-amber); }
+.ap-sign__icon.is-none { color: var(--neutral-400); }
+.ap-sign__what { font-weight: var(--weight-medium); }
+.ap-sign__who  { color: var(--text-tertiary); }
+
+/* v1's string, kept: a badge running down the left with a hairline
+   through it, the stamp — date in bold, then the time and the person —
+   and what happened on the line underneath. A note is somebody writing,
+   so it keeps v1's brand rule down its edge; a log is set quieter and
+   italic, as v1 set it. */
+.ap-string { display: flex; flex-direction: column; position: relative; }
+.ap-string::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 22px; bottom: 18px;
+  width: 1px;
+  background: var(--border-subtle);
+}
+.ap-ev { display: flex; gap: var(--space-8); position: relative; }
+.ap-ev__badge {
+  width: 24px; height: 24px; flex: none;
+  border-radius: var(--radius-6);
+  display: grid; place-items: center;
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+  box-shadow: 0 0 0 3px var(--bg-base);
+}
+.ap-ev__badge.is-brand { background: var(--brand-600); color: var(--text-on-dark); }
+.ap-ev__body { flex: 1; min-width: 0; padding-bottom: var(--space-16); }
+.ap-ev--note .ap-ev__body { border-left: 2px solid var(--brand-500); padding-left: 10px; }
+.ap-ev__stamp { color: var(--text-tertiary); }
+.ap-ev__stamp b { color: var(--text-primary); font-weight: var(--weight-demi); }
+.ap-ev__text { color: var(--text-secondary); margin-top: var(--space-4); }
+.ap-ev__text.is-log { font-style: italic; color: var(--text-tertiary); }
+.ap-string .ap-ev:last-child .ap-ev__body { padding-bottom: var(--space-4); }
+
+/* The full view breaks the same string by day. */
+.ap-day { margin-bottom: var(--space-12); }
+.ap-day__date {
+  position: sticky; top: 0; z-index: 2;
+  padding: var(--space-8) 0;
+  background: var(--bg-base);
+  color: var(--text-tertiary);
+}
+.ap-string--full::before { background: var(--border-subtle); }
+
+.ap-act { display: flex; gap: var(--space-8); padding: var(--space-4) 2px; }
+.ap-act__glyph { display: grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: var(--radius-6); background: var(--bg-surface); color: var(--text-tertiary); }
+.ap-act__glyph.is-call { color: var(--success-base); }
+.ap-act__glyph.is-doc  { color: var(--accent-amber); }
+.ap-act__glyph.is-sign { color: var(--text-brand); }
+.ap-act__body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ap-act__text { font: var(--weight-medium) 12px/17px var(--font-family); }
+.ap-act__meta { color: var(--text-tertiary); }
+
+/* ==========================================================================
+   The workspace
+   ========================================================================== */
+
+.ap-ws {
+  min-height: 0;
+  display: flex; flex-direction: column;
+  border-radius: var(--radius-16);
+  background: var(--bg-base);
+  box-shadow: var(--elevation-card);
+  overflow: hidden;
+}
+
+/* The three views, as a strip the broker lands on rather than something
+   to be discovered. Each tab carries its own count, which is what makes
+   the two beside the form look like places with contents. */
+.ap-tabs {
+  flex: none; display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-8) var(--space-16) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ap-tabs__hint { margin-left: auto; padding-bottom: var(--space-8); color: var(--text-placeholder); }
+.ap-tab__n {
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.ap-tab.is-on .ap-tab__n { background: var(--brand-50); color: var(--text-brand); }
+.ap-tab {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  padding: 10px var(--space-16);
+  border: 0; border-bottom: 2px solid transparent;
+  background: transparent;
+  font: var(--weight-demi) 13px/18px var(--font-family);
+  color: var(--text-tertiary); cursor: pointer;
+}
+.ap-tab:hover { color: var(--text-primary); }
+.ap-tab.is-on { color: var(--text-brand); border-bottom-color: var(--brand-600); }
+
+.ap-wshead { flex: none; display: flex; align-items: center; gap: 10px; padding: 14px var(--space-20); border-bottom: 1px solid var(--border-subtle); }
+.ap-wshead__glyph { display: grid; place-items: center; color: var(--text-brand); }
+.ap-wshead__hint  { margin-left: auto; color: var(--text-placeholder); }
+.ap-back {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; flex: none;
+  border-radius: var(--radius-8);
+  background: var(--bg-surface); color: var(--text-secondary);
+  cursor: pointer; transform: rotate(180deg);
+}
+.ap-back:hover { background: var(--bg-muted); }
+
+/* No `scroll-behavior: smooth` here. It made every repaint animate the
+   form from the top back to where it was, which is what folding a band
+   looked like. The one place smooth is wanted — jumping from the section
+   rail — asks for it per call with `scrollIntoView`. */
+.ap-ws__body { flex: 1; min-height: 0; overflow-y: auto; }
+.ap-ws__body.is-form { padding: var(--space-16) var(--space-20) var(--space-20); display: flex; flex-direction: column; gap: var(--space-16); }
+.ap-ws__body.is-view { padding: var(--space-16) var(--space-20) var(--space-20); }
+.ap-ws__end {
+  flex: none; display: flex; align-items: center; gap: var(--space-12);
+  padding: var(--space-16); margin-top: var(--space-4);
+  border-radius: var(--radius-12);
+  background: var(--bg-surface);
+}
+.ap-ws__end .t-caption { color: var(--text-tertiary); }
+
+/* ---------- Form sections ------------------------------------------------------ */
+
+.ap-sec { flex: none; border: 1px solid var(--border-subtle); border-radius: var(--radius-12); scroll-margin-top: var(--space-4); }
+.ap-sec__head { display: flex; align-items: center; gap: 10px; padding: var(--space-12) var(--space-16); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface); border-radius: var(--radius-12) var(--radius-12) 0 0; }
+.ap-sec__glyph { display: grid; place-items: center; color: var(--text-brand); }
+.ap-sec__ok { display: grid; place-items: center; color: var(--success-base); }
+.ap-sec__body { padding: var(--space-16); }
+.ap-sec.is-skipped .ap-sec__head { border-bottom: 0; border-radius: var(--radius-12); }
+.ap-sec__skip { margin: 0; padding: var(--space-12) var(--space-16); font: var(--weight-regular) 12px/18px var(--font-family); color: var(--text-placeholder); }
+
+.ap-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-16); }
+.ap-field { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
+.ap-field.is-wide { grid-column: span 2; }
+.ap-field__label { color: var(--text-tertiary); }
+.ap-req { color: var(--error-base); font-style: normal; padding-left: 2px; }
+
+.ap-ctl {
+  display: flex; align-items: center; gap: var(--space-6);
+  height: 38px; padding: 0 var(--space-12);
+  border: 1px solid var(--border-default); border-radius: var(--radius-8);
+  background: var(--bg-base);
+}
+.ap-ctl:focus-within { border-color: var(--border-focus); box-shadow: var(--elevation-focus); }
+.ap-ctl__fix  { font-style: normal; color: var(--text-placeholder); flex: none; }
+.ap-ctl__chev { display: grid; place-items: center; color: var(--text-tertiary); pointer-events: none; }
+.ap-input, .ap-sel {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+  font: var(--weight-medium) 14px/20px var(--font-family); color: var(--text-primary);
+}
+.ap-sel { appearance: none; cursor: pointer; }
+
+.ap-rep { border: 1px solid var(--border-subtle); border-radius: var(--radius-10); margin-bottom: var(--space-12); overflow: hidden; }
+.ap-rep.is-primary { border-color: var(--brand-200); }
+.ap-rep__head { display: flex; align-items: center; gap: 10px; padding: 10px var(--space-16); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); }
+.ap-rep.is-primary .ap-rep__head { background: var(--brand-50); }
+.ap-rep__role { color: var(--text-tertiary); }
+.ap-rep .ap-grid { padding: var(--space-16); }
+
+.ap-sub { margin-bottom: var(--space-20); }
+.ap-sub:last-child { margin-bottom: 0; }
+.ap-sub__title { display: flex; align-items: center; gap: var(--space-6); margin-bottom: var(--space-12); color: var(--text-secondary); }
+.ap-sub__title svg { color: var(--text-brand); }
+
+.ap-line { display: flex; align-items: center; gap: 10px; padding: var(--space-8) var(--space-12); border: 1px solid var(--border-subtle); border-radius: var(--radius-8); margin-bottom: var(--space-6); }
+.ap-line__main { flex: 1; min-width: 0; }
+
+.ap-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-12); margin-bottom: var(--space-20); }
+.ap-pick__opt { display: flex; flex-direction: column; gap: 2px; padding: var(--space-12) var(--space-16); border: 1px solid var(--border-default); border-radius: var(--radius-10); cursor: pointer; }
+.ap-pick__opt:hover { border-color: var(--border-brand); }
+.ap-pick__opt.is-on { border-color: var(--border-brand); background: var(--brand-50); box-shadow: inset 0 0 0 1px var(--border-brand); }
+.ap-pick__opt.is-on .ap-pick__label { color: var(--text-brand); }
+.ap-pick__note { color: var(--text-tertiary); }
+
+.ap-table { border: 1px solid var(--border-subtle); border-radius: var(--radius-10); overflow: hidden; }
+.ap-table__head, .ap-table__row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 140px 36px; align-items: center; gap: var(--space-12); padding: 10px var(--space-16); }
+.ap-table__head { background: var(--bg-surface); font: var(--weight-demi) 12px/16px var(--font-family); color: var(--text-tertiary); }
+.ap-table__row { border-top: 1px solid var(--border-subtle); }
+.ap-table__row .is-num { font-variant-numeric: tabular-nums; }
+
+/* ---------- The two full views -------------------------------------------------- */
+
+.ap-filters { display: flex; align-items: center; gap: var(--space-6); margin-bottom: var(--space-16); }
+
+.ap-hist { display: flex; flex-direction: column; }
+.ap-hist__row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 130px 160px; align-items: center; gap: var(--space-12); padding: 10px var(--space-8); border-bottom: 1px solid var(--border-subtle); }
+.ap-hist__glyph { display: grid; place-items: center; color: var(--text-tertiary); }
+.ap-hist__glyph.is-call { color: var(--success-base); }
+.ap-hist__glyph.is-doc  { color: var(--accent-amber); }
+.ap-hist__glyph.is-sign { color: var(--text-brand); }
+.ap-hist__who, .ap-hist__when { color: var(--text-tertiary); }
+
+.ap-lib { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-16); }
+.ap-lib__card { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-16); border: 1px solid var(--border-subtle); border-radius: var(--radius-12); }
+.ap-lib__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.ap-lib__glyph { color: var(--text-placeholder); }
+.ap-lib__meta { color: var(--text-tertiary); }
+.ap-lib__acts { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-top: 10px; }
+
+/* ---------- Rail ----------------------------------------------------------------- */
+
+.ap-rail { display: flex; flex-direction: column; gap: var(--space-2); }
+.ap-rail.is-idle { opacity: 0.55; }
+.ap-rail__item {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: 8px 10px; border-radius: var(--radius-8);
+  font: var(--weight-medium) 13px/18px var(--font-family);
+  color: var(--text-secondary); text-decoration: none; cursor: pointer;
+}
+.ap-rail__item svg { flex: none; color: var(--text-placeholder); }
+.ap-rail__item:hover { background: var(--bg-surface); color: var(--text-primary); }
+.ap-rail__item.is-on { background: var(--brand-50); color: var(--text-brand); font-weight: var(--weight-demi); }
+.ap-rail__item.is-on svg { color: var(--text-brand); }
+.ap-rail__skip { margin-left: auto; font: var(--weight-medium) 10px/14px var(--font-family); color: var(--text-placeholder); }
+
+/* The two views listed as siblings of the form's sections. The arrow is
+   the difference between them: a section scrolls the page, one of these
+   replaces what the middle column is showing. */
+.ap-rail--views .ap-rail__item { font-weight: var(--weight-demi); }
+.ap-rail__n {
+  margin-left: auto;
+  padding: 1px var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--bg-muted);
+  font: var(--weight-demi) 11px/16px var(--font-family);
+  color: var(--text-secondary);
+}
+.ap-rail__item.is-on .ap-rail__n { background: var(--bg-base); color: var(--text-brand); }
+.ap-rail__go { margin-left: auto; display: grid; place-items: center; color: var(--text-placeholder); }
+.ap-rail__n + .ap-rail__go { margin-left: 0; }
+.ap-rail__item:hover .ap-rail__go, .ap-rail__item.is-on .ap-rail__go { color: var(--text-brand); }
+
+/* ---------- Locked ---------------------------------------------------------------- */
+
+.ap-body.is-locked .ap-ctl { background: var(--neutral-100); }
+.ap-body.is-locked .ap-input,
+.ap-body.is-locked .ap-sel { color: var(--text-tertiary); cursor: not-allowed; }
+
+/* ---------- Toasts ----------------------------------------------------------------- */
+
+.ap-toasts { position: absolute; z-index: 80; left: 50%; bottom: var(--space-24); transform: translateX(-50%); display: flex; flex-direction: column; gap: var(--space-8); align-items: center; pointer-events: none; }
+.ap-toast {
+  display: flex; align-items: center; gap: var(--space-8);
+  padding: 10px var(--space-16); border-radius: var(--radius-pill);
+  background: var(--neutral-900); color: var(--text-on-dark);
+  font: var(--weight-medium) 13px/18px var(--font-family);
+  box-shadow: var(--elevation-raised);
+  transition: opacity 0.35s, transform 0.35s;
+}
+.ap-toast svg { color: var(--success-border); }
+.ap-toast.is-out { opacity: 0; transform: translateY(8px); }
+
+/* ---------- Scrollbars --------------------------------------------------------------- */
+
+.ap ::-webkit-scrollbar { width: 8px; }
+.ap ::-webkit-scrollbar-thumb { background: var(--neutral-400); border-radius: var(--radius-pill); }
+.ap ::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Panel base -----------------------------------------------------
+   The column itself; how wide it is belongs to each shell. */
+.ap-panel {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-right: var(--space-4);
+}

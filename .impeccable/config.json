@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "css/appview-tape.css"
+        ],
+        "createdAt": "2026-10-30T00:39:44.549Z",
+        "reason": "Tape's signature is a 3px top rule on square tapes; every flagged block sets border-radius 0 beside it, and this regex rule cannot read the value. Value-scoped ignores do not apply to this rule (it has no extractable value). Computed corners verified square on every thick-ruled element in Tape."
+      }
+    ]
+  }
+}

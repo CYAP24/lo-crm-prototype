@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanban x App View V1 — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/shell.css?v=40aaa9d9">
+<script>
+/* ======================================================================
+   Kanban x App View V1 — the board and the deal, together.
+
+   For showing the work end to end: each tab is a version of the kanban,
+   and pressing a deal on it opens that deal's application view over the
+   board. The plain boards open v1 Panels; the Ribbon boards open v2 Tape,
+   which is built on the same Ribbon language. The boards and the
+   application views are the real ones — kanban.html and appview.html show
+   each on its own; this view pairs them.
+   ====================================================================== */
+window.SHELL = {
+  title: 'Kanban x App View V1',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v1',
+  tour:  false,
+  versions: [
+    { id:'v1', label:'v1', sub:'Visual cues → Panels', file:'kanban-x-appview-v1.html',
+      note:'Kanban v1 · press a deal to open app view v1, Panels' },
+    { id:'v1-2', label:'v1.2', sub:'Ribbon → Tape', file:'kanban-x-appview-v1-2.html',
+      note:'Kanban v1.2 · press a deal to open app view v2, Tape' },
+    { id:'v2', label:'v2', sub:'Text & colour → Panels', file:'kanban-x-appview-v2.html',
+      note:'Kanban v2 · press a deal to open app view v1, Panels' },
+    { id:'v2-2', label:'v2.2', sub:'Ribbon → Tape', file:'kanban-x-appview-v2-2.html',
+      note:'Kanban v2.2 · press a deal to open app view v2, Tape' }
+  ]
+};
+</script>
+<script src="js/shell.js?v=99380b63" defer></script>
+</head>
+<body>
+</body>
+</html>
