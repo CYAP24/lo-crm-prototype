@@ -1,0 +1,410 @@
+/* ==========================================================================
+   Application view — Ribbon, the base layer under Tape (v2)
+   --------------------------------------------------------------------------
+   Ribbon was a version of its own and is not any more; this file stays
+   because Tape is built on it. appview-v2.html loads it after
+   css/appview-layout.css and then loads css/appview-tape.css on top, and
+   the page's `.screen` carries both `.skin-ribbon` and `.skin-tape`. So
+   Ribbon supplies the small caps, the tabular figures, the ruled rows and
+   the capsule geometry, and Tape restates only what it changes.
+
+   Delete this file and Tape loses all of that. Fold it into Tape if Tape
+   is ever the only look left that needs it.
+
+   It carries the board's Ribbon language over (css/kanban-ribbon.css) and
+   leans on it harder, because a deal has room a 340px card does not:
+
+     - every heading on the screen is a **rounded ribbon** with a capsule
+       at its head, in a tint that says what kind of heading it is
+     - labels go to small caps with .09em of tracking, so a heading reads
+       as a heading before it is read as a word
+     - every figure is tabular, so the counts down the panel and the dates
+       down the task list line up whether or not anything aligns them
+     - cards trade their shadow for a hairline and a spine in the margin,
+       the way a reader marks a page
+     - the ground goes white and stays white; colour is spent on the
+       ribbons and rationed everywhere else, and solid red is kept for the
+       one band that means *you are late*
+
+   Where v1 separates things with shadow and grey, this separates them with
+   geometry and type. Nothing new is invented: the tints, inks and colours
+   are the system's, and the shapes are the ones the brand already uses.
+   ========================================================================== */
+
+/* The one typographic decision the whole skin rests on. */
+.skin-ribbon .ap-win { font-variant-numeric: tabular-nums; }
+
+/* The ribbon shape itself, as one rule every heading borrows: a tinted
+   lozenge with a capsule at its head. `--rb-tint` and `--rb-key` are what
+   each heading sets. */
+.skin-ribbon .ap-next__head,
+.skin-ribbon .ap-band__head,
+.skin-ribbon .ap-card__head,
+.skin-ribbon .apv-card__title,
+.skin-ribbon .ap-day__date,
+.skin-ribbon .ap-wshead {
+  --rb-tint: var(--bg-muted);
+  --rb-key: var(--neutral-400);
+  position: relative;
+  background: var(--rb-tint);
+  border-radius: var(--radius-10);
+}
+.skin-ribbon .ap-next__head::before,
+.skin-ribbon .ap-band__head::before,
+.skin-ribbon .ap-card__head::before,
+.skin-ribbon .apv-card__title::before {
+  content: '';
+  flex: none;
+  width: 4px;
+  height: 16px;
+  margin-right: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--rb-key);
+}
+
+/* Small caps for everything that labels rather than says. */
+.skin-ribbon .ap-next__eyebrow,
+.skin-ribbon .ap-band__label,
+.skin-ribbon .ap-card__title,
+.skin-ribbon .apv-card__title,
+.skin-ribbon .ap-assign__label,
+.skin-ribbon .ap-ctab,
+.skin-ribbon .ap-tab,
+.skin-ribbon .ap-day__date,
+.skin-ribbon .apv-prog__of {
+  font-weight: var(--weight-demi);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+/* ---------- The window ----------------------------------------------------
+   White from edge to edge. v1 floats white cards on a grey ground; here
+   the ground is the paper and the ribbons are what divide it. */
+
+.skin-ribbon .ap { background: #15161B; }
+.skin-ribbon .ap-win { --ap-ground: var(--bg-base); border-radius: var(--radius-12); }
+.skin-ribbon .apv-body { background: var(--bg-base); }
+
+/* ---------- Header --------------------------------------------------------
+   Two bands, divided by a hairline rather than by a change of ground. */
+
+.skin-ribbon .apv-head { border-bottom: 2px solid var(--neutral-900); }
+.skin-ribbon .apv-head__foot { border-top: 1px solid var(--border-subtle); }
+
+.skin-ribbon .ap-who__name { letter-spacing: -.015em; }
+.skin-ribbon .ap-who__meta { letter-spacing: .04em; text-transform: uppercase; font-size: 10px; }
+.skin-ribbon .ap-money { border-left: 0; padding-left: var(--space-20); }
+.skin-ribbon .ap-money__n { letter-spacing: -.02em; }
+.skin-ribbon .ap-money__t { letter-spacing: .07em; text-transform: uppercase; font-size: 10px; }
+
+/* The segment is a ribbon too, at label size. */
+.skin-ribbon .ap-seg {
+  border-radius: var(--radius-pill);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 4px var(--space-10, 10px);
+}
+
+/* Capsules, and the one control that makes something is filled. */
+.skin-ribbon .ap-cp,
+.skin-ribbon .ap-ap,
+.skin-ribbon .ap-btn { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-cp--on {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ribbon .ap-cp--on svg { color: var(--text-on-dark); }
+.skin-ribbon .ap-btn--brand,
+.skin-ribbon .ap-submit.is-ready {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+
+/* The assignment strip: the label above each control becomes its ribbon. */
+.skin-ribbon .ap-assign__label { font-size: 9px; color: var(--text-placeholder); }
+.skin-ribbon .ap-assign__ctl { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-assign__ctl:hover { border-color: var(--border-default); background: var(--bg-surface); }
+
+/* Warnings are ribbons with a capsule, and only the loudest keeps a fill. */
+.skin-ribbon .ap-warn {
+  border-radius: var(--radius-pill);
+  padding-left: var(--space-8);
+}
+.skin-ribbon .ap-warn b {
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.skin-ribbon .ap-warn__act {
+  border-radius: var(--radius-pill);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+/* ---------- Navigator -----------------------------------------------------
+   One card, hairlined rather than lifted, and its two headings are
+   ribbons. The spine's stages keep the board's stage colours as capsules. */
+
+.skin-ribbon .apv-card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.skin-ribbon .apv-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0 0 var(--space-8);
+  padding: var(--space-6) 10px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  --rb-tint: var(--brand-50);
+  --rb-key: var(--brand-600);
+}
+.skin-ribbon .apv-card__group { border-top: 1px solid var(--border-default); }
+
+.skin-ribbon .apv-prog__now { letter-spacing: -.01em; }
+.skin-ribbon .apv-prog__meter { height: 8px; border-radius: var(--radius-pill); background: var(--neutral-200); }
+.skin-ribbon .apv-prog__of { font-size: 9px; }
+.skin-ribbon .apv-prog__pct { font-variant-numeric: tabular-nums; }
+
+/* A stage in the spine is a capsule, filled where the deal has been and
+   outlined where it has not. The current one takes the ribbon. */
+.skin-ribbon .ap-spine__step { border-radius: var(--radius-8); }
+.skin-ribbon .ap-spine__step.is-now {
+  background: var(--brand-50);
+  box-shadow: inset 2px 0 0 var(--ap-stage, var(--brand-600));
+}
+.skin-ribbon .ap-spine__label { letter-spacing: .02em; }
+.skin-ribbon .ap-spine__n {
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The section rail: the one in view gets the ribbon, the rest stay plain. */
+.skin-ribbon .ap-rail__item { border-radius: var(--radius-8); }
+.skin-ribbon .ap-rail__item.is-on { background: var(--brand-50); box-shadow: inset 2px 0 0 var(--brand-600); }
+.skin-ribbon .ap-rail__n { border-radius: var(--radius-pill); font-variant-numeric: tabular-nums; }
+.skin-ribbon .ap-rail__skip { letter-spacing: .08em; text-transform: uppercase; font-size: 9px; }
+
+/* ---------- Tasks to action -----------------------------------------------
+   The card's own heading is a neutral ribbon — these are the deal's tasks
+   and not the stage's — and each band heading below it is a ribbon in its
+   own tone, which is where this skin spends its colour.
+
+   Fill, weight and height rank the three bands at once, the way the
+   board's alert bands do: solid red for late, a tinted lozenge with a rule
+   under it for soon, and the quietest grey for the running list. */
+
+.skin-ribbon .ap-next {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.skin-ribbon .ap-next__head {
+  display: flex;
+  align-items: center;
+  margin: var(--space-8) var(--space-8) 0;
+  height: 36px;
+  padding: 0 var(--space-12);
+  border-bottom: 0;
+  background: var(--bg-muted);
+  --rb-key: var(--neutral-500);
+}
+.skin-ribbon .ap-next__head:hover { background: var(--neutral-200); }
+.skin-ribbon .ap-next__eyebrow { font-size: 10px; color: var(--text-secondary); }
+.skin-ribbon .ap-next__count { letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+.skin-ribbon .ap-next__pip {
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+
+.skin-ribbon .ap-band { border-bottom: 0; }
+/* `.ap-next--wide .ap-band__head` in the layout outranks a bare
+   `.skin-ribbon .ap-band__head`, so these carry `.ap-next` to match it,
+   and every tone names its fill rather than only its token. */
+.skin-ribbon .ap-next .ap-band__head {
+  margin: var(--space-8) var(--space-8) var(--space-4);
+  padding: var(--space-6) var(--space-10, 10px);
+  background: var(--rb-tint);
+  border-radius: var(--radius-10);
+}
+.skin-ribbon .ap-band__pip { display: none; }   /* the ribbon's capsule replaces it */
+.skin-ribbon .ap-band__label { font-size: 10px; }
+.skin-ribbon .ap-band__count {
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Late is the only thing on this screen drawn in solid red. */
+.skin-ribbon .ap-next .ap-band.is-error .ap-band__head {
+  --rb-tint: var(--error-base);
+  --rb-key: var(--text-on-dark);
+  background: var(--error-base);
+  padding: var(--space-8) var(--space-10, 10px);
+}
+.skin-ribbon .ap-next .ap-band.is-error .ap-band__label,
+.skin-ribbon .ap-next .ap-band.is-error .ap-band__chev { color: var(--text-on-dark); }
+.skin-ribbon .ap-next .ap-band.is-error .ap-band__count {
+  background: rgba(255, 255, 255, .22);
+  color: var(--text-on-dark);
+}
+
+.skin-ribbon .ap-next .ap-band.is-warn .ap-band__head {
+  --rb-tint: var(--warning-bg);
+  --rb-key: var(--warning-base);
+  background: var(--warning-bg);
+  border-bottom: 2px solid var(--warning-base);
+  border-radius: var(--radius-10) var(--radius-10) 0 0;
+}
+.skin-ribbon .ap-next .ap-band.is-calm .ap-band__head {
+  --rb-tint: var(--bg-muted);
+  --rb-key: var(--neutral-400);
+  background: var(--bg-muted);
+}
+
+/* Rows become ruled rather than filled. The deal's own tasks keep their
+   mark, but as a capsule in the margin rather than a dashed outline. */
+.skin-ribbon .ap-todo {
+  background: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-left: var(--space-12);
+}
+.skin-ribbon .ap-band__body > .ap-todo:last-child { border-bottom: 0; }
+.skin-ribbon .ap-todo.is-task {
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: inset 3px 0 0 var(--neutral-300);
+}
+.skin-ribbon .ap-todo__label { letter-spacing: -.005em; }
+.skin-ribbon .ap-due {
+  border-radius: var(--radius-pill);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.skin-ribbon .ap-flag {
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+.skin-ribbon .ap-tick { border-radius: var(--radius-4); }
+.skin-ribbon .ap-next__foot { border-top: 1px solid var(--border-default); }
+
+/* ---------- Workspace -----------------------------------------------------
+   The tabs become capsules on a rail rather than text with an underline:
+   the same row of choices, drawn as the board draws a choice. */
+
+.skin-ribbon .ap-ws {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.skin-ribbon .ap-tabs {
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-12);
+  background: var(--bg-surface);
+}
+.skin-ribbon .ap-tab {
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+}
+.skin-ribbon .ap-tab:hover { background: var(--bg-base); }
+.skin-ribbon .ap-tab.is-on {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: var(--text-on-dark);
+}
+.skin-ribbon .ap-tab.is-on svg { color: var(--text-on-dark); }
+.skin-ribbon .ap-tab__n {
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+.skin-ribbon .ap-tab.is-on .ap-tab__n { background: rgba(255, 255, 255, .22); color: var(--text-on-dark); }
+
+/* The form's sections: the heading is a ribbon, the fields stay plain. */
+.skin-ribbon .ap-sec { border-radius: var(--radius-12); border: 1px solid var(--border-default); }
+.skin-ribbon .ap-sec__head {
+  letter-spacing: .02em;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+}
+.skin-ribbon .ap-field__label { letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+.skin-ribbon .ap-input,
+.skin-ribbon .ap-sel { border-radius: var(--radius-8); }
+.skin-ribbon .ap-wshead { margin: var(--space-8); --rb-tint: var(--bg-surface); }
+.skin-ribbon .ap-day__date { padding: var(--space-6) var(--space-10, 10px); font-size: 10px; }
+
+/* ---------- Pinned panel --------------------------------------------------
+   Each card's heading is a ribbon in the brand tint, and the two with a
+   full view of their own say so in their ribbon rather than beside it. A
+   card carrying something wrong takes the error tint, which is the only
+   time a panel heading is not purple. */
+
+.skin-ribbon .ap-card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.skin-ribbon .ap-card .ap-card__head {
+  margin: var(--space-8) var(--space-8) 0;
+  padding: var(--space-8) 10px;
+  --rb-tint: var(--brand-50);
+  --rb-key: var(--brand-600);
+  background: var(--brand-50);
+}
+.skin-ribbon .ap-card .ap-card__head:hover { background: var(--brand-100); }
+.skin-ribbon .ap-card.is-closed .ap-card__head { margin-bottom: var(--space-8); }
+.skin-ribbon .ap-card__title { font-size: 10px; color: var(--text-brand); }
+.skin-ribbon .ap-card__glyph { display: none; }   /* the capsule is the mark */
+.skin-ribbon .ap-card__count {
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+}
+.skin-ribbon .ap-card__open {
+  border-radius: var(--radius-pill);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 9px;
+  opacity: 1;
+}
+.skin-ribbon .ap-card__body { padding-top: var(--space-8); }
+
+.skin-ribbon .ap-note { border-radius: var(--radius-10); box-shadow: inset 3px 0 0 var(--neutral-300); }
+.skin-ribbon .ap-notes__bar .ap-ap { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-ctabs { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-ctab { border-radius: var(--radius-pill); font-size: 10px; }
+.skin-ribbon .ap-ctab__n { font-variant-numeric: tabular-nums; }
+.skin-ribbon .ap-citem__auto {
+  border-radius: var(--radius-pill);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+.skin-ribbon .ap-chip,
+.skin-ribbon .ap-tag {
+  border-radius: var(--radius-pill);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.skin-ribbon .ap-docsum__cell b { font-variant-numeric: tabular-nums; }
+.skin-ribbon .ap-meter { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-ev__badge { border-radius: var(--radius-pill); }
+.skin-ribbon .ap-ev__stamp { letter-spacing: .03em; }
+
+/* ---------- Menus and toasts ---------------------------------------------- */
+
+.skin-ribbon .ap-menu { border-radius: var(--radius-12); }
+.skin-ribbon .ap-menu__head { letter-spacing: .09em; text-transform: uppercase; font-size: 9px; }
+.skin-ribbon .ap-toast { border-radius: var(--radius-pill); }

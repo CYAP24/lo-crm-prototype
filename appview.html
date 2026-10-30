@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Application view — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/shell.css?v=40aaa9d9">
+<script>
+/* ======================================================================
+   The application-view prototype view — a duplicate of the screen a deal
+   opens into, framed on its own so it can be reworked without the work
+   list in front of it and without touching the screen it was copied from.
+   Its versions number from v1 in their own right.
+
+   Add a version here and it appears everywhere — tabs, compare pickers,
+   keyboard shortcuts and deep links. The chrome itself is js/shell.js,
+   shared with the other prototype views.
+
+   There is no tour on this screen, so that control is off; with one
+   version the compare control stands down on its own.
+   ====================================================================== */
+window.SHELL = {
+  title: 'Application view',
+  sub:   'LoanOptions CRM prototype',
+  start: 'v1',
+  tour:  false,
+  versions: [
+    { id:'v1', label:'v1', sub:'Panels', file:'appview-v1.html',
+      note:'White cards on a soft grey ground \u00b7 shadow, 16px corners, sentence case' },
+    { id:'v2', label:'v2', sub:'Tape', file:'appview-v2.html',
+      note:'One ruled sheet, tape across every column \u00b7 square sheet, round objects \u00b7 big figures' }
+  ]
+};
+</script>
+<script src="js/shell.js?v=99380b63" defer></script>
+</head>
+<body>
+</body>
+</html>

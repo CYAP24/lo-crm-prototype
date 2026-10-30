@@ -397,6 +397,13 @@
   border-color: var(--border-default);
   background: var(--bg-base);
 }
+/* Ribbon sets the button's ground at the same weight as the base hover, so
+   the hover is restated here or it would never show. */
+.skin-ribbon .kb-ap:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-muted);
+  color: var(--text-primary);
+}
 
 /* ---------- Panels --------------------------------------------------------
    The sidebars keep the radius the base board gives them. Only the labels

@@ -288,6 +288,66 @@
   outline-offset: -1px;
 }
 
+/* ---------- A card can be picked up -------------------------------------------
+   Every card can be dragged to another stage, so the pointer over one says
+   so: a soft grey ring just inside its edge, and a hand ready to grab. The
+   ring is drawn inside the card rather than outside it so the column's own
+   scrolling never clips it, and it leaves alone the red ring a call-now
+   card already wears. */
+
+.kb-c {
+  cursor: grab;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color .14s ease;
+}
+.kb-c:not(.kb-c--cues.is-immediate):hover { outline-color: var(--neutral-400); }
+
+/* While a card is being dragged: the card under the pointer, and the
+   columns it can and cannot land in. Its position and the fade on the gap
+   it left are set inline by wireDrag(); what is here is how it looks.
+
+   The selectors lead with `.screen` on purpose. The skins restyle cards
+   and columns at two and three classes of specificity — Ribbon's
+   `.skin-ribbon .kb-c` sets its own shadow, and `.skin-ribbon .kb-col`
+   clears the column ground — so a drag state written at one class lost
+   to them on the Ribbon boards. */
+.screen .kb-c.kb-ghost {
+  transform: rotate(1.5deg) scale(1.02);
+  transform-origin: 30% 20%;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, .22), 0 4px 10px rgba(16, 24, 40, .12);
+  outline-color: transparent;
+}
+.screen .kb-c.kb-ghost.is-blocked { opacity: .55; }
+
+.screen .kb-board .kb-col.is-drop {
+  outline: 2px dashed var(--brand-400);
+  outline-offset: -2px;
+  background-color: var(--brand-50);
+}
+.screen .kb-board .kb-col.is-nodrop {
+  outline: 2px dashed var(--neutral-400);
+  outline-offset: -2px;
+  cursor: not-allowed;
+}
+
+/* A global state for the length of one drag, so the hand stays closed over
+   every element the pointer crosses, whatever cursor that element asks for. */
+html.kb-dragging,
+html.kb-dragging * { cursor: grabbing !important; user-select: none; }
+
+/* The card that just moved pulses once in its new place, so the eye can
+   find where it went. */
+.kb-c.is-just-moved { animation: kb-moved 1.2s ease-out; }
+@keyframes kb-moved {
+  0%, 30% { outline-color: var(--brand-600); }
+  100%    { outline-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kb-c.is-just-moved { animation: none; }
+  .screen .kb-c.kb-ghost { transform: none; }
+}
+
 /* ---------- Banner --------------------------------------------------------- */
 
 .kb-c__banner {
@@ -519,6 +579,15 @@
   color: var(--text-secondary);
   white-space: nowrap;
   cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+/* Just enough to say it can be pressed: a grey fill, a firmer edge and
+   darker type. Not the brand, which would make four buttons on every card
+   compete with the call key. */
+.kb-ap:hover {
+  background: var(--bg-surface);
+  border-color: var(--neutral-500);
+  color: var(--text-primary);
 }
 .kb-ap svg { flex: none; }
 .kb-ap--grow { flex: 1; min-width: 0; }

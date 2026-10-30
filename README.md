@@ -47,6 +47,8 @@ screen's versions and lets you switch between them:
 | `index.html` | The work list | v1, v2, v3 |
 | `kanban.html` | The kanban board | v1, v2 |
 | `screen2.html` | Screen 2 | v1 |
+| `appview.html` | The application view | v1, v2 — one screen, two looks |
+| `kanban-x-appview.html` | **Kanban x App View V1** — the board and the deal together, for showing the client | v1, v1.2, v2, v2.2 |
 
 Each numbers its versions **from v1 in its own right**: the kanban's v1 and
 the work list's v1 are different screens, not two takes on one.
@@ -82,11 +84,11 @@ window.SHELL = {
 
 To add a version, append one entry to that `versions` array — tabs, compare
 pickers, shortcuts and deep links all follow. To add a **screen**, copy one of
-the two pages and point it at that screen's versions.
+these pages and point it at that screen's versions.
 
 Two controls look after themselves: compare stands down when there is only one
 version, since there is nothing to hold it against, and the tour button appears
-only where `tour` is set — screen 2 has no tour yet.
+only where `tour` is set — so far only the work list has one.
 
 ## The artboard and scrolling
 
@@ -112,7 +114,7 @@ assets/brand/    logo.svg and assist.svg, exported from CRM-2026 — the sprite
 css/tokens.css   Design tokens — colours, spacing, radius, elevation, type ramp.
                  Variable names match the code syntax set on the Figma variables.
 css/shell.css    The prototype views' own chrome — the dark harness, not the
-                 mocks it frames. Shared by index.html and screen2.html.
+                 mocks it frames. Shared by every prototype view.
 js/shell.js      The harness itself: tabs, compare, scaling, shortcuts, deep
                  links. Driven by the page's window.SHELL.
 css/worklist.css Layout + components. Shared by all work-list versions.
@@ -128,10 +130,24 @@ js/popups.js      Row popups — Tasks / Notes / Activity cards, with their
 js/tour.js        Points-of-interest tour — engine and the step list per
                   version.
 css/tour.css      Spotlight and callout styles.
-js/appview.js     Application view — the screen a deal opens into (v1).
+js/appview.js     Application view — the screen a deal opens into.
 css/appview.css   Its styles.
+js/appview-core.js  The reworked application view at appview.html —
+css/appview-core.css  its state, the submission gates, the one task list,
+                  the form, the panel bodies, the two full views and every
+                  component it is built from. See below.
+js/appview-view.js  That screen: its header, its three columns, where the
+css/appview-layout.css  task strip sits. The two files every skin shares.
+css/appview-ribbon.css  Tape's base layer, scoped to `.skin-ribbon`. No
+                  longer a version of its own — kept because Tape is
+                  built on it. See below.
+css/appview-tape.css  v2 — the Tape skin, scoped to `.skin-tape`, loaded
+                  after Ribbon. Neither changes any markup.
 js/kanban.js      Kanban board — the deals as cards. See below.
 css/kanban.css    Its styles, on top of worklist.css.
+js/kanban-appview.js  Kanban x App View: press a deal on the board and its
+css/kanban-appview.css  application view opens over it. Loaded on the
+                  kanban-x-appview-*.html pages only. See below.
 js/screen2.js     Screen 2 — a standalone copy of the application view, being
 css/screen2.css   reworked into a different screen. See below.
 js/variants.js    Concept renderers (v3–v5).
@@ -145,6 +161,14 @@ kanban-v1.html        v1 — alert states, tasks as tinted blocks.
 kanban-v2.html        v2 — alert states, text and colour only.
 screen2.html          The screen-2 prototype view — v1.
 screen2-v1.html       Screen 2, v1 — the copy of the application view.
+appview.html          The application-view prototype view — v1 to v4.
+appview-v1.html       The application view, reworked — v1, Panels.
+appview-v2.html       The same screen, v2 — Tape.
+kanban-x-appview.html The Kanban x App View V1 prototype view.
+kanban-x-appview-v1.html    Kanban v1 opening app view v1, Panels.
+kanban-x-appview-v1-2.html  Kanban v1.2 (Ribbon) opening app view v2, Tape.
+kanban-x-appview-v2.html    Kanban v2 opening app view v1, Panels.
+kanban-x-appview-v2-2.html  Kanban v2.2 (Ribbon) opening app view v2, Tape.
 ```
 
 ## Versions
@@ -242,6 +266,254 @@ All three versions open into it: each passes `appView` to the shared mount.
 They still differ in the row itself — v2 keeps Broker Assist in its quick-view
 sidebar, v3 keeps the split action columns — but the screen behind a deal is
 the same one.
+
+### Its own prototype view
+
+The screen is also framed on its own at `appview.html`, so it can be worked
+on without the work list in front of it — and what is framed there now is a
+**rebuild** rather than the screen above. The original
+(`js/appview.js`, `css/appview.css`) is untouched and still what a deal
+opens into from the work list; the rebuild answers five rounds of feedback
+on what that screen should have been.
+
+It is **one screen in two looks**:
+
+| | What it is |
+|---|---|
+| **v1 Panels** | White cards on a soft grey ground, 16px corners, a quiet shadow under each, sentence case. The base: no skin stylesheet at all. |
+| **v2 Tape** | **The cards dissolve**: each column is one ruled sheet, and every section is announced by a length of tinted tape laid edge to edge across its column with a 3px rule along its top. Counts are set at 18px at the end of each tape, the name and money at 34px. The sheet and its tapes are square; everything sitting on them is round. |
+
+They share **everything but the look**. `js/appview-view.js` renders both
+and `css/appview-layout.css` divides both; Tape is stylesheets loaded after
+them and scoped to classes on `.screen`, exactly as `css/kanban-ribbon.css`
+skins the board. It touches no markup, renderer or behaviour, so a change
+to the screen lands in both at once and they stay honest comparisons.
+
+**Tape is two stylesheets, because it was built on Ribbon.** Ribbon was a
+look of its own — every heading a tinted, rounded ribbon with a capsule at
+its head, small caps, tabular figures — and Tape began as one of two pushes
+of it. Ribbon and the other push have been cut, but Tape still stands on
+Ribbon: `appview-v2.html` loads `css/appview-ribbon.css` and then
+`css/appview-tape.css`, its `.screen` carries `skin-ribbon skin-tape`, and
+Tape restates only what it changes. Ribbon supplies the small caps, the
+tabular figures, the ruled rows and the capsule geometry. Delete it and
+Tape loses all of that; fold it into Tape if nothing else is ever going to
+need it.
+
+**Tape ranks by size and rule, not colour.** Almost nothing structural is
+coloured. *Late* is a red rule and a red figure, not a red block; the panel
+folds into an index of five tapes each ending in its count.
+
+**Square is structure, round is everything else.** Its first draft squared
+every corner on the screen, and the brand is a round one. The sheet, the
+columns, the tapes, the header and the full-bleed task rows stay sharp —
+that join is the idea — and the things that sit *on* the sheet are round
+again: the window, the tab capsules laid on the tab tape, the inputs, the
+notes, the alerts, the segmented switches, the menus, the progress bar,
+and the soft lozenges that mark the current stage and the section in view.
+
+**A corner check worth keeping.** A thick rule along one edge of a rounded
+box bends round its corners. Tape was checked for it with computed styles,
+all cards open and a menu showing, and is clear. Two things the check found
+came from Ribbon and are fixed in Tape: the 3px bar inside a note's left
+edge (Tape draws a plain grey tile instead), and Ribbon's rounded top on the
+Due-soon band, which Tape squares by name.
+
+The design hook's `border-accent-on-rounded` rule is switched off for
+`css/appview-tape.css` alone (`.impeccable/config.json`, with its reason).
+The rule is lexical: it flags any thick top border with a `border-radius`
+nearby without reading the value, and every one of Tape's tapes sets
+`border-radius: 0` right beside its rule. It cannot be ignored per value —
+the hook extracts no value for it — so a file-scoped wildcard is the only
+scope it supports. The cost is that it will not catch a future clash in
+Tape; the computed check above is what does.
+
+### What the screen is
+
+**A window, not a page.** `.ap` is the dimmed board and `.ap-win` is the
+window opened over it — inset, rounded, lifted, with the close control at
+its top right. There is no product nav above it; that belongs to the thing
+underneath. The record band carries the client, the segment, the money, the
+reference and when the deal last moved.
+
+**The pipeline is the navigation.** The left column is one navigator card
+from top to bottom: progress — a bar, a percentage and *Stage 1 of 6* — then
+the stage spine, then the form's own sections. Progress is drawn there and
+nowhere else.
+
+**The middle is a workspace with tabs** — Application form, Document
+library, Activity history — each with its live count, so the two full views
+are a visible choice rather than something to go and find. They take over
+the middle column rather than floating over the screen, and `Esc` returns.
+
+**Tasks to action** sits over it: every task on the deal in three bands by
+date — **Overdue**, **Due soon**, **Your tasks** — soonest first inside
+each, with anything past its date in the first band whoever raised it.
+Every row is the same shape: the tick and the task with its options at the
+top right, the date and whose it is underneath. No action buttons; a task is
+something you tick. The card is capped, *Your tasks* scrolls inside its own
+ceiling so twenty cost the same room as four, and the whole card folds to
+one line — by hand, or on its own as soon as the broker scrolls into the
+form. Folded it still reads *2 overdue · 2 due soon · 8 yours*.
+
+**The alert bar is documents and system warnings**, and nothing else:
+documents waiting on the broker, and warnings about the record (possible
+duplicate, visa expiring, settled lock). Jobs are rows in the task card; a
+job in both places is what turned this strip into a second to-do list.
+
+**The pinned panel**: Notes (internal and external behind two tabs,
+scrolling, no *read more*), Documents, Checklist progress (three preset
+lists behind three tabs, the system ticking what it can see and labelling
+those *auto*, the broker ticking the rest), What's signed, Latest activity.
+Documents and Latest activity carry a **Full view** control in their card
+*header*, where it survives the card folding shut.
+
+**Submission is a real loop.** Five gates — contacted, privacy form,
+documents, signatures, required fields — each answered by something on the
+screen. Tick the blocking tasks, accept the documents, chase the
+signatures, and the button goes from *Submit — 4 to go* to *Submit
+application*. It stays pressable while blocked, because disabling it would
+hide the reason; pressing it lists the gates. Submitting moves the deal to
+**In Progress**.
+
+**The assignment strip** names its roles — Broker, Associate, Partner, Next
+follow-up — and each is a picker. The rosters come from the board's own
+`assigned`, `associate` and `partner` columns, so reassigning hands the deal
+to somebody who exists, and broker and associate exclude each other.
+
+**What is dressing.** The deal, its documents, the stage colours, the
+warnings and the task counts come from `js/data.js`. A residency expiry, a
+booked follow-up and a settlement date have nowhere to live in the model
+yet, so they are `AP_MOCK` at the top of the core — the block to delete when
+the model carries them.
+
+### What it learned
+
+Five rounds of feedback, and the decisions worth keeping a record of:
+
+- **One list of work, not three.** The banner *Not yet contacted*, the
+  blocking action *Call and qualify the enquiry* and the task *Call client*
+  were one job written three times. The warning that is really a job is now
+  a flag on the row that does it; the deal's tasks live in the same bands;
+  the panel's Tasks card has gone.
+- **One pipeline, not two.** An earlier arrangement drew all six stages as
+  a header track *and* down the left spine. The track went.
+- **The task card may not eat the form.** It is capped and folds itself.
+  The workspace is ~610px of the window rather than ~500.
+- **Progress needs a bar.** The stage track was built, not exported: a
+  segmented run where the current step takes the slack so its label always
+  fits, using `MASTER_STAGES` colours so a deal reads the same here as on
+  the board. It survives as the spine's bar and percentage.
+
+And two defects found while measuring, both recorded because the second was
+reported as working before it was:
+
+- **`--space-10` and `--space-14` do not exist.** The scale goes 2, 4, 6, 8,
+  12, 16, 20… An undefined custom property invalidates the whole
+  declaration, so sixteen gaps rendered as `normal` and two paddings as
+  nothing. They are literals now, as the rest of these files already do for
+  off-scale values.
+- **A `scroll` event neither bubbles nor captures.** The section rail's
+  scroll-spy was a capturing listener on the persistent root and never
+  fired. It binds to the scrolling element now and rebinds after every
+  repaint (`apBindScroll`), which is also what lets the task card fold
+  itself. Separately, `scroll-behavior: smooth` on that element made every
+  repaint animate the form from the top back down — which is what folding a
+  band looked like. It is gone; the rail's jump asks for smooth per call.
+
+### Removed
+
+**v1 (a duplicate of the live screen), v2 (broker header and pinned panel)
+and v3 (the action column)** were cut once the fourth was chosen. Their
+files, renderers and styles are deleted; the fourth was renumbered to v1 and
+its `.v4-*` class prefix became `.apv-*`, since there is one layout now.
+Nothing is lost with them — the screen the first of them duplicated is still
+`js/appview.js` and still opens from the work list.
+
+**Workbench**, a dark-chrome skin that briefly sat at v3, was cut after
+review; `css/appview-workbench.css` is deleted, and Pennant and Tape took
+its place as two pushes of Ribbon.
+
+**Ribbon (v2) and Pennant (v3)** were then cut, leaving Panels and Tape.
+`appview-v2.html`, `appview-v3.html` and `css/appview-pennant.css` are
+deleted, and Tape was renumbered from v4 to v2. Ribbon's stylesheet stays —
+see above. Pennant's idea is worth keeping a note of: headings as
+swallowtail flags, grey unless they need doing, and **raised means act on
+it** — the only things casting a hard shadow were the controls you press.
+
+## Kanban x App View V1
+
+The board and the deal, together, for showing the work end to end. Each tab
+is a version of the kanban, and pressing a deal on it opens that deal's
+application view over the board:
+
+| Tab | Board | Opens |
+|---|---|---|
+| **v1** | Kanban v1 · Visual cues | App view v1 · Panels |
+| **v1.2** | Kanban v1.2 · Ribbon | App view v2 · Tape |
+| **v2** | Kanban v2 · Text & colour | App view v1 · Panels |
+| **v2.2** | Kanban v2.2 · Ribbon | App view v2 · Tape |
+
+The plain boards open Panels and the Ribbon boards open Tape, because Tape
+is built on the same Ribbon language — so each pairing is one visual system
+from the board through to the deal.
+
+**Nothing is copied.** Each page is its kanban page exactly — same
+renderer, same stylesheets, same controls — plus `css/kanban-appview.css`
+and `js/kanban-appview.js`, and a one-line `window.KXA = { view, scrim }`
+saying which application view it opens. The application view is the real
+`appview-v1.html` or `appview-v2.html`, so any change to the board or the
+deal shows up here with no second copy to keep in step.
+
+**The deal opens in a frame.** `js/kanban-appview.js` puts a layer over the
+artboard holding an `<iframe>` with `appview-vN.html?deal=APP-2026-0876&embed=1`.
+The frame keeps the two screens from touching: the application view's page
+rules (`.screen`, the box-sizing reset, `html, body`), its globals and its
+`Esc` handler stay in their own document. The layer draws the scrim — a dark
+shade for Panels, a pale frost for Tape, each matching the desk that version
+draws on its own — because only the board's document can see the board to
+dim and blur it.
+
+**How it opens and closes:**
+
+- **Open** — a press anywhere on a card *except* the things on it that
+  already do a job: the select box, the call / SMS / email keys, the Note
+  and Task pills (the sidebar in v1, the floating card in v2), Request docs,
+  the ⋮. Under the pointer a card wears the board's soft grey ring and a
+  pointing hand. The board dims, then the window rises in once its page has
+  loaded, and the card stays outlined in purple behind the scrim. A press
+  that moves becomes a drag instead (see *Moving a deal*, under Kanban view),
+  and the click a browser fires after a drag is swallowed, so finishing one
+  never opens the deal.
+- **Close** — the window's ×; a press on the dimmed board around it; or
+  `Esc`, which peels one layer at a time inside the window (an open menu,
+  then a full view back to the form) and only closes the window once there
+  is nothing else to close. The window asks the board to close it with a
+  `postMessage`; the board only listens to its own frame.
+
+**The application view takes the deal it is given.** `?deal=` picks the
+deal by reference, and the screen's mock detail — applicants, the company,
+notes, signatures, activity, a few task names — passes through `apName()`
+on its way to the page, so it carries the opened client's first and last
+name and their partner. Opening Cielo Escandor shows Cielo Escandor
+throughout, not Maria Josephin under Cielo's header. For Maria's own deal
+every substitution maps a name to itself (all 88 mock strings were
+checked), so `appview.html` renders exactly as before. What is *not*
+personalised is the rest of the dressing: dates of birth, addresses, the
+asset, the figures in the form — the same sample values on every deal.
+
+`?embed=1` turns the page's own ground and scrim transparent and makes
+closing hand control back to the board; without it the page behaves as it
+always has.
+
+**The stage travels both ways.** The window loads its own copy of the data,
+so a card dragged to Approval would otherwise open showing its old stage.
+The board passes the card's stage with `?stage=`, and the window opens at
+it. Going back, the window's close message carries its stage: if it changed
+while the window was open (the stage menu, or submitting, which moves the
+deal to In Progress) the card moves to match as the window closes, and
+pulses in its new column. Opening a deal and closing it with no change
+moves nothing, so a new lead looked at and put down stays a new lead.
 
 ## Kanban view
 
@@ -451,6 +723,56 @@ The button is wired by delegation from the screen rather than bound to
 itself, because v1 repaints its whole toolbar whenever a view, filter or sort
 changes. `Esc` or a click anywhere outside closes.
 
+#### Moving a deal
+
+**Drag a card to another column to change its stage.** In every version, and
+on the Kanban x App View pages too, since they are the same board.
+
+- **Where it can go** — any stage column, or Snoozed. Not New lead: that is
+  the arrivals tray the system fills, not a stage a deal is sent back to,
+  and the column greys out under a card that cannot land there. Dropping a
+  card on the column it came from does nothing.
+- **What moving does** — to a stage: the deal takes that stage, its day
+  count restarts at 1 and its sub-stage becomes the stage's entry label
+  (*Docs requested*, *Sent to lender*…), from `KB_STAGE_ENTRY`. To Snoozed:
+  parked for a week from the board's today. Out of Snoozed: un-parked. Any
+  move marks the deal `contacted`, which is what lets a lead dragged out of
+  New lead stop shouting *call now* — `kbState` checks it. The change is
+  to the in-memory deal and lasts until the page reloads.
+- **How it feels** — a press only becomes a drag after six pixels, so a
+  click is still a click. The card itself lifts and tilts under the pointer,
+  in its own skin; the gap it left fades; the column it would land in is
+  outlined in dashed purple. Near either edge the board scrolls itself, so
+  the far columns can be reached without letting go. On release the board
+  repaints, scrolls the moved card into view and pulses it once — a card
+  can land in a column off the edge of the screen, especially once the
+  board has scrolled itself mid-drag, and a move you cannot see reads as
+  the card having vanished. `Esc`, or letting go over the column it came
+  from, puts it back.
+- **What still works** — the things on a card that already do a job are
+  never the start of a drag: the select box, the call / SMS / email keys,
+  the Note and Task pills, Request docs, the ⋮.
+
+Pointer events rather than the browser's own drag and drop, so what follows
+the pointer is the card in its skin rather than a faded screenshot of it.
+The dragged card's position, and the fade on the gap it left, are set
+**inline**, and the drag styles lead with `.screen`: a skin restyles cards
+and columns at higher specificity than a one-class rule, and on the Ribbon
+boards `.skin-ribbon .kb-c { position: relative }` once won over
+`.kb-ghost { position: fixed }` and dropped the dragged card into the page
+below the board.
+The drag is wired once on the board element, which survives every repaint;
+`kbMoveDeal()` does the move and anything else that moves a deal asks for
+the same repaint with a `kb:repaint` event.
+
+**Every card says it can be picked up.** Under the pointer a card wears a
+soft grey ring just inside its edge (inside, so the column's own scrolling
+never clips it) and the pointer becomes a hand that grabs. A call-now card
+keeps its red ring. **The buttons along a card's foot** — Note, Task,
+Request docs, ⋮ — take a grey fill, a firmer edge and darker type on
+hover; Ribbon restates the hover because it sets the button's ground at the
+same weight as the base.
+
 #### Removed
 
 - **The first board card** — the one from the `Draft #2 - 1440 px` frame, with
@@ -649,6 +971,11 @@ starting point for a different screen. It is a copy rather than a second
 skin, because the two are meant to diverge: the `av` prefix was renamed to
 `s2` throughout, so `js/screen2.js` and `css/screen2.css` can be reshaped
 freely without any of it reaching the screen a deal opens into.
+
+`appview.html` holds **a second duplicate of the same screen**, and the two
+are for different things: that one is the application view being reworked as
+itself, this one is the application view being turned into a different
+screen. They were taken from the same original and diverge from there.
 
 It still shares what is genuinely common — `css/tokens.css`, the icon sprite
 in `js/icons.js`, and the deal data in `js/data.js`.

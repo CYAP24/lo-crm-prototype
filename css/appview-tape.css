@@ -1,0 +1,304 @@
+/* ==========================================================================
+   Application view — v2 · Tape
+   --------------------------------------------------------------------------
+   Ribbon, pushed toward structure. Loaded after
+   css/appview-ribbon.css on a `.screen` carrying both `.skin-ribbon` and
+   `.skin-tape`, so it keeps Ribbon's small caps, tabular figures and ruled
+   rows, and takes the ribbon somewhere Ribbon itself never went: **it
+   stops being an object and becomes the structure.**
+
+     - the cards dissolve. Each column is one continuous white sheet, ruled
+       from the next by a single hairline, and nothing floats on anything
+     - every section is announced by a length of tape laid edge to edge
+       across its column: a tinted band with a 3px rule along its top edge
+       in the section's key colour. Ribbon's ribbons sat *inside* a card;
+       here the tape *is* the division between one thing and the next
+     - figures go large. Counts are set at 18px in tabular numerals at the
+       right-hand end of each tape, so the panel reads down as a column of
+       numbers before a word of it is read
+     - the client's name and the money go up to a display size, under a
+       strip of brand tape across the top of the window
+     - the desk goes light, because this is a sheet of paper on a table and
+       not a window in the dark
+
+   Quiet colour, loud scale. Tape spends almost no colour on structure and
+   lets size and rule do the ranking.
+
+   **Square is structure, round is everything else.** The first draft
+   squared every corner on the screen, and the brand is a round one. So the
+   sheet, its columns, the tapes and the header keep their sharp edges —
+   that is the join the idea is about — and everything that sits *on* the
+   sheet gets the system's roundness back: the window, the tabs, the inputs,
+   the notes, the chips, the alerts, the menus, the meters and the markers
+   for where you are. A tape is laid flat; the things on it are objects.
+   ========================================================================== */
+
+/* ---------- The table and the sheet ------------------------------------------ */
+
+.skin-tape .ap { background: var(--neutral-300); }
+.skin-tape .ap-win {
+  border-radius: var(--radius-12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .08), 0 12px 40px rgba(0, 0, 0, .14);
+}
+
+/* One sheet: no gutters, no padding, columns ruled rather than separated. */
+.skin-tape .apv-body {
+  gap: 0;
+  padding: 0;
+}
+.skin-tape .apv-side,
+.skin-tape .apv-main { border-right: 1px solid var(--border-default); }
+.skin-tape .apv-main { gap: 0; }
+.skin-tape .ap-panel { gap: 0; padding: 0; }
+
+/* Every container gives up its box. */
+.skin-tape .apv-card,
+.skin-tape .ap-next,
+.skin-tape .ap-ws,
+.skin-tape .ap-card,
+.skin-tape .ap-sec {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* ---------- The tape ------------------------------------------------------------
+   One shape for every heading: full width, square, tinted, a 3px rule along
+   the top. The rule is the mark that Ribbon's capsule was, so the capsule
+   goes. */
+
+.skin-tape .ap-next__head::before,
+.skin-tape .ap-band__head::before,
+.skin-tape .ap-card__head::before,
+.skin-tape .apv-card__title::before { display: none; }
+
+.skin-tape .ap-card .ap-card__head,
+.skin-tape .ap-next .ap-next__head,
+.skin-tape .ap-next .ap-band__head,
+.skin-tape .apv-card__title,
+.skin-tape .ap-sec__head {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  border-top: 3px solid var(--tp-rule, var(--neutral-900));
+  background: var(--tp-tint, var(--bg-surface));
+}
+
+/* Big figures at the end of the tape. 18px rather than the first draft's
+   22: still a clear step up from the 13px label beside them, which is what
+   makes them stand out, without shouting over the headings they belong to. */
+.skin-tape .ap-card__count,
+.skin-tape .ap-band__count {
+  min-width: 0;
+  padding: 0;
+  background: none;
+  font: var(--weight-demi) 18px/22px var(--font-family);
+  letter-spacing: -.02em;
+  color: var(--text-primary);
+}
+.skin-tape .ap-card__count.is-error { background: none; color: var(--error-base); }
+.skin-tape .ap-card__count.is-warn  { background: none; color: var(--warning-text); }
+
+/* ---------- Header ---------------------------------------------------------------
+   A strip of brand tape across the top of the sheet, then the deal at
+   display size. */
+
+.skin-tape .apv-head { border-top: 6px solid var(--brand-600); }
+.skin-tape .apv-head__top { height: 104px; }
+.skin-tape .ap-who__name {
+  font-size: 34px;
+  line-height: 38px;
+  letter-spacing: -.03em;
+}
+.skin-tape .ap-money { border-left: 1px solid var(--border-default); padding-left: var(--space-24); }
+.skin-tape .ap-money__n {
+  font-size: 34px;
+  line-height: 38px;
+  letter-spacing: -.03em;
+}
+.skin-tape .apv-head__foot { background: var(--bg-surface); }
+
+/* Warnings are short lengths of tape, square, with their tone along the
+   top rather than as a fill. */
+.skin-tape .ap-warn {
+  border-radius: var(--radius-10);
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+/* An alert is an object on the sheet, not a division of it, so it is a
+   rounded lozenge in its tint. Its tone is its fill and its icon, not a
+   rule — a rule along a rounded top would bend at the corners. */
+.skin-tape .ap-warn.is-error  { background: var(--error-bg);   color: var(--error-text); }
+.skin-tape .ap-warn.is-warn   { background: var(--warning-bg); color: var(--warning-text); }
+.skin-tape .ap-warn.is-dark   { background: var(--bg-muted);   color: var(--text-primary); }
+.skin-tape .ap-warn.is-locked { background: var(--bg-muted);   color: var(--text-primary); }
+.skin-tape .ap-warn.is-error svg { color: var(--error-base); }
+.skin-tape .ap-warn.is-warn svg  { color: var(--warning-base); }
+.skin-tape .ap-warn__act { background: rgba(0, 0, 0, .07); }
+
+/* ---------- Navigator --------------------------------------------------------------
+   The column is the sheet's left margin: its two headings are tapes across
+   it, and what sits under them is set in from the edge. */
+
+.skin-tape .apv-card { padding: 0; gap: 0; }
+.skin-tape .apv-card__title {
+  align-self: stretch;
+  display: block;
+  padding: 10px 20px;
+  font-size: 10px;
+  color: var(--text-primary);
+  --tp-rule: var(--brand-600);
+  --tp-tint: var(--brand-50);
+}
+.skin-tape .apv-prog { padding: 0 0 var(--space-12); gap: var(--space-6); }
+.skin-tape .apv-prog > :not(.apv-card__title) { margin: 0 20px; }
+.skin-tape .apv-prog > .apv-prog__line { margin-top: var(--space-12); }
+.skin-tape .apv-prog__pct { font: var(--weight-demi) 18px/22px var(--font-family); letter-spacing: -.02em; color: var(--text-primary); }
+.skin-tape .apv-prog__meter { height: 6px; border-radius: var(--radius-pill); }
+.skin-tape .apv-prog__fill  { border-radius: var(--radius-pill); }
+.skin-tape .apv-card__group { margin: 0; padding: 0; border-top: 0; }
+
+/* Where the deal is and where the form is. These are markers, so they are
+   round: a soft lozenge set 12px in from the column's edge, inside the
+   sheet rather than cut into it. The spine's node keeps the stage colour,
+   which is the stage's own mark; the lozenge only says *you are here*. */
+.skin-tape .ap-spine { padding: var(--space-6) 0 var(--space-12); }
+.skin-tape .ap-spine__step { margin: 0 12px; padding-left: 8px; border-radius: var(--radius-10); }
+.skin-tape .ap-spine__step::before { left: 16px; }
+.skin-tape .ap-spine__step.is-now {
+  background: var(--bg-surface);
+  box-shadow: none;
+  color: var(--text-primary);
+}
+.skin-tape .ap-rail { padding: var(--space-6) 0; }
+.skin-tape .ap-rail__item { margin: 0 12px; padding-left: 8px; padding-right: 8px; border-radius: var(--radius-10); }
+.skin-tape .ap-rail__item.is-on {
+  background: var(--brand-50);
+  box-shadow: none;
+  color: var(--text-brand);
+}
+
+/* ---------- Tasks to action ------------------------------------------------------
+   The card's own tape is ink. Each band's tape is its tone, quiet in the
+   tint and loud only in the rule and the figure, so *late* is a red rule
+   and a large red 2 rather than a red block. */
+
+.skin-tape .ap-next .ap-next__head {
+  height: 44px;
+  padding: 0 20px;
+  --tp-rule: var(--neutral-900);
+  --tp-tint: var(--bg-surface);
+}
+.skin-tape .ap-next .ap-next__head:hover { background: var(--bg-muted); }
+
+.skin-tape .ap-next .ap-band__head { padding: 8px 20px 8px; }
+.skin-tape .ap-next .ap-band.is-error .ap-band__head {
+  --tp-rule: var(--error-base);
+  --tp-tint: var(--error-bg);
+  background: var(--error-bg);
+  padding: 8px 20px;
+}
+.skin-tape .ap-next .ap-band.is-error .ap-band__label,
+.skin-tape .ap-next .ap-band.is-error .ap-band__chev { color: var(--error-text); }
+.skin-tape .ap-next .ap-band.is-error .ap-band__count { background: none; color: var(--error-base); }
+/* Ribbon rounds this band's top corners at four classes of specificity,
+   which beats the three the shared tape rule carries, so the radius has to
+   be taken off here by name or the 3px rule bends round the corner. */
+.skin-tape .ap-next .ap-band.is-warn .ap-band__head {
+  --tp-rule: var(--warning-base);
+  --tp-tint: var(--warning-bg);
+  background: var(--warning-bg);
+  border-bottom: 0;
+  border-radius: 0;
+}
+.skin-tape .ap-next .ap-band.is-warn .ap-band__count { color: var(--warning-text); }
+.skin-tape .ap-next .ap-band.is-calm .ap-band__head {
+  --tp-rule: var(--neutral-400);
+  --tp-tint: var(--bg-surface);
+  background: var(--bg-surface);
+}
+.skin-tape .ap-next .ap-band.is-calm .ap-band__count { color: var(--text-secondary); }
+
+/* Jobs run edge to edge under their tape, ruled. */
+.skin-tape .ap-band__body { padding: 0; gap: 0; }
+.skin-tape .ap-todo { padding: 10px 20px; border-radius: 0; }
+.skin-tape .ap-todo.is-task { box-shadow: inset 4px 0 0 var(--neutral-300); }
+.skin-tape .ap-next__foot { border-top: 1px solid var(--border-default); padding: 8px 20px; }
+.skin-tape .ap-next--wide .ap-band { border-right: 1px solid var(--border-default); }
+
+/* ---------- The tab bar ------------------------------------------------------------
+   The bar is a length of tape, edge to edge and square. The tabs are round
+   capsules laid on it: the live one white, lifted a hairline off the tape
+   and set in brand, the others quiet until they are hovered. */
+
+.skin-tape .ap-tabs {
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-16);
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+}
+.skin-tape .ap-tab {
+  padding: var(--space-6) var(--space-16);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--text-tertiary);
+}
+.skin-tape .ap-tab:hover { background: var(--bg-base); }
+.skin-tape .ap-tab.is-on {
+  background: var(--bg-base);
+  border-color: var(--border-default);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+  color: var(--text-brand);
+}
+.skin-tape .ap-tab.is-on svg { color: var(--text-brand); }
+.skin-tape .ap-tab__n,
+.skin-tape .ap-tab.is-on .ap-tab__n {
+  padding: 0 0 0 var(--space-4);
+  background: none;
+  font: var(--weight-demi) 15px/18px var(--font-family);
+  color: var(--text-tertiary);
+}
+.skin-tape .ap-tab.is-on .ap-tab__n { color: var(--text-brand); }
+
+/* The form is the same ledger: sections divided by tape, not boxed. */
+.skin-tape .ap-ws__body.is-form { padding: 0; gap: 0; }
+.skin-tape .ap-sec__head {
+  padding: 12px 24px;
+  --tp-rule: var(--neutral-900);
+  --tp-tint: var(--bg-surface);
+}
+.skin-tape .ap-sec__body { padding: 20px 24px 28px; }
+.skin-tape .ap-sec.is-skipped .ap-sec__head { border-radius: 0; }
+.skin-tape .ap-sec__skip { padding: 14px 24px 20px; }
+.skin-tape .ap-ws__end { padding: 24px; border-radius: 0; border-top: 3px solid var(--neutral-900); }
+.skin-tape .ap-ws__body.is-view { padding: 0 24px 24px; }
+
+/* ---------- Pinned panel ----------------------------------------------------------------
+   The right margin of the sheet. Each card is a tape and what is under it,
+   with no gap between one and the next: folded, the panel is an index of
+   five tapes, each ending in its figure. */
+
+.skin-tape .ap-card .ap-card__head {
+  padding: 12px 20px;
+  --tp-rule: var(--brand-600);
+  --tp-tint: var(--brand-50);
+}
+.skin-tape .ap-card .ap-card__head:hover { background: var(--brand-100); }
+.skin-tape .ap-card__title { color: var(--text-primary); }
+.skin-tape .ap-card__body { padding: 14px 20px 20px; }
+.skin-tape .ap-card__open { background: var(--bg-base); }
+
+/* Everything inside a card keeps the system's roundness — notes, document
+   cards, the Internal/External and checklist switches (Ribbon's segmented
+   capsules), inputs and meters. Tape does not restyle them at all; the
+   only thing it changes is that it no longer squares them. */
+.skin-tape .ap-meter { height: 6px; }
+/* Ribbon marks a note with a 3px bar inside its left edge. On a rounded
+   note that bar bends round both corners, so here the note is a plain
+   rounded tile on the sheet's own grey instead. */
+.skin-tape .ap-note { box-shadow: none; background: var(--bg-surface); }
+
+/* Menus and the submit panel are objects that float over the sheet, so
+   they keep Ribbon's rounded panel and its shadow. */

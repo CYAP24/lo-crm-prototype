@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kanban x App View V1 — kanban v1 · Visual cues → app view v1 · Panels</title>
+<meta name="viewport" content="width=1920">
+<link rel="stylesheet" href="css/tokens.css?v=bc20d396">
+<link rel="stylesheet" href="css/worklist.css?v=e4b809a5">
+<!-- variants.css and variants.js come along for the quick actions panel
+     only: its .dp-* styles and its panelTasks / panelNotes renderers.
+     window.VARIANT is unset here, so the work-list renderer never runs. -->
+<link rel="stylesheet" href="css/variants.css?v=6dbde3bb">
+<link rel="stylesheet" href="css/kanban.css?v=df03c284">
+<link rel="stylesheet" href="css/kanban-appview.css?v=c4db4016">
+<script>window.KXA = { view: 'appview-v1.html', scrim: 'dark' };</script>
+<script>window.KB_VARIANT = 'v1';</script>
+<script src="js/icons.js?v=14bdc486" defer></script>
+<script src="js/data.js?v=5e67169f" defer></script>
+<script src="js/variants.js?v=849d918f" defer></script>
+<script src="js/popups.js?v=2606b5e5" defer></script>
+<script src="js/kanban.js?v=776342ef" defer></script>
+<script src="js/kanban-appview.js?v=9d960c8b" defer></script>
+</head>
+<body>
+<!-- Kanban x App View V1 — kanban v1 · Visual cues, opening app view v1 · Panels.
+     The board is kanban-v1.html exactly: same renderer, same styles, same
+     controls. css/kanban-appview.css and js/kanban-appview.js add one
+     thing on top — press a deal and appview-v1.html opens over the board with
+     that deal in it. -->
+<div class="screen" id="app"></div>
+</body>
+</html>

@@ -207,6 +207,36 @@ const ICON_SPRITE = `
   <symbol id="i-sort" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4.4 2.8v10.4M2.2 11l2.2 2.2L6.6 11M11.6 13.2V2.8M9.4 5l2.2-2.2L13.8 5"/>
   </symbol>
+  <!-- Added for the application view's v2: the document, entity and
+       contact controls it puts on the screen had no glyph in the set.
+       Same 16x16 box and 1.3 stroke as the rest, so they sit with them. -->
+  <symbol id="i-lock" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3.2" y="6.9" width="9.6" height="6.7" rx="1.8"/><path d="M5.7 6.9V5.1a2.3 2.3 0 0 1 4.6 0v1.8"/>
+  </symbol>
+  <symbol id="i-copy" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6" y="6" width="7.6" height="7.6" rx="1.8"/><path d="M10 6V4.4a2 2 0 0 0-2-2H4.4a2 2 0 0 0-2 2V8a2 2 0 0 0 2 2H6"/>
+  </symbol>
+  <symbol id="i-upload" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 10.6v-8"/><path d="m4.9 5.7 3.1-3.1 3.1 3.1"/><path d="M2.6 10.6V12a1.6 1.6 0 0 0 1.6 1.6h7.6A1.6 1.6 0 0 0 13.4 12v-1.4"/>
+  </symbol>
+  <symbol id="i-download" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2.6v8"/><path d="m4.9 7.5 3.1 3.1 3.1-3.1"/><path d="M2.6 10.6V12a1.6 1.6 0 0 0 1.6 1.6h7.6A1.6 1.6 0 0 0 13.4 12v-1.4"/>
+  </symbol>
+  <symbol id="i-eye" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1.7 8S4 4 8 4s6.3 4 6.3 4-2.3 4-6.3 4-6.3-4-6.3-4Z"/><circle cx="8" cy="8" r="1.8"/>
+  </symbol>
+  <symbol id="i-trash" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.8 4.3h10.4"/><path d="M6.3 4.3V3.2A1.2 1.2 0 0 1 7.5 2h1a1.2 1.2 0 0 1 1.2 1.2v1.1"/>
+    <path d="m4.3 4.3.5 8.1a1.3 1.3 0 0 0 1.3 1.2h3.8a1.3 1.3 0 0 0 1.3-1.2l.5-8.1"/>
+  </symbol>
+  <symbol id="i-signature" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.9 2.7a1.6 1.6 0 0 0-2.3 0L4.4 8.9l-.7 3 3-.7 6.2-6.2a1.6 1.6 0 0 0 0-2.3Z"/><path d="M2.4 14.2h11.2"/>
+  </symbol>
+  <symbol id="i-building" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="2.5" width="10" height="11.1" rx="1.6"/>
+    <path d="M5.9 5.5h1.1M9 5.5h1.1M5.9 8.1h1.1M9 8.1h1.1"/><path d="M6.6 13.6v-2.3h2.8v2.3"/>
+  </symbol>
+
   <!-- Broker Assist. Two-stop gradient rather than a flat fill, so this one
        ignores currentColor - exported from CRM-2026. -->
   <symbol id="i-assist" viewBox="0 0 14 14">
